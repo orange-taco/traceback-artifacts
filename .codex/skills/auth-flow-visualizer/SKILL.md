@@ -12,13 +12,13 @@ future domains without reducing the explanation to a table or a prose-only page.
 ## Workflow
 
 - The canonical guides and this skill live in `orange-taco/traceback-artifacts`,
-  separate from the TRACEBACK backend. Inspect `orange-taco/traceback` at a
-  known revision before asserting current implementation or deployment state.
-  In Codex Cloud, attach both repositories to the same environment. The iPad
-  itself does not need to clone either repository. If the backend repository
-  is unavailable in the task, mark implementation claims unverified instead
-  of guessing.
-- Link backend files to their GitHub URL and checked revision. Do not use
+  separate from the TRACEBACK backend and frontend. Inspect
+  `orange-taco/traceback` or `orange-taco/traceback-client`, as appropriate,
+  at a known revision before asserting current implementation or deployment state.
+  In Codex Cloud, attach all three repositories to the same environment. The
+  iPad itself does not need to clone them. If a relevant source repository is
+  unavailable in the task, mark implementation claims unverified instead of guessing.
+- Link source files to their GitHub URL and checked revision. Do not use
   relative paths that escape this documentation repository: the published
   site cannot resolve them.
 - Create or update HTML artifacts under `docs/artifact/` in the repository.
