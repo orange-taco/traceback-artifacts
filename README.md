@@ -16,8 +16,9 @@ TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관�
 보관하지 않습니다.
 
 iPad에서 문서를 읽는 데 로컬 clone이나 `git pull`은 필요하지 않습니다.
-Codex Cloud로 수정할 때는 이 문서 저장소, 백엔드 저장소, 프런트 저장소를
-같은 Cloud 환경의 GitHub 저장소로 등록합니다. Codex가 세 저장소를 읽고,
+Codex Cloud로 수정할 때는 게시된 개인 환경 `TRACEBACK Study (3 repos)`를
+선택합니다. 이 환경에는 문서 저장소, 백엔드 저장소, 프런트 저장소가
+GitHub 저장소로 연결되어 있습니다. Codex가 세 저장소를 읽고,
 문서 변경은 이 저장소에만 제출합니다. 연결되지 않은 저장소를
 Codex가 자동으로 볼 수 있다고 가정하지 않습니다.
 
@@ -42,6 +43,8 @@ HTML은 브라우저에서 `docs/artifact/index.html`로 열 수 있습니다. `
 1. 설명 대상에 따라 `orange-taco/traceback`과
    `orange-taco/traceback-client`의 대상 브랜치와 파일을 확인합니다.
    Cloud 환경에 세 저장소를 연결하면 iPad에 clone을 둘 필요가 없습니다.
+   두 코드 저장소의 기본 브랜치는 `main`이므로, 개발 중인 내용은
+   `development` 또는 대상 PR 브랜치를 명시해 확인합니다.
 2. 문서 작성 스킬에 따라 HTML·이미지와 링크를 수정합니다.
 3. `python3 scripts/verify_site.py`로 상대 링크를 확인합니다.
 4. 문서 저장소의 PR에서 변경을 검토한 뒤 `main`으로 병합해 게시합니다.

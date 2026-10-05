@@ -12,6 +12,8 @@ Before changing a guide:
    current TRACEBACK code or deployed state.
 3. For current-code claims, inspect `orange-taco/traceback` or
    `orange-taco/traceback-client` at an identifiable revision, as appropriate.
+   Their default branches are `main`; use `development` or the named PR branch
+   when documenting work that has not reached `main`.
    In Codex Cloud, attach both source repositories and this artifact repository
    to the same environment; do not assume the reader's iPad has a local checkout.
    If the relevant source is unavailable, say so and avoid asserting that code
