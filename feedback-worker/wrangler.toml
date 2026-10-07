@@ -1,0 +1,10 @@
+name = "traceback-feedback"
+main = "src/index.js"
+compatibility_date = "2026-10-07"
+workers_dev = true
+
+[vars]
+GITHUB_OWNER = "oscar2272"
+FEEDBACK_REPO = "traceback-feedback"
+ALLOWED_GITHUB_USER_ID = "88140361"
+PUBLIC_SITE_ORIGIN = "https://orange-taco.github.io"
