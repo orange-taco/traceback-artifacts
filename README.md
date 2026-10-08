@@ -3,6 +3,7 @@
 TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관리합니다.
 
 - 문서 시작: [`docs/artifact/index.html`](docs/artifact/index.html)
+- 프로젝트 설정 기록: [`docs/artifact/artifact-feedback-operations.html`](docs/artifact/artifact-feedback-operations.html)
 - iPad 읽기 주소: [TRACEBACK 학습 목차](https://orange-taco.github.io/traceback-artifacts/)
 - 문서 작성 기준: [`.codex/skills/auth-flow-visualizer/SKILL.md`](.codex/skills/auth-flow-visualizer/SKILL.md)
 - 설명의 근거가 되는 백엔드 코드: [`orange-taco/traceback`](https://github.com/orange-taco/traceback)
@@ -16,24 +17,23 @@ TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관�
 보관하지 않습니다.
 
 iPad에서 문서를 읽는 데 로컬 clone이나 `git pull`은 필요하지 않습니다.
-Codex Cloud로 수정할 때는 게시된 개인 환경 `TRACEBACK Study (3 repos)`를
-선택합니다. 현재 이 환경에는 문서 저장소, 백엔드 저장소, 프런트 저장소가
-GitHub 저장소로 연결되어 있습니다. 비공개 의견 저장소를 만들었다면
-그 저장소도 환경에 추가하고 재게시해야 Codex Cloud에서 의견 파일을 읽을 수
-있습니다. 연결되지 않은 저장소를 Codex가 자동으로 볼 수 있다고 가정하지
-않습니다.
+Codex Cloud로 수정할 때는 개인 환경 `TRACEBACK Study (4 repos)`를
+선택합니다. 문서·백엔드·프런트 저장소와 비공개 의견 저장소가 이 환경의
+목록에 있어야 의견 파일을 읽을 수 있습니다. 환경을 편집했다면 재게시하고
+새 Cloud 작업에서 파일 접근을 확인합니다. 연결되지 않은 저장소를 Codex가
+자동으로 볼 수 있다고 가정하지 않습니다.
 
-GitHub Pages는 계속 공개 읽기 사이트입니다. 의견 UI와 저장 서버의 코드는
-이 저장소에 준비되어 있지만, 별도 GitHub App·Cloudflare Worker·비공개
-저장소를 설정하고 Pages를 다시 게시하기 전에는 의견 버튼이 나타나지
-않습니다. iPad에서 의견을 저장해도 Codex 작업이나 문서 수정은 시작되지
-않습니다. 수정할 때는 본인이 Codex Cloud에서 별도 작업을 시작하고 문서
-PR을 검토합니다.
+GitHub Pages는 계속 공개 읽기 사이트입니다. 별도 GitHub App·Cloudflare
+Worker·비공개 저장소를 연결했고, 공개 문서의 의견 버튼에서 실제 비공개
+저장까지 확인했습니다(2026-10-08). iPad에서 의견을 저장해도 Codex 작업이나
+문서 수정은 시작되지 않습니다. 수정할 때는 본인이 Codex Cloud에서 별도
+작업을 시작하고 문서 PR을 검토합니다.
 
 ## iPad 의견 저장
 
-구성 및 배포 절차는 [`feedback-worker/README.md`](feedback-worker/README.md)에
-있습니다. 공개 문서에서 **의견 남기기**를 누르면 작성 화면으로 이동합니다.
+전체 설정의 순서·이유·화면은 [운영 가이드](docs/artifact/artifact-feedback-operations.html),
+명령과 API는 [`feedback-worker/README.md`](feedback-worker/README.md)에 있습니다.
+공개 문서에서 **의견 남기기**를 누르면 작성 화면으로 이동합니다.
 문구 선택은 필요하지 않습니다. 위치를 자유롭게 적고, 문서 전체의 맥락에
 대한 의견도 남길 수 있습니다. 저장되는 JSON에는 문서 URL, 절 ID(있으면),
 선택 문구(null), 위치 설명, 의견, 게시 revision, 작성 시각과 GitHub 작성자
