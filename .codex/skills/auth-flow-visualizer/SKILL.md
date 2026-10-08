@@ -112,8 +112,11 @@ diagrams and explicit verification status. Keep the existing long guides as
 linked concept and implementation references: `traceback-system-guide.html`,
 `1-aws-ssm-ssh-learning-guide.html`, `2-dev-server-first-deployment.html`,
 `3-development-ip-domain-guide.html`, and `4-dns-resolution-map.html`. Preserve
-their existing URLs and fragment IDs. Do not move basic teaching material back
-into the five short pages.
+their existing URLs and fragment IDs. Use `concept-access.html`,
+`concept-deploy.html`, `concept-address.html`, `concept-dns.html`,
+`concept-auth.html`, and `concept-email.html` for short, topic-specific
+explanations between the five project maps and the long references. Do not move
+basic teaching material back into the five short pages.
 
 The index also links the authentication study path:
 `auth-session-allauth-guide.html` compares session/token, account-flow tools,

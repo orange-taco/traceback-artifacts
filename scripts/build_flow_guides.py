@@ -118,6 +118,88 @@ PAGES = [
 ]
 
 
+CONCEPTS = [
+    {
+        "file": "concept-access.html",
+        "title": "서버 접속에는 신원, 권한, 네트워크 길이 모두 필요합니다",
+        "lead": "원격 컴퓨터에 들어가는 문제를 세 질문으로 나눕니다. 나는 누구인지, 그 컴퓨터에 접속해도 되는지, 실제 통신할 길이 있는지입니다.",
+        "nodes": [("사람", "로그인", "AWS Identity Center 등", "client"), ("허용", "IAM 권한", "대상·행동 제한", "aws"), ("길", "네트워크 경로", "인터넷·VPC endpoint", "api"), ("대상", "EC2의 Agent/셸", "명령을 실행할 컴퓨터", "data")],
+        "facts": [
+            ("SSH와 SSM", "SSH는 사용자의 컴퓨터가 서버의 SSH 포트로 새 연결을 엽니다. SSM Session Manager는 EC2의 Agent가 AWS 서비스와 통신해 세션을 엽니다. 어느 방식을 택하느냐에 따라 필요한 인바운드 규칙과 접속 도구가 달라집니다."),
+            ("IAM과 보안 그룹", "IAM은 AWS API 작업의 허용 범위를, EC2 보안 그룹은 네트워크 연결의 허용 범위를 정합니다. 둘 중 하나만 맞아도 접속이 되는 것은 아닙니다."),
+            ("TRACEBACK에서", "개발 EC2 접속은 SSM 경로를 사용하도록 준비했습니다. 과거 관찰 상태와 실제 명령은 상세 문서에 기록되어 있으며, 접속 시 현재 AWS 상태를 다시 확인합니다."),
+        ],
+        "flow": "flow-2-access.html", "deep": "1-aws-ssm-ssh-learning-guide.html",
+        "deep_label": "VPC·Identity Center·SSH/SSM·실제 명령 상세",
+    },
+    {
+        "file": "concept-deploy.html",
+        "title": "배포는 코드를 검증하고 실행할 이미지로 전달하는 과정입니다",
+        "lead": "GitHub에 코드가 있다는 사실과 서버에서 새 앱이 동작한다는 사실 사이에는 여러 독립 단계가 있습니다.",
+        "nodes": [("원본", "Git commit", "변경의 고정된 기록", "client"), ("검증", "CI", "품질·테스트", "front"), ("전달", "컨테이너 이미지", "registry에 저장", "aws"), ("실행", "서버·DB", "설정·migration·health", "api")],
+        "facts": [
+            ("CI와 CD", "CI는 변경을 검사합니다. CD는 검증된 결과물을 대상 환경에 배포합니다. CI가 통과해도 네트워크와 실제 고객 요청이 정상이라는 뜻은 아닙니다."),
+            ("이미지와 digest", "컨테이너 이미지는 실행할 코드와 의존성을 묶습니다. digest는 특정 이미지 내용을 가리켜 개발에서 검사한 결과물을 운영에 그대로 옮기는 데 쓰입니다."),
+            ("TRACEBACK에서", "백엔드 development workflow는 Actions 검증 뒤 ECR 이미지와 SSM 명령으로 개발 EC2에 전달하도록 정의되어 있습니다. 실제 AWS 배포 성공은 실행 로그와 외부 요청으로 별도 확인합니다."),
+        ],
+        "flow": "flow-3-deploy.html", "deep": "2-dev-server-first-deployment.html",
+        "deep_label": "OIDC·ECR·EC2·RDS·환경변수·첫 배포 상세",
+    },
+    {
+        "file": "concept-address.html",
+        "title": "도메인은 이름이고, IP는 연결할 주소입니다",
+        "lead": "등록한 도메인을 실제 서버에 연결하려면 DNS가 그 이름의 목적지 IP를 알려주어야 합니다. IP가 바뀌는지 여부도 운영 선택입니다.",
+        "nodes": [("이름 사용권", "도메인 등록", "갱신·소유", "client"), ("답 관리", "권한 DNS", "A 레코드 등", "aws"), ("네트워크 주소", "공인 IP", "서버로 연결", "api"), ("프로그램", "웹 서버", "요청 처리", "data")],
+        "facts": [
+            ("등록과 DNS 관리", "도메인 등록업체는 이름의 사용권을, 권한 DNS 제공업체는 이름에 대한 답을 관리합니다. 같은 회사일 수도 있고 서로 달라도 됩니다."),
+            ("유동 IP와 고정 IP", "기본 공인 IP는 EC2 재시작 뒤 달라질 수 있습니다. AWS Elastic IP는 할당을 유지해 DNS 갱신 부담을 줄이지만 주소 보유 비용이 계속될 수 있습니다."),
+            ("TRACEBACK에서", "이전 관찰에는 Route 53의 api.dev-traceback.com A 레코드가 개발 EC2의 Elastic IP를 가리켰습니다. 이름의 답과 HTTPS 서버 동작은 별도로 확인해야 합니다."),
+        ],
+        "flow": "flow-4-address.html", "deep": "3-development-ip-domain-guide.html",
+        "deep_label": "IP·도메인·EIP의 프로젝트 값과 비용 상세",
+    },
+    {
+        "file": "concept-dns.html",
+        "title": "DNS는 웹페이지를 보내지 않고 주소를 알려줍니다",
+        "lead": "도메인으로 웹사이트를 열 때 이름 찾기와 웹 연결은 순서가 이어지지만 서로 다른 통신입니다.",
+        "nodes": [("질문", "브라우저/서버", "도메인의 IP 요청", "client"), ("찾기", "recursive resolver", "캐시·위임 추적", "front"), ("답", "권한 DNS", "A 레코드 등", "aws"), ("접속", "IP → TLS → HTTP", "웹 서버와 통신", "api")],
+        "facts": [
+            ("resolver와 권한 DNS", "resolver는 사용자를 대신해 답을 찾고 잠시 캐시합니다. 권한 DNS는 해당 도메인의 레코드에 대한 답을 관리합니다."),
+            ("DNS 다음", "IP를 받은 요청자는 그 주소에 새 TCP/TLS 연결을 시도합니다. DNS 성공만으로 인증서, 웹 서버, API, DB가 동작한다고 판단할 수 없습니다."),
+            ("TRACEBACK에서", "이전 관찰에는 API 도메인의 A 레코드는 응답했으나 외부 HTTPS 요청은 실패했습니다. 그래서 도메인 조회와 443/TLS/API 경로를 별도로 점검합니다."),
+        ],
+        "flow": "flow-5-dns.html", "deep": "4-dns-resolution-map.html",
+        "deep_label": "resolver·root·위임·캐시·TLS 상세 그림",
+    },
+    {
+        "file": "concept-auth.html",
+        "title": "로그인 상태와 가입 절차는 다른 결정입니다",
+        "lead": "브라우저가 로그인 상태를 어떻게 유지할지와 가입·이메일·소셜 인증을 어느 도구가 처리할지는 구분해서 선택합니다.",
+        "nodes": [("방문자", "브라우저", "가입·로그인 요청", "client"), ("상태", "세션/토큰", "다음 요청의 신원", "front"), ("절차", "인증 라이브러리", "가입·확인·소셜 연결", "api"), ("기록", "사용자 DB", "계정·검증 상태", "data")],
+        "facts": [
+            ("세션과 토큰", "세션은 서버가 로그인 상태를 관리하고 브라우저가 보통 쿠키로 세션 식별자를 보냅니다. 토큰 방식은 클라이언트가 받은 자격 증명을 이후 요청에 전달합니다. 저장·만료·폐기 방식이 달라집니다."),
+            ("라이브러리와 화면", "가입 규칙을 직접 만들 수도 있고 검증된 라이브러리를 사용할 수도 있습니다. 라이브러리가 HTML 화면까지 그릴지, API만 제공하고 프런트가 화면을 맡을지도 독립 결정입니다."),
+            ("TRACEBACK에서", "개발 브랜치는 Django allauth Headless API와 브라우저 세션 흐름을 사용합니다. 실제 외부 로그인과 이메일 전달 성공은 별도 검증 대상입니다."),
+        ],
+        "flow": "flow-1-system.html", "deep": "auth-session-allauth-guide.html",
+        "deep_label": "세션·토큰·allauth Headless·Kakao 탈퇴 상세",
+    },
+    {
+        "file": "concept-email.html",
+        "title": "메일 생성, 전송, 수신 확인은 각각 다릅니다",
+        "lead": "앱이 확인 메일을 만들었다고 사용자가 받은 것은 아닙니다. 전송 방법, 제공업체, 발송 시점과 실제 수신을 나누어 봅니다.",
+        "nodes": [("앱", "Django", "내용·링크 생성", "client"), ("전송", "SMTP/API", "메일 발송 요청", "front"), ("제공업체", "SES 등", "외부 전달", "aws"), ("사용자", "받은 편지함", "링크 열고 확인", "data")],
+        "facts": [
+            ("SMTP와 SES", "SMTP는 메일 서버로 메시지를 제출하는 통신 방식입니다. SES는 AWS의 발송 서비스입니다. SES에도 SMTP 방식 또는 API 방식으로 요청할 수 있습니다."),
+            ("즉시 발송과 큐", "가입 요청 중 직접 보내면 구성이 단순하지만 발송 지연이 응답에 영향을 줍니다. 큐는 요청과 발송을 분리하는 대신 작업자·재시도·중복 방지 운영이 필요합니다."),
+            ("TRACEBACK에서", "개발 브랜치는 Django mailer와 SES SMTP 설정을 사용합니다. 설정이 있다는 것과 실제 받은 편지함에 도착했다는 것은 별도입니다."),
+        ],
+        "flow": "flow-1-system.html", "deep": "email-smtp-ses-guide.html",
+        "deep_label": "SMTP·SES·확인 링크·설정 근거 상세",
+    },
+]
+
+
 STYLE = """
   :root{font-family:system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;color:#173042;background:#f4f7f8;line-height:1.6}
   *{box-sizing:border-box}body{margin:0}main{max-width:1110px;margin:auto;padding:24px clamp(16px,4vw,44px) 90px}
@@ -132,6 +214,8 @@ STYLE = """
   .next{display:flex;justify-content:space-between;gap:12px;margin-top:25px;font-weight:750}.source-note{font-size:.78rem;color:#637481;margin-top:14px}
   @media(max-width:700px){.flow{grid-template-columns:1fr;gap:21px}.flow li:not(:last-child)::after{content:'↓';left:50%;right:auto;top:auto;bottom:-25px}.next{flex-direction:column}.top{align-items:start}.top button{flex:none}}
   @media print{body{background:white}.top,button,.next{display:none!important}.panel,.flow li{break-inside:avoid}.flow{grid-template-columns:repeat(4,minmax(0,1fr))}a{color:inherit}}
+  .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.facts article{background:#f1f7f9;border:1px solid #c8dce6;border-radius:10px;padding:14px}.facts h3{font-size:1rem;margin:0 0 7px}.facts p{font-size:.9rem;color:#435b69;margin:0}
+  @media(max-width:700px){.facts{grid-template-columns:1fr}}
 """
 
 
@@ -155,5 +239,29 @@ def render(page: dict, index: int) -> str:
 '''
 
 
+def render_concept(page: dict) -> str:
+    nodes = "".join(
+        f'<li class="{kind}"><small>{escape(owner)}</small><strong>{escape(name)}</strong><span>{escape(role)}</span></li>'
+        for owner, name, role, kind in page["nodes"]
+    )
+    facts = "".join(
+        f'<article><h3>{escape(title)}</h3><p>{escape(body)}</p></article>'
+        for title, body in page["facts"]
+    )
+    return f'''<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{escape(page["title"])} · TRACEBACK 개념</title><style>{STYLE}</style></head>
+<body><main><nav class="top" aria-label="문서 탐색"><a href="index.html">← TRACEBACK 전체 구조</a><button type="button" onclick="window.print()">PDF로 저장</button></nav>
+<header class="hero"><p class="eyebrow">TRACEBACK을 이해하기 위한 개념</p><h1>{escape(page["title"])}</h1><p class="lead">{escape(page["lead"])}</p></header>
+<section class="panel" aria-labelledby="model-title"><h2 id="model-title">일반적인 연결 그림</h2><ol class="flow">{nodes}</ol></section>
+<section class="panel" aria-labelledby="explain-title"><h2 id="explain-title">각 선택의 의미</h2><div class="facts">{facts}</div></section>
+<section class="panel" aria-labelledby="more-title"><h2 id="more-title">TRACEBACK 사례와 더 깊은 설명</h2><ul class="links"><li><a href="{page["flow"]}">우리 프로젝트의 짧은 흐름 →</a></li><li><a href="{page["deep"]}">{escape(page["deep_label"])} →</a></li></ul><p class="source-note">프로젝트 구현 근거와 확인 날짜는 연결한 흐름·심화 문서에 표시했습니다. 이 페이지의 첫 그림은 일반 개념입니다.</p></section>
+<nav class="next"><a href="index.html">← 전체 구조와 다른 개념</a></nav></main><script src="feedback.js" defer></script></body></html>
+'''
+
+
 for index, page in enumerate(PAGES):
     (ROOT / page["file"]).write_text(render(page, index))
+
+for page in CONCEPTS:
+    (ROOT / page["file"]).write_text(render_concept(page))
