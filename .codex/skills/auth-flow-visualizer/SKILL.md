@@ -31,9 +31,10 @@ future domains without reducing the explanation to a table or a prose-only page.
   output. Use inline `data:` images when a single portable HTML file is needed,
   accepting the larger HTML size and harder image replacement.
 - Treat it as a small documentation site: keep a shared shell and domain
-  navigation. The five short TRACEBACK flow pages show the current project
-  topology first; linked concept and implementation references carry the deeper
-  explanations. Preserve existing source-reference sections when adding a domain.
+  navigation. The five TRACEBACK flow pages show the project topology and its
+  actual configuration, environment boundaries, and verification state. Linked
+  concept pages explain general mechanisms; long references hold procedures and
+  source excerpts. Preserve existing source-reference sections when adding a domain.
 - Keep `docs/artifact/index.html` as the single mobile entry point. Link each new
   guide from that index and give the guide a visible return link to the index.
   Group future topics there without requiring readers to save separate URLs.
@@ -80,7 +81,7 @@ can answer these questions from the page itself:
 1. What is the end-to-end flow? Show it first with a labeled visual and explain
    the arrows, participants, and boundaries in plain language.
 2. Where can the reader learn the underlying terms, practical options, and
-   tradeoffs? A short TRACEBACK flow page may link to a separate concept guide;
+   tradeoffs? A TRACEBACK flow page may link to a separate concept guide;
    the concept guide presents the general model before the project example.
 3. Which option does TRACEBACK use, and why? Tie the decision to the actual
    code, configuration, and operational constraints.
@@ -105,18 +106,22 @@ state. An attractive page that omits a required answer is unfinished.
 
 ## AWS initial setup learning set
 
-Maintain five short project-flow pages in order: `flow-1-system.html`,
+Maintain five project-configuration pages in order: `flow-1-system.html`,
 `flow-2-access.html`, `flow-3-deploy.html`, `flow-4-address.html`, and
-`flow-5-dns.html`. They answer what TRACEBACK is configured to do, using concise
-diagrams and explicit verification status. Keep the existing long guides as
+`flow-5-dns.html`. They show the full TRACEBACK configuration and connection
+paths, including Client→Vercel and Server→AWS, actual environment-variable
+locations, development/production boundaries, and explicit verification state.
+Do not shorten actual configuration into a summary or move it out of the five
+pages. Keep the existing long guides as
 linked concept and implementation references: `traceback-system-guide.html`,
 `1-aws-ssm-ssh-learning-guide.html`, `2-dev-server-first-deployment.html`,
 `3-development-ip-domain-guide.html`, and `4-dns-resolution-map.html`. Preserve
 their existing URLs and fragment IDs. Use `concept-access.html`,
 `concept-deploy.html`, `concept-address.html`, `concept-dns.html`,
 `concept-auth.html`, and `concept-email.html` for short, topic-specific
-explanations between the five project maps and the long references. Do not move
-basic teaching material back into the five short pages.
+explanations between the five project maps and the long references. Move general
+networking and computing theory there while keeping concrete settings in the
+project pages.
 
 The index also links the authentication study path:
 `auth-session-allauth-guide.html` compares session/token, account-flow tools,
@@ -124,7 +129,7 @@ and allauth presentation modes; `email-smtp-ses-guide.html` compares mail
 transport, delivery provider, and send timing. Keep both paths connected to
 the system guide and the deployment guide where server configuration matters.
 
-- On a short project-flow page, start with the actual TRACEBACK participants and
+- On a project-flow page, start with the actual TRACEBACK participants and
   explain which connections are code-defined, previously observed, or live-tested.
   Link unfamiliar terms to the companion concept guide. In a concept guide, start
   with the general mechanism, explain terms and alternatives, then use TRACEBACK
