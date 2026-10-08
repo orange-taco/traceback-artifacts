@@ -14,6 +14,8 @@
   .next{display:flex;justify-content:space-between;gap:12px;margin-top:25px;font-weight:750}.source-note{font-size:.78rem;color:#637481;margin-top:14px}
   @media(max-width:700px){.flow{grid-template-columns:1fr;gap:21px}.flow li:not(:last-child)::after{content:'↓';left:50%;right:auto;top:auto;bottom:-25px}.next{flex-direction:column}.top{align-items:start}.top button{flex:none}}
   @media print{body{background:white}.top,button,.next{display:none!important}.panel,.flow li{break-inside:avoid}.flow{grid-template-columns:repeat(4,minmax(0,1fr))}a{color:inherit}}
+  .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.facts article{background:#f1f7f9;border:1px solid #c8dce6;border-radius:10px;padding:14px}.facts h3{font-size:1rem;margin:0 0 7px}.facts p{font-size:.9rem;color:#435b69;margin:0}
+  @media(max-width:700px){.facts{grid-template-columns:1fr}}
 </style></head>
 <body><main><nav class="top" aria-label="문서 탐색"><a href="index.html">← TRACEBACK 전체 구조</a><button type="button" onclick="window.print()">PDF로 저장</button></nav>
 <header class="hero"><p class="eyebrow">TRACEBACK 실제 구성 · 03 / 05 · 코드가 서버에 도착하는 길</p><h1>개발 코드는 어떻게 EC2에 배포될까?</h1><p class="lead">백엔드 development 브랜치에 코드가 반영되면 GitHub Actions가 검증한 뒤 하나의 컨테이너 이미지를 ECR에 저장하고 SSM으로 개발 EC2에 배포하도록 구성되어 있습니다.</p></header>
