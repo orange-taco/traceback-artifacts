@@ -30,9 +30,10 @@ future domains without reducing the explanation to a table or a prose-only page.
   `docs/artifact/images/`; verify their relative paths and include them in PDF
   output. Use inline `data:` images when a single portable HTML file is needed,
   accepting the larger HTML size and harder image replacement.
-- Treat it as a small documentation site: keep a shared shell, domain navigation,
-  overview, and one visual section per documented subsystem. Preserve existing
-  sections when adding a new domain.
+- Treat it as a small documentation site: keep a shared shell and domain
+  navigation. The five short TRACEBACK flow pages show the current project
+  topology first; linked concept and implementation references carry the deeper
+  explanations. Preserve existing source-reference sections when adding a domain.
 - Keep `docs/artifact/index.html` as the single mobile entry point. Link each new
   guide from that index and give the guide a visible return link to the index.
   Group future topics there without requiring readers to save separate URLs.
@@ -78,9 +79,9 @@ can answer these questions from the page itself:
 
 1. What is the end-to-end flow? Show it first with a labeled visual and explain
    the arrows, participants, and boundaries in plain language.
-2. What do the underlying terms mean, what practical options exist, and what
-   changes when each option is chosen? Present the general model before the
-   TRACEBACK example. If the subject has no real alternative, say why.
+2. Where can the reader learn the underlying terms, practical options, and
+   tradeoffs? A short TRACEBACK flow page may link to a separate concept guide;
+   the concept guide presents the general model before the project example.
 3. Which option does TRACEBACK use, and why? Tie the decision to the actual
    code, configuration, and operational constraints.
 4. Where is it implemented? Place relevant source/configuration excerpts next
@@ -104,14 +105,15 @@ state. An attractive page that omits a required answer is unfinished.
 
 ## AWS initial setup learning set
 
-When editing the five AWS guides in `docs/artifact/`, maintain them as one learning
-path: `traceback-system-guide.html` for the whole system and CI/CD map, then
-`1-aws-ssm-ssh-learning-guide.html` for access and identities,
-`2-dev-server-first-deployment.html` for deployment and infrastructure,
-`3-development-ip-domain-guide.html` for IP and domain choices, and
-`4-dns-resolution-map.html` for DNS resolution. Link forward and back where a
-reader needs the companion explanation or code; do not make readers guess which
-document owns a topic.
+Maintain five short project-flow pages in order: `flow-1-system.html`,
+`flow-2-access.html`, `flow-3-deploy.html`, `flow-4-address.html`, and
+`flow-5-dns.html`. They answer what TRACEBACK is configured to do, using concise
+diagrams and explicit verification status. Keep the existing long guides as
+linked concept and implementation references: `traceback-system-guide.html`,
+`1-aws-ssm-ssh-learning-guide.html`, `2-dev-server-first-deployment.html`,
+`3-development-ip-domain-guide.html`, and `4-dns-resolution-map.html`. Preserve
+their existing URLs and fragment IDs. Do not move basic teaching material back
+into the five short pages.
 
 The index also links the authentication study path:
 `auth-session-allauth-guide.html` compares session/token, account-flow tools,
@@ -119,11 +121,11 @@ and allauth presentation modes; `email-smtp-ses-guide.html` compares mail
 transport, delivery provider, and send timing. Keep both paths connected to
 the system guide and the deployment guide where server configuration matters.
 
-- Start each topic with a visual path that shows what talks to what and why.
-  The first visual must teach the document's general mechanism, not serve as a
-  TRACEBACK status report. Explain general networking or AWS terms before showing
-  TRACEBACK-specific IDs. Show project values and readiness in a separate,
-  explicitly labeled application of that mechanism.
+- On a short project-flow page, start with the actual TRACEBACK participants and
+  explain which connections are code-defined, previously observed, or live-tested.
+  Link unfamiliar terms to the companion concept guide. In a concept guide, start
+  with the general mechanism, explain terms and alternatives, then use TRACEBACK
+  as a dated example. Keep current-state and general claims visibly distinct.
 - Before splitting a long guide into sections or tabs, draw one end-to-end map
   that includes its main path, meaningful alternate paths, and where those paths
   rejoin. Label which part each later section enlarges. At section boundaries,

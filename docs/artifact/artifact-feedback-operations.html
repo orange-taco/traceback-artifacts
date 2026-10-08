@@ -127,14 +127,14 @@ PUBLIC_SITE_ORIGIN = "https://orange-taco.github.io"</code></pre><p>Worker가 �
           </article>
 
           <article class="step" id="s4">
-            <span class="step-kicker">04 · GitHub App · 조직 설치 전</span>
+            <span class="step-kicker">04 · GitHub App · 조직 설치 완료</span>
             <h3>App을 문서 저장소에만 설치</h3>
             <p>처음 만든 개인 소유 비공개 App <strong>TRACEBACK Feedback Oscar2272</strong>는 개인 의견 저장소에만 설치되어 있었습니다. <a href="https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/making-a-github-app-public-or-private">비공개 GitHub App은 소유 계정에만 설치</a>할 수 있어 2026년 10월 8일 App을 <code>orange-taco</code> 조직으로 이전했습니다. GitHub 화면에서 새 소유자와 기존 App ID·Client ID 유지를 확인했습니다. 이전 완료와 함께 개인 계정 설치는 자동 제거됐습니다.</p>
             <div class="why"><strong>두 토큰의 역할:</strong> OAuth 사용자 토큰은 <code>/user</code>로 소유자를 확인한 뒤 버립니다. App 설치 토큰은 Worker가 짧게 발급받아 의견 JSON 한 건을 씁니다.</div>
             <div class="screen" role="img" aria-label="전환 전 GitHub App 설치 화면 재현: 개인 의견 저장소 하나, Contents read/write">
               <div class="screen-bar"><span>GitHub / Apps / TRACEBACK Feedback Oscar2272</span><b>화면 재현</b></div>
               <div class="screen-body"><div class="screen-title">Install on oscar2272</div><div class="ui-row"><strong>Repository access</strong><span class="pill">Only select repositories</span></div><div class="ui-row"><strong>선택한 저장소</strong><span>oscar2272/traceback-feedback</span></div><div class="ui-row"><strong>Repository permissions</strong><span>Metadata 읽기 · Contents 읽기/쓰기</span></div><div class="ui-row"><strong>App ID · 설치 ID</strong><span>5232748 · 169112765</span></div><div class="ui-row"><strong>Client ID</strong><span>Iv23liEhxT16HdVO5bvG</span></div><div class="ui-row"><strong>Callback</strong><span><code>…workers.dev/oauth/callback</code></span></div></div>
-              <div class="screen-caption">이 화면은 전환 전 상태입니다. 이전 후 조직 <code>orange-taco</code>의 <code>traceback-artifacts</code>만 선택해 새로 설치합니다. GitHub 권한은 저장소 Contents 전체에 적용되므로 Worker 코드가 기록 경로를 <code>feedback/</code>로 제한합니다.</div>
+              <div class="screen-caption">이 화면은 이전 경로의 기록입니다. 2026-10-08에 조직 <code>orange-taco</code>의 <code>traceback-artifacts</code>만 선택해 설치했습니다(설치 ID <code>169215439</code>). GitHub 권한은 저장소 Contents 전체에 적용되므로 Worker 코드가 기록 경로를 <code>feedback/</code>로 제한합니다.</div>
             </div>
             <details><summary>전환할 때</summary><ol class="recipe"><li><a href="https://docs.github.com/en/apps/maintaining-github-apps/transferring-ownership-of-a-github-app">기존 App을 orange-taco로 이전</a>하고 조직 소유 상태를 확인합니다.</li><li>callback은 <code>https://traceback-feedback.traceback-feedback-worker.workers.dev/oauth/callback</code>으로 유지하고 웹훅은 끕니다.</li><li>Repository permission은 Contents 읽기/쓰기로 제한하며, <strong>Only select repositories</strong>에서 <code>traceback-artifacts</code>만 골라 설치합니다.</li><li>새 조직 설치 ID를 Worker secret에 등록합니다. 비밀값은 공개 문서에 적지 않습니다.</li></ol></details>
           </article>
@@ -142,7 +142,7 @@ PUBLIC_SITE_ORIGIN = "https://orange-taco.github.io"</code></pre><p>Worker가 �
           <article class="step" id="s5">
             <span class="step-kicker">05 · Worker secrets</span>
             <h3>키는 Worker에만 등록</h3>
-            <p>client secret, App private key, 세션 서명 비밀값을 Cloudflare Worker secret으로 저장했습니다. 현재 설치 ID는 아직 개인 비공개 저장소를 가리킵니다. 조직 설치가 끝나면 이 값을 교체합니다. private key 원본 PEM은 로컬 <code>~/.ssh/</code>에 보관하며 파일 권한은 <code>600</code>입니다.</p>
+            <p>client secret, App private key, 세션 서명 비밀값을 Cloudflare Worker secret으로 저장했습니다. 조직 설치 ID <code>169215439</code>로 secret을 교체하고 Worker를 재배포했습니다. private key 원본 PEM은 로컬 <code>~/.ssh/</code>에 보관하며 파일 권한은 <code>600</code>입니다.</p>
             <div class="why"><strong>왜 secret인가?</strong> Pages HTML, <code>feedback.js</code>, PR diff, 브라우저 저장소에는 GitHub 토큰이나 OpenAI API 키가 없어야 합니다.</div>
             <div class="screen" role="img" aria-label="Cloudflare Worker의 secret 이름 목록 재현. 값은 보이지 않음">
               <div class="screen-bar"><span>Cloudflare / Worker / Variables and Secrets</span><b>화면 재현 · 값 제외</b></div>
@@ -188,15 +188,15 @@ if origin:
           <article class="step" id="s8">
             <span class="step-kicker">08 · Live verification</span>
             <h3>iPad 흐름과 서버 거부를 각각 확인</h3>
-            <p>기존 비공개 경로에서는 소유자 로그인 뒤 테스트 의견 저장과 834px 화면 흐름을 확인했습니다. 단일 저장소 전환 후에는 새 공개 JSON의 문서 URL, 절 ID, 선택 문구(null), 위치, 의견, 게시 revision과 작성자 ID를 다시 확인해야 합니다.</p>
-            <div class="why"><strong>검증 경계:</strong> UI가 버튼을 숨기더라도 서버 검사가 최종 기준입니다. 익명 저장은 실서버 401, 다른 계정은 Worker 테스트에서 403, 수정·실행 경로는 404를 확인했습니다. 새 저장 대상의 실제 저장은 아직 검증 전입니다.</div>
+            <p>단일 저장소 전환 뒤 2026-10-08에 소유자 세션으로 실제 의견 ID <a href="https://github.com/orange-taco/traceback-artifacts/blob/main/feedback/420fb0e8-4448-4c3e-a70d-d674fef43d1b.json"><code>420fb0e8-4448-4c3e-a70d-d674fef43d1b</code></a>을 저장했습니다. 공개 JSON의 문서 URL, 절 ID(null), 선택 문구(null), 위치, 의견, 게시 revision, 작성자 ID <code>88140361</code>을 확인했습니다. 새 양식을 834px 폭으로 확인했습니다.</p>
+            <div class="why"><strong>검증 경계:</strong> UI가 버튼을 숨기더라도 서버 검사가 최종 기준입니다. 익명 저장은 실서버 401, 다른 계정은 Worker 테스트에서 403, 수정·실행 경로는 404를 확인했습니다. 다른 계정의 실제 GitHub 로그인 시험은 수행하지 않았습니다.</div>
             <div class="screen" role="img" aria-label="iPad 의견 저장 화면 재현: 문서 URL, 전체 문서, 위치, 의견, 의견만 저장">
               <div class="screen-bar"><span>iPad Safari 흐름 · Pages → Worker</span><b>양식 재현</b></div>
               <div class="screen-body"><div class="screen-title">이 문서에 의견 남기기</div><p class="screen-help">문서 URL · 게시 revision · 절 ID(없으면 전체 문서)</p><div class="ui-row"><strong>어느 부분인가요?</strong><span>예: 첫 번째 그림의 전체 흐름</span></div><div class="ui-row"><strong>어떤 점이 아쉽거나 궁금한가요?</strong><span>전체 문맥을 기준으로 자유롭게 작성</span></div><span class="mock-button">의견만 저장</span></div>
               <div class="screen-caption">문구를 선택하지 않아도 됩니다. 화면 전체나 특정 그림에 대한 의견을 위치 필드에 적습니다.</div>
             </div>
             <figure class="capture"><a href="images/feedback-pages-ipad.jpg"><img src="images/feedback-pages-ipad.jpg" alt="실제 공개 시스템 가이드의 iPad 폭 화면. 인증 절과 왼쪽 아래 의견 남기기 버튼이 보인다"></a><figcaption>실제 Pages 화면 · 834px 폭. 왼쪽 아래 의견 남기기 버튼을 누르면 현재 문서와 절 ID가 전달됩니다. 그림을 누르면 원본 크기로 열립니다.</figcaption></figure>
-            <figure class="capture"><a href="images/feedback-form-ipad.jpg"><img src="images/feedback-form-ipad.jpg" alt="이전 비공개 저장 방식의 iPad 폭 의견 양식. 문서 URL, auth 절 ID, 게시 revision, 위치와 의견 입력 필드, 의견만 저장 버튼이 보인다"></a><figcaption>이전 Worker 양식 · 같은 폭. 공개 저장 안내가 추가된 새 화면은 단일 저장소 전환 후 다시 캡처합니다. 이 캡처에는 의견이나 인증 비밀값이 없습니다.</figcaption></figure>
+            <figure class="capture"><a href="images/feedback-form-ipad.jpg"><img src="images/feedback-form-ipad.jpg" alt="이전 비공개 저장 방식의 iPad 폭 의견 양식. 문서 URL, auth 절 ID, 게시 revision, 위치와 의견 입력 필드, 의견만 저장 버튼이 보인다"></a><figcaption>이전 Worker 양식의 캡처입니다. 새 공개 저장 안내가 있는 양식은 위 화면 재현과 2026-10-08 834px 브라우저 검사로 확인했습니다. 이 캡처에는 의견이나 인증 비밀값이 없습니다.</figcaption></figure>
             <div class="screen" role="img" aria-label="저장 완료 후 이번 의견 또는 모든 의견 요청문을 복사하고 Codex Cloud를 여는 흐름 재현">
               <div class="screen-bar"><span>Worker / 저장 완료 → Codex Cloud</span><b>현재 코드 화면 재현</b></div>
               <div class="screen-body"><div class="screen-title">의견을 저장했습니다</div><p class="screen-help">의견 파일은 공개 저장소의 feedback/에 있습니다. Codex 작업은 아직 시작되지 않았습니다.</p><div class="ui-row"><strong>모든 의견을 한 번에 검토</strong><span class="mock-button">요청 복사</span></div><div class="ui-row"><strong>이번 의견만 검토</strong><span>접어서 선택</span></div><div class="ui-row"><strong>다음 단계</strong><span>Codex Cloud 열기 → 새 작업에 붙여넣기 → 보내기</span></div></div>
@@ -224,9 +224,9 @@ if origin:
       <p class="eyebrow">2026-10-08 확인 상태</p>
       <h2 id="state-title">무엇이 실제로 확인됐나</h2>
       <div class="state-grid">
-        <div class="state partial"><span class="pill gold">이전 경로 확인</span><h3>Worker와 기존 저장</h3><p><code>/healthz</code> 200, 익명 저장 401, 소유자 로그인과 비공개 저장소 테스트 JSON은 확인했습니다. 같은 공개 저장소로의 실제 쓰기는 아직 확인 전입니다.</p></div>
+        <div class="state ok"><span class="pill">실제 저장 확인</span><h3>Worker와 공개 의견</h3><p>조직 App 설치 뒤 Worker를 배포했고, 소유자 로그인으로 <code>feedback/420fb0e8-4448-4c3e-a70d-d674fef43d1b.json</code> 쓰기를 확인했습니다. 익명 저장은 실서버 401입니다.</p></div>
         <div class="state partial"><span class="pill gold">코드·테스트 확인</span><h3>다른 사용자 거부</h3><p>다른 GitHub ID 로그인 403과 저장 거부를 자동 테스트했습니다. 실제 다른 계정으로 로그인하는 검사는 수행하지 않았습니다.</p></div>
-        <div class="state ok"><span class="pill">실배포 확인</span><h3>Pages와 iPad 경로</h3><p>첫 배포 SHA <code>a8556579e4eb</code>에서 의견 버튼, <code>#auth</code> 절 전달과 834px 작성 화면을 확인했습니다. 새 공개 저장 안내 화면은 전환 뒤 다시 확인합니다.</p></div>
+        <div class="state ok"><span class="pill">실배포 확인</span><h3>Pages와 iPad 경로</h3><p>첫 배포 SHA <code>a8556579e4eb</code>에서 의견 버튼과 <code>#auth</code> 절 전달을 확인했습니다. 단일 저장소 전환 뒤 새 공개 안내 양식과 저장 완료 화면을 834px 폭에서 확인했습니다.</p></div>
         <div class="state pending"><span class="pill gray">새 파일 뒤 확인</span><h3>Cloud 새 작업</h3><p>게시된 세 저장소 환경은 유지합니다. 공개 의견 파일을 만든 뒤 새 Cloud 작업에서 실제 읽기를 확인해야 합니다.</p></div>
       </div>
     </section>
