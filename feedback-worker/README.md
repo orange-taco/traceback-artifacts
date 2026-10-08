@@ -23,8 +23,10 @@ ChatGPT plan and its limits.
    `npx wrangler login`, then run `npx wrangler deploy` here to obtain the Worker
    HTTPS URL. The `workers.dev` URL is suitable for this small personal form.
 3. Use a GitHub App that can be installed on the `orange-taco` organization:
-   either publish the existing personal App registration or register a private
-   App owned by that organization. Set its website URL to the Worker origin and
+   [transfer ownership of the existing App](https://docs.github.com/en/apps/maintaining-github-apps/transferring-ownership-of-a-github-app)
+   to the organization and keep it private, register a new organization-owned
+   private App, or make the existing personal App public. Set its website URL
+   to the Worker origin and
    its callback to `<worker-origin>/oauth/callback`. Disable webhooks, grant
    only **Contents: Read and write** repository permission, and install it on
    **only** `traceback-artifacts`. Record the App ID, Client ID, and that
