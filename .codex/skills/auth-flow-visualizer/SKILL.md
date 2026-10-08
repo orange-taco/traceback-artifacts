@@ -31,13 +31,16 @@ future domains without reducing the explanation to a table or a prose-only page.
   output. Use inline `data:` images when a single portable HTML file is needed,
   accepting the larger HTML size and harder image replacement.
 - Treat it as a small documentation site: keep a shared shell and domain
-  navigation. The five TRACEBACK flow pages show the project topology and its
-  actual configuration, environment boundaries, and verification state. Linked
-  concept pages explain general mechanisms; long references hold procedures and
-  source excerpts. Preserve existing source-reference sections when adding a domain.
-- Keep `docs/artifact/index.html` as the single mobile entry point. Link each new
-  guide from that index and give the guide a visible return link to the index.
-  Group future topics there without requiring readers to save separate URLs.
+  navigation. The five TRACEBACK infrastructure pages show the project topology,
+  actual configuration, choices, environment boundaries, and verification state.
+  Explain only the concepts needed at each step on that same page, below the
+  setting or command that raised the question. Keep deeper account/auth behavior
+  in its own topic artifact. Preserve existing source-reference sections.
+- Keep `docs/artifact/index.html` as the single mobile entry point. Add each new
+  guide to `docs/artifact/catalog.json`, run `scripts/build_index.py`, and give
+  the guide a visible return link to the index. New subjects/topics can use
+  `docs/artifact/topics/<subject>/<topic>/<slug>/index.html`; do not break older
+  published URLs when organizing existing guides.
 - Make the explanation visual-first with SVG or CSS diagrams, lanes, arrows,
   highlights, and state transitions. Do not turn the main explanation into tables or
   prose cards.
@@ -81,8 +84,10 @@ can answer these questions from the page itself:
 1. What is the end-to-end flow? Show it first with a labeled visual and explain
    the arrows, participants, and boundaries in plain language.
 2. Where can the reader learn the underlying terms, practical options, and
-   tradeoffs? A TRACEBACK flow page may link to a separate concept guide;
-   the concept guide presents the general model before the project example.
+   tradeoffs? Put the terms and comparison after the concrete TRACEBACK step
+   on that page. Separate AWS product names from general networking/computing
+   terms. Use another page only for a genuinely separate subject, such as
+   account behavior after an infrastructure overview.
 3. Which option does TRACEBACK use, and why? Tie the decision to the actual
    code, configuration, and operational constraints.
 4. Where is it implemented? Place relevant source/configuration excerpts next
@@ -112,16 +117,16 @@ Maintain five project-configuration pages in order: `flow-1-system.html`,
 paths, including Client→Vercel and Server→AWS, actual environment-variable
 locations, development/production boundaries, and explicit verification state.
 Do not shorten actual configuration into a summary or move it out of the five
-pages. Keep the existing long guides as
-linked concept and implementation references: `traceback-system-guide.html`,
+pages. Use tabs for meaningful tasks, such as choosing and configuring EC2 access
+versus actually opening the session. Put alternative choices and longer setup
+evidence in accessible details blocks, with screenshots or rendered diagrams
+when they help verify the observed setting. Keep existing long guides at their
+published URLs as historical references: `traceback-system-guide.html`,
 `1-aws-ssm-ssh-learning-guide.html`, `2-dev-server-first-deployment.html`,
 `3-development-ip-domain-guide.html`, and `4-dns-resolution-map.html`. Preserve
-their existing URLs and fragment IDs. Use `concept-access.html`,
-`concept-deploy.html`, `concept-address.html`, `concept-dns.html`,
-`concept-auth.html`, and `concept-email.html` for short, topic-specific
-explanations between the five project maps and the long references. Move general
-networking and computing theory there while keeping concrete settings in the
-project pages.
+their existing URLs and fragment IDs. Do not add separate vocabulary-only pages
+or a vocabulary section to the index. The main path should read like a sentence
+followed by just enough explanation to understand and reproduce that sentence.
 
 The index also links the authentication study path:
 `auth-session-allauth-guide.html` compares session/token, account-flow tools,
@@ -131,9 +136,9 @@ the system guide and the deployment guide where server configuration matters.
 
 - On a project-flow page, start with the actual TRACEBACK participants and
   explain which connections are code-defined, previously observed, or live-tested.
-  Link unfamiliar terms to the companion concept guide. In a concept guide, start
-  with the general mechanism, explain terms and alternatives, then use TRACEBACK
-  as a dated example. Keep current-state and general claims visibly distinct.
+  Compare relevant options in a collapsible block, show the concrete setting and
+  evidence, then define the terms the reader just met below it. Keep current-state
+  and general claims visibly distinct.
 - Before splitting a long guide into sections or tabs, draw one end-to-end map
   that includes its main path, meaningful alternate paths, and where those paths
   rejoin. Label which part each later section enlarges. At section boundaries,

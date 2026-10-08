@@ -1,81 +1,15 @@
 <!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="TRACEBACK 서비스의 실제 요청·배포 흐름과 이를 이해하기 위한 개념 문서">
-  <title>TRACEBACK · 서비스와 인프라 구조</title>
-  <style>
-    :root{color-scheme:light;--bg:#f4f7f9;--paper:#fff;--ink:#172b38;--muted:#536977;--line:#cbd8df;--blue:#176b91;--soft:#e8f3f8;font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6}main{width:min(1050px,calc(100% - 32px));margin:auto;padding:clamp(28px,6vw,72px) 0 80px}h1,h2,p{margin:0}h1{font-size:clamp(2.1rem,6vw,4rem);line-height:1.13;letter-spacing:-.04em;word-break:keep-all}h2{font-size:1.25rem}p{color:var(--muted)}.eyebrow{color:var(--blue);font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.intro{max-width:720px;margin:16px 0 30px;font-size:1.04rem}.map{display:flex;align-items:stretch;gap:8px;overflow-x:auto;padding:5px 2px 20px}.map span{min-width:140px;flex:1;padding:13px;border:1px solid var(--line);background:var(--paper);font-size:.86rem;font-weight:750}.map b{align-self:center;color:var(--blue)}.map small{display:block;margin-top:3px;color:var(--muted);font-weight:400}.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin:16px 0}.section-head p{font-size:.87rem}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card{display:block;min-height:155px;padding:22px;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:inherit;text-decoration:none}.card:hover,.card:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.card small{display:block;color:var(--blue);font-size:.76rem;font-weight:800;letter-spacing:.08em}.card strong{display:block;margin:9px 0 7px;font-size:1.2rem}.card p{font-size:.87rem}.card.featured{grid-column:1/-1;background:var(--soft);border-color:#a7cbdc}.foot{margin-top:24px;font-size:.86rem}.pdf-export{position:fixed;right:16px;bottom:16px;z-index:5;padding:10px 14px;border:1px solid var(--blue);border-radius:999px;background:var(--paper);color:var(--blue);font:inherit;font-size:.84rem;font-weight:800;cursor:pointer;box-shadow:0 5px 18px #172b3820}@media(max-width:650px){.map{display:grid;grid-template-columns:1fr;gap:5px}.map span{min-width:0}.map b{justify-self:center;transform:rotate(90deg)}.cards{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:5px}}@media print{body{background:white}.pdf-export{display:none}.card,.map span{break-inside:avoid}a{color:inherit}}
-  </style>
-  <style>
-    .publish{margin:8px 0 34px;padding:22px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
-    .publish h2{margin-bottom:7px}.publish-path{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:17px 0}
-    .publish-path div{position:relative;padding:14px;border:1px solid #a7cbdc;border-radius:10px;background:var(--soft)}
-    .publish-path strong{display:block;color:var(--ink)}.publish-path small{display:block;margin-top:4px;color:var(--muted)}
-    .publish-path div:not(:last-child)::after{content:"→";position:absolute;right:-15px;top:37%;z-index:1;color:var(--blue);font-weight:900}
-    .publish details{margin-top:13px;border-top:1px solid var(--line);padding-top:11px}.publish summary{cursor:pointer;color:var(--blue);font-weight:800}
-    .publish details p{margin-top:8px;font-size:.9rem}.publish code{overflow-wrap:anywhere}
-    @media(max-width:650px){.publish-path{grid-template-columns:1fr}.publish-path div:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-17px}}
-    @media print{.publish-path div{break-inside:avoid}.publish details:not([open])>*:not(summary),details.publish>*:not(summary){display:block!important}details.publish>summary{display:none}}
-  </style>
-</head>
-<body>
-  <button type="button" class="pdf-export" onclick="window.print()" aria-label="목차를 PDF로 저장">PDF로 저장</button>
-  <main>
-    <p class="eyebrow">TRACEBACK · service &amp; infrastructure</p>
-    <h1>TRACEBACK 스토어는<br>어떻게 구성되나요?</h1>
-    <p class="intro">TRACEBACK은 상품 탐색·장바구니·결제·주문 조회를 목표로 하는 온라인 스토어입니다. 현재 개발 브랜치는 인증·계정 기능과 프런트 와이어프레임 중심입니다. 아래 그림은 이를 Vercel 화면, Django/EC2 API, PostgreSQL DB로 연결하려는 구성입니다. <a href="https://github.com/orange-taco/traceback/blob/9a8794919142587789a7a7b9818ec62ec1fb75b5/docs/system.md#L17-L24">제품 범위</a>와 실제 구현·외부 연결 상태는 구분해 읽으세요.</p>
-    <p class="eyebrow">고객 요청 · TRACEBACK 구성</p>
-    <div class="map" role="img" aria-label="고객 브라우저에서 Vercel 프런트엔드, Django API가 있는 EC2, RDS PostgreSQL로 이어지는 TRACEBACK 요청 경로">
-      <span>고객 브라우저<small>스토어 화면·인증 요청</small></span><b aria-hidden="true">→</b><span>Vercel<small>React Router 화면·API rewrite</small></span><b aria-hidden="true">→</b><span>EC2<small>Django 인증·API</small></span><b aria-hidden="true">→</b><span>RDS<small>PostgreSQL · 연결 검증 별도</small></span>
-    </div>
-    <div class="section-head"><h2>TRACEBACK 인프라 구성 · 1–5</h2><p>실제 구성·설정 위치·확인 상태를 따라갑니다. 일반 개념은 아래에서 따로 읽으세요.</p></div>
-    <nav class="cards" aria-label="TRACEBACK 인프라 흐름 다섯 단계">
-      <a class="card featured" href="flow-1-system.html"><small>01 · SYSTEM</small><strong>서비스 전체 경계</strong><p>고객 브라우저 → Vercel → Django/EC2 → RDS의 역할과 현재 확인 범위.</p></a>
-      <a class="card" href="flow-2-access.html"><small>02 · ACCESS</small><strong>운영자의 EC2 접속</strong><p>사람의 AWS 로그인과 EC2의 SSM Agent가 만나는 경로.</p></a>
-      <a class="card" href="flow-3-deploy.html"><small>03 · DEPLOY</small><strong>Client→Vercel · Server→AWS</strong><p>두 배포 경로와 GitHub·Vercel·EC2 환경변수, dev/prod 상태.</p></a>
-      <a class="card" href="flow-4-address.html"><small>04 · ADDRESS</small><strong>API 서버의 이름과 IP</strong><p>Vercel의 API 주소, Route 53 A 레코드, EC2의 Elastic IP.</p></a>
-      <a class="card" href="flow-5-dns.html"><small>05 · DNS</small><strong>이름을 찾은 뒤 HTTPS 연결</strong><p>DNS 답을 받은 다음에도 TLS·Nginx·Django가 필요한 이유.</p></a>
-    </nav>
-    <div class="section-head"><h2>이해에 필요한 개념</h2><p>짧은 그림과 핵심 선택을 주제별로 분리했습니다.</p></div>
-    <nav class="cards" aria-label="TRACEBACK 흐름을 이해하기 위한 개념 문서">
-      <a class="card" href="concept-access.html"><small>ACCESS · CONCEPTS</small><strong>신원·권한·서버 접속</strong><p>SSH와 SSM, IAM과 네트워크 길의 역할.</p></a>
-      <a class="card" href="concept-deploy.html"><small>DEPLOY · CONCEPTS</small><strong>CI/CD와 컨테이너 배포</strong><p>코드 검증, 이미지, 서버 실행이 서로 다른 단계인 이유.</p></a>
-      <a class="card" href="concept-address.html"><small>ADDRESS · CONCEPTS</small><strong>IP·도메인·Elastic IP</strong><p>이름과 주소, 도메인 등록과 DNS 관리의 차이.</p></a>
-      <a class="card" href="concept-dns.html"><small>DNS · CONCEPTS</small><strong>DNS 조회와 HTTPS</strong><p>resolver가 IP를 찾은 뒤 웹 연결이 시작되는 순서.</p></a>
-      <a class="card" href="concept-auth.html"><small>IDENTITY · CONCEPTS</small><strong>세션·토큰·가입 절차</strong><p>로그인 유지 방식과 인증 라이브러리 선택을 구분합니다.</p></a>
-      <a class="card" href="concept-email.html"><small>EMAIL · CONCEPTS</small><strong>SMTP·SES와 확인 메일</strong><p>메일 생성, 전송, 수신 확인은 각각 다른 단계입니다.</p></a>
-    </nav>
-    <details class="publish"><summary>설정 순서와 코드 원문을 더 깊게 읽기</summary>
-      <p>1–5에서 실제 구성과 설정 위치를 먼저 보고, 단계별 절차·긴 코드 발췌가 필요할 때 펼치세요. 기존 절 링크도 유지합니다. 오래된 관찰값은 각 문서의 날짜를 확인하세요.</p>
-      <nav class="cards" aria-label="TRACEBACK 설정과 구현 심화 자료">
-        <a class="card" href="traceback-system-guide.html"><small>SYSTEM · SOURCE</small><strong>시스템·CI/CD 코드 원문</strong></a>
-        <a class="card" href="1-aws-ssm-ssh-learning-guide.html"><small>ACCESS · DEEP DIVE</small><strong>VPC·IAM·SSH·SSM 설정</strong></a>
-        <a class="card" href="2-dev-server-first-deployment.html"><small>DEPLOY · DEEP DIVE</small><strong>AWS 첫 배포 절차</strong></a>
-        <a class="card" href="3-development-ip-domain-guide.html"><small>ADDRESS · DEEP DIVE</small><strong>IP·도메인·EIP 설정</strong></a>
-        <a class="card" href="4-dns-resolution-map.html"><small>DNS · DEEP DIVE</small><strong>DNS 상세 왕복</strong></a>
-        <a class="card" href="auth-session-allauth-guide.html"><small>IDENTITY · DEEP DIVE</small><strong>allauth와 계정 흐름</strong></a>
-        <a class="card" href="email-smtp-ses-guide.html"><small>EMAIL · DEEP DIVE</small><strong>SES SMTP와 확인 링크</strong></a>
-      </nav>
-    </details>
-    <div class="section-head"><h2>이 문서 프로젝트 운영</h2><p>위 학습 경로와 별도로, 공개 사이트와 의견 저장을 다시 설정하는 순서입니다.</p></div>
-    <nav class="cards" aria-label="TRACEBACK 문서 프로젝트 운영 가이드">
-      <a class="card featured" href="artifact-feedback-operations.html"><small>OPERATIONS · SETUP TIMELINE</small><strong>공개 문서·의견·Codex Cloud 연결</strong><p>Pages, Worker, GitHub App과 Cloud 환경을 왜 연결했는지 단계별 화면과 iPad 캡처로 따라갑니다.</p></a>
-    </nav>
-    <section class="publish" aria-labelledby="publish-title">
-      <h2 id="publish-title">이 학습 사이트는 어떻게 공개되나요?</h2>
-      <p>저장소에 HTML 파일이 있어도 공개 사이트는 자동으로 생기지 않습니다. 게시 작업이 실행되고 성공해야 URL에서 읽을 수 있습니다.</p>
-      <div class="publish-path" role="img" aria-label="문서가 게시 브랜치에 반영되고 GitHub Pages 작업이 성공하면 공개 URL에서 열립니다">
-        <div><strong>① 문서가 게시 브랜치에 도착</strong><small>이 저장소의 PR을 <code>main</code>에 병합</small></div>
-        <div><strong>② Pages 작업 성공</strong><small><code>pages.yml</code>이 문서·이미지를 업로드</small></div>
-        <div><strong>③ 공개 URL 확인</strong><small><code>orange-taco.github.io/traceback-artifacts/</code>에서 목차 열기</small></div>
-      </div>
-      <details><summary>PR을 병합했는데도 URL이 열리지 않나요?</summary><p>이 저장소의 <code>main</code>에 문서가 반영된 뒤 <code>pages.yml</code> 작업이 성공해야 공개됩니다. PR 검사 성공과 Pages 게시 성공은 다릅니다. 병합 뒤 Pages 실행 결과와 실제 URL을 확인하세요. API 서버의 ECR 이미지 빌드·EC2 배포는 별도 작업입니다. <a href="https://github.com/orange-taco/traceback-artifacts/blob/main/.github/workflows/pages.yml">이 저장소의 Pages workflow</a></p></details>
-    </section>
-    <p class="foot">문서는 공개 학습 자료입니다. TRACEBACK의 실제 설정 상태는 각 문서에 표시된 확인 날짜를 기준으로 읽으세요.</p>
-  </main>
-  <script src="feedback.js" defer></script>
-</body>
-</html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="TRACEBACK 인프라와 계정, 아티팩트 운영을 실제 설정 순서대로 읽는 학습 문서 목차">
+<title>학습 아티팩트 · TRACEBACK</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;--ink:#172b38;--muted:#536977;--blue:#176b91;--line:#cbd8df;--paper:#fff;background:#f4f7f9;color:var(--ink);line-height:1.6}*{box-sizing:border-box}body{margin:0}main{width:min(1100px,calc(100% - 32px));margin:auto;padding:clamp(24px,5vw,64px) 0 90px}a{color:var(--blue)}a:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid #e39a36;outline-offset:3px}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.3rem,6vw,4.3rem);line-height:1.12;letter-spacing:-.05em;word-break:keep-all}h2{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.2}h3{font-size:1.22rem}p{color:var(--muted)}.eyebrow{font-size:.75rem;font-weight:800;letter-spacing:.13em;color:var(--blue);text-transform:uppercase}.hero{max-width:760px;margin-bottom:28px}.hero p:last-child{margin-top:15px;font-size:1.05rem}.jump{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0 18px}.jump a{padding:8px 13px;border:1px solid var(--line);border-radius:99px;background:white;text-decoration:none;font-weight:750;font-size:.87rem}.search{display:block;width:min(100%,520px);padding:12px 14px;border:1px solid #aebfc9;border-radius:10px;background:white;font:inherit;margin:0 0 35px}.subject{margin:35px 0 48px;scroll-margin-top:20px}.subject-head{padding-bottom:15px;border-bottom:2px solid #b6d3df}.subject-head p:last-child{max-width:78ch;margin-top:8px}.topic{margin:22px 0 30px}.topic-head{display:flex;justify-content:space-between;align-items:baseline;gap:22px;margin-bottom:12px}.topic-head p{font-size:.9rem;max-width:62ch}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.card{min-height:100px;display:block;border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:17px 19px;color:var(--ink);text-decoration:none}.card:hover,.card:focus-visible{border-color:#5f9db9;box-shadow:0 5px 16px #12293812}.card strong{display:block;font-size:1.05rem}.card span{display:block;margin-top:5px;color:var(--muted);font-size:.89rem}.card[hidden],.subject[hidden],.topic[hidden]{display:none}.foot{border-top:1px solid var(--line);padding-top:18px;font-size:.85rem}.pdf{position:fixed;right:15px;bottom:15px;padding:10px 14px;border:1px solid var(--blue);border-radius:99px;background:white;color:var(--blue);font:inherit;font-weight:800;cursor:pointer;box-shadow:0 5px 18px #172b3820}@media(max-width:650px){.cards{grid-template-columns:1fr}.topic-head{display:block}.topic-head p{margin-top:5px}}@media print{body{background:white}.jump,.search,.pdf{display:none}.card,.topic{break-inside:avoid}.card[hidden],.subject[hidden],.topic[hidden]{display:block}}
+</style></head><body><button class="pdf" type="button" onclick="window.print()">PDF로 저장</button><main>
+<header class="hero"><p class="eyebrow">LEARNING ARTIFACTS</p><h1>실제 구성을 따라 읽는 아티팩트</h1><p>지금은 TRACEBACK의 인프라와 계정, 이 문서 사이트의 운영 과정을 담았습니다. 각 문서는 설정과 선택 이유를 먼저 보여주고, 그 단계에서 필요한 용어와 코드를 같은 화면에서 설명합니다.</p></header>
+<nav class="jump" aria-label="주제 바로가기"><a href="#traceback">TRACEBACK</a><a href="#artifact-operations">아티팩트 프로젝트 운영</a></nav><label for="artifact-search">문서 찾기</label><input class="search" id="artifact-search" type="search" placeholder="주제, 설정, 용어 검색" autocomplete="off">
+<div id="catalog"><section class="subject" id="traceback"><div class="subject-head"><p class="eyebrow">SUBJECT · traceback</p><h2>TRACEBACK</h2><p>온라인 스토어의 화면·API·데이터와 그 인프라를 실제 설정 순서대로 읽습니다. 상품·주문 기능은 현재 개발 브랜치에서 와이어프레임과 인증 중심입니다.</p></div><div class="topic" id="traceback-infrastructure"><div class="topic-head"><h3>인프라 구성</h3><p>Client → Vercel과 Server → AWS. 접속, 배포, 주소, DNS의 실제 값과 확인 상태를 단계별로 봅니다.</p></div><div class="cards"><a class="card" href="flow-1-system.html" data-search="TRACEBACK 인프라 구성 01 · 서비스 전체 구성 고객 요청과 두 배포 경로의 연결"><strong>01 · 서비스 전체 구성</strong><span>고객 요청과 두 배포 경로의 연결</span></a><a class="card" href="flow-2-access.html" data-search="TRACEBACK 인프라 구성 02 · 개발 EC2 접속 접속 경로 선택·설정과 실제 SSM 접속"><strong>02 · 개발 EC2 접속</strong><span>접속 경로 선택·설정과 실제 SSM 접속</span></a><a class="card" href="flow-3-deploy.html" data-search="TRACEBACK 인프라 구성 03 · Client와 Server 배포 Vercel·AWS CI/CD, 환경변수, dev/prod"><strong>03 · Client와 Server 배포</strong><span>Vercel·AWS CI/CD, 환경변수, dev/prod</span></a><a class="card" href="flow-4-address.html" data-search="TRACEBACK 인프라 구성 04 · 개발 API 주소 Route 53 A 레코드·EIP·Vercel origin"><strong>04 · 개발 API 주소</strong><span>Route 53 A 레코드·EIP·Vercel origin</span></a><a class="card" href="flow-5-dns.html" data-search="TRACEBACK 인프라 구성 05 · DNS 뒤의 HTTPS 주소 조회부터 EC2·Django·RDS까지"><strong>05 · DNS 뒤의 HTTPS</strong><span>주소 조회부터 EC2·Django·RDS까지</span></a></div></div><div class="topic" id="traceback-identity"><div class="topic-head"><h3>로그인·계정</h3><p>인프라를 이해한 뒤 인증 흐름 자체를 공부할 때 엽니다.</p></div><div class="cards"><a class="card" href="auth-session-allauth-guide.html" data-search="TRACEBACK 로그인·계정 세션·allauth·계정 생명주기 로그인·가입·소셜 계정·탈퇴"><strong>세션·allauth·계정 생명주기</strong><span>로그인·가입·소셜 계정·탈퇴</span></a><a class="card" href="email-smtp-ses-guide.html" data-search="TRACEBACK 로그인·계정 이메일 확인과 SES SMTP 확인 메일의 생성·전송·수신"><strong>이메일 확인과 SES SMTP</strong><span>확인 메일의 생성·전송·수신</span></a></div></div></section><section class="subject" id="artifact-operations"><div class="subject-head"><p class="eyebrow">SUBJECT · artifact-operations</p><h2>아티팩트 프로젝트 운영</h2><p>이 공개 학습 사이트와 의견 저장, Codex Cloud 작업 연결의 설정 기록입니다.</p></div><div class="topic" id="artifact-operations-publishing"><div class="topic-head"><h3>게시·의견</h3><p>GitHub Pages 공개 주소와 본인만 의견을 저장하는 경로를 설정한 순서입니다.</p></div><div class="cards"><a class="card" href="artifact-feedback-operations.html" data-search="아티팩트 프로젝트 운영 게시·의견 Pages·의견·Codex Cloud 운영 설정 과정과 iPad 화면, 역할 분리"><strong>Pages·의견·Codex Cloud 운영</strong><span>설정 과정과 iPad 화면, 역할 분리</span></a></div></div></section></div><p id="search-empty" hidden>일치하는 문서가 없습니다.</p>
+<footer class="foot">GitHub Pages의 공개 문서입니다. AWS·Vercel 상태는 각 문서의 확인 날짜를 기준으로 읽으세요.</footer>
+</main><script src="feedback.js" defer></script><script>
+const search=document.getElementById('artifact-search');const cards=[...document.querySelectorAll('.card')];
+search.addEventListener('input',()=>{const q=search.value.trim().toLocaleLowerCase();for(const card of cards){card.hidden=!!q&&!card.dataset.search.toLocaleLowerCase().includes(q)}for(const topic of document.querySelectorAll('.topic')){topic.hidden=![...topic.querySelectorAll('.card')].some(card=>!card.hidden)}for(const subject of document.querySelectorAll('.subject')){subject.hidden=![...subject.querySelectorAll('.topic')].some(topic=>!topic.hidden)}document.getElementById('search-empty').hidden=cards.some(card=>!card.hidden)});
+</script></body></html>

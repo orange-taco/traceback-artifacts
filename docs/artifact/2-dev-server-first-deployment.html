@@ -131,7 +131,7 @@
       <p>지금 가진 EC2, RDS, S3, Vercel이 어떤 역할을 하고, 어디를 먼저 설정해야 하는지 한 흐름으로 정리합니다. 서버에 SSH로 들어가 <code>git pull</code>하는 배포 방식이 아니라 GitHub Actions가 검증한 Docker 이미지를 EC2에 전달하도록 이미 구성돼 있습니다.</p>
       <span class="hero-note">일반 원리와 선택지를 설명한 뒤 TRACEBACK의 선택과 이유를 표시합니다.</span>
       <span class="hero-note">현재 권장안: ① dev는 dev로 운영하고, 준비가 되면 prod를 별도 구축</span>
-      <p class="small">이 페이지는 배포 설정의 심화 자료입니다. 프로젝트 배포 경로는 <a href="flow-3-deploy.html">짧은 TRACEBACK 배포 그림</a>, 기본 용어는 <a href="concept-deploy.html">CI/CD·컨테이너 개념</a>에서 먼저 볼 수 있습니다. 세 workflow의 줄별 원문은 <a href="traceback-system-guide.html#code">구현 참고</a>에 있습니다.</p>
+      <p class="small">이 페이지는 이전 배포 설정 기록입니다. 현재 두 배포 경로와 환경별 설정은 <a href="flow-3-deploy.html">TRACEBACK 배포 구성</a>에 있습니다. 세 workflow의 줄별 원문은 <a href="traceback-system-guide.html#code">구현 참고</a>에 있습니다.</p>
     </div>
   </header>
   <nav class="nav" aria-label="문서 목차"><div class="wrap"><a href="#big-picture">큰 흐름</a><a href="#launch-order">설정 순서·막힌 곳</a><a href="#status">현재 상태</a><a href="#db-choice">DB 구성</a><a href="#flow">연결 구조</a><a href="#cicd-iam">GitHub·IAM·ECR</a><a href="#deploy-code">배포 코드 해설</a><a href="#proxy">Nginx·HTTPS</a><a href="#glossary">용어</a><a href="#choice">운영 선택</a><a href="#steps">작업 순서</a><a href="#env">환경변수</a><a href="#cost">비용·보안</a></div></nav>

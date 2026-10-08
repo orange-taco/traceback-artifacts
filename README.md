@@ -16,13 +16,19 @@ TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관�
 소스 링크에 확인한 Git revision을 남깁니다. 이 저장소는 앱 코드를 복사해서
 보관하지 않습니다.
 
-목차의 **TRACEBACK 인프라 구성 1–5**는 고객 요청, 운영자 접속,
+목차는 `docs/artifact/catalog.json`에서 주제와 분야를 관리하고
+`python3 scripts/build_index.py`로 단일 진입점 `index.html`을 만듭니다.
+새 강의·프로젝트 자료도 catalog에 subject/topic을 추가할 수 있습니다.
+새 파일의 경로 규칙은 [`topics/README.md`](docs/artifact/topics/README.md)에
+있습니다. 기존 공개 HTML·이미지는 URL을 유지합니다.
+
+TRACEBACK **인프라 구성 1–5**는 고객 요청, 운영자 접속,
 Client→Vercel과 Server→AWS의 배포, 주소, DNS를 실제 설정과 함께
-보여줍니다. 환경변수의 저장 위치, development/production의 차이,
-코드에 정의된 경로와 관찰·검증 상태를 본문에서 볼 수 있습니다.
-네트워크, AWS, 인증, 이메일의 일반 원리·선택지는 **개념 문서**로
-분리했습니다. 설정 절차와 긴 코드 원문은 **상세 자료**에서 열 수
-있습니다. 기존 상세 문서의 URL과 절 링크는 유지합니다.
+보여줍니다. 환경변수 위치, development/production 차이와 검증 상태를
+본문에서 봅니다. 접속 방법의 선택·실제 설정·명령과 그때 필요한
+AWS·네트워크 용어를 해당 페이지에 둡니다. 로그인과 이메일의 내부
+동작은 별도 주제 아티팩트에서 자세히 다룹니다. 기존 상세 문서의 URL과
+절 링크는 유지합니다.
 
 iPad에서 문서를 읽는 데 로컬 clone이나 `git pull`은 필요하지 않습니다.
 Codex Cloud로 수정할 때는 게시된 개인 환경 `TRACEBACK Study (3 repos)`를
@@ -58,7 +64,8 @@ artifact 수정 API를 제공하지 않습니다. 저장 완료 화면의 Codex 
 
 ## 로컬 확인
 
-저장소 루트에서 다음 명령으로 사이트 내부의 파일·fragment 링크를 검사합니다.
+저장소 루트에서 다음 명령으로 catalog와 index 일치 여부, 사이트 내부의
+파일·fragment 링크를 검사합니다.
 
 ```sh
 python3 scripts/verify_site.py

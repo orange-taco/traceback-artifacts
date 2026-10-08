@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - docs/artifact/**
+      - scripts/build_index.py
       - scripts/verify_site.py
       - .github/workflows/pages.yml
   workflow_dispatch:
