@@ -129,14 +129,14 @@ PUBLIC_SITE_ORIGIN = "https://orange-taco.github.io"</code></pre><p>Worker가 �
           <article class="step" id="s4">
             <span class="step-kicker">04 · GitHub App · 조직 설치 전</span>
             <h3>App을 문서 저장소에만 설치</h3>
-            <p>처음 만든 개인 소유 비공개 App <strong>TRACEBACK Feedback Oscar2272</strong>는 <code>oscar2272/traceback-feedback</code>에만 설치되어 있습니다. <a href="https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/making-a-github-app-public-or-private">비공개 GitHub App은 소유 계정에만 설치</a>할 수 있으므로, 조직의 문서 저장소로 저장 대상을 옮기려면 App 소유권 이전 또는 조직 소유 App 생성이 필요합니다.</p>
+            <p>처음 만든 개인 소유 비공개 App <strong>TRACEBACK Feedback Oscar2272</strong>는 개인 의견 저장소에만 설치되어 있었습니다. <a href="https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/making-a-github-app-public-or-private">비공개 GitHub App은 소유 계정에만 설치</a>할 수 있어 2026년 10월 8일 App을 <code>orange-taco</code> 조직으로 이전했습니다. GitHub 화면에서 새 소유자와 기존 App ID·Client ID 유지를 확인했습니다. 이전 완료와 함께 개인 계정 설치는 자동 제거됐습니다.</p>
             <div class="why"><strong>두 토큰의 역할:</strong> OAuth 사용자 토큰은 <code>/user</code>로 소유자를 확인한 뒤 버립니다. App 설치 토큰은 Worker가 짧게 발급받아 의견 JSON 한 건을 씁니다.</div>
             <div class="screen" role="img" aria-label="전환 전 GitHub App 설치 화면 재현: 개인 의견 저장소 하나, Contents read/write">
               <div class="screen-bar"><span>GitHub / Apps / TRACEBACK Feedback Oscar2272</span><b>화면 재현</b></div>
               <div class="screen-body"><div class="screen-title">Install on oscar2272</div><div class="ui-row"><strong>Repository access</strong><span class="pill">Only select repositories</span></div><div class="ui-row"><strong>선택한 저장소</strong><span>oscar2272/traceback-feedback</span></div><div class="ui-row"><strong>Repository permissions</strong><span>Metadata 읽기 · Contents 읽기/쓰기</span></div><div class="ui-row"><strong>App ID · 설치 ID</strong><span>5232748 · 169112765</span></div><div class="ui-row"><strong>Client ID</strong><span>Iv23liEhxT16HdVO5bvG</span></div><div class="ui-row"><strong>Callback</strong><span><code>…workers.dev/oauth/callback</code></span></div></div>
-              <div class="screen-caption">이 화면은 전환 전 상태입니다. 새 설치는 조직 <code>orange-taco</code>의 <code>traceback-artifacts</code>만 선택해야 합니다.</div>
+              <div class="screen-caption">이 화면은 전환 전 상태입니다. 이전 후 조직 <code>orange-taco</code>의 <code>traceback-artifacts</code>만 선택해 새로 설치합니다. GitHub 권한은 저장소 Contents 전체에 적용되므로 Worker 코드가 기록 경로를 <code>feedback/</code>로 제한합니다.</div>
             </div>
-            <details><summary>전환할 때</summary><ol class="recipe"><li><a href="https://docs.github.com/en/apps/maintaining-github-apps/transferring-ownership-of-a-github-app">기존 App을 orange-taco로 이전</a>해 비공개로 유지하거나 조직 소유 비공개 App을 새로 만듭니다.</li><li>callback은 <code>https://traceback-feedback.traceback-feedback-worker.workers.dev/oauth/callback</code>으로 지정하고 웹훅은 끕니다.</li><li>Repository permission은 Contents 읽기/쓰기로 제한하며, <strong>Only select repositories</strong>에서 <code>traceback-artifacts</code>만 골라 설치합니다.</li><li>새 조직 설치 ID를 Worker secret에 등록합니다. 새 App이면 ID, Client ID, client secret, private key도 새로 등록합니다.</li></ol></details>
+            <details><summary>전환할 때</summary><ol class="recipe"><li><a href="https://docs.github.com/en/apps/maintaining-github-apps/transferring-ownership-of-a-github-app">기존 App을 orange-taco로 이전</a>하고 조직 소유 상태를 확인합니다.</li><li>callback은 <code>https://traceback-feedback.traceback-feedback-worker.workers.dev/oauth/callback</code>으로 유지하고 웹훅은 끕니다.</li><li>Repository permission은 Contents 읽기/쓰기로 제한하며, <strong>Only select repositories</strong>에서 <code>traceback-artifacts</code>만 골라 설치합니다.</li><li>새 조직 설치 ID를 Worker secret에 등록합니다. 비밀값은 공개 문서에 적지 않습니다.</li></ol></details>
           </article>
 
           <article class="step" id="s5">
@@ -197,6 +197,14 @@ if origin:
             </div>
             <figure class="capture"><a href="images/feedback-pages-ipad.jpg"><img src="images/feedback-pages-ipad.jpg" alt="실제 공개 시스템 가이드의 iPad 폭 화면. 인증 절과 왼쪽 아래 의견 남기기 버튼이 보인다"></a><figcaption>실제 Pages 화면 · 834px 폭. 왼쪽 아래 의견 남기기 버튼을 누르면 현재 문서와 절 ID가 전달됩니다. 그림을 누르면 원본 크기로 열립니다.</figcaption></figure>
             <figure class="capture"><a href="images/feedback-form-ipad.jpg"><img src="images/feedback-form-ipad.jpg" alt="이전 비공개 저장 방식의 iPad 폭 의견 양식. 문서 URL, auth 절 ID, 게시 revision, 위치와 의견 입력 필드, 의견만 저장 버튼이 보인다"></a><figcaption>이전 Worker 양식 · 같은 폭. 공개 저장 안내가 추가된 새 화면은 단일 저장소 전환 후 다시 캡처합니다. 이 캡처에는 의견이나 인증 비밀값이 없습니다.</figcaption></figure>
+            <div class="screen" role="img" aria-label="저장 완료 후 이번 의견 또는 모든 의견 요청문을 복사하고 Codex Cloud를 여는 흐름 재현">
+              <div class="screen-bar"><span>Worker / 저장 완료 → Codex Cloud</span><b>현재 코드 화면 재현</b></div>
+              <div class="screen-body"><div class="screen-title">의견을 저장했습니다</div><p class="screen-help">의견 파일은 공개 저장소의 feedback/에 있습니다. Codex 작업은 아직 시작되지 않았습니다.</p><div class="ui-row"><strong>모든 의견을 한 번에 검토</strong><span class="mock-button">요청 복사</span></div><div class="ui-row"><strong>이번 의견만 검토</strong><span>접어서 선택</span></div><div class="ui-row"><strong>다음 단계</strong><span>Codex Cloud 열기 → 새 작업에 붙여넣기 → 보내기</span></div></div>
+              <div class="screen-caption">나중에 돌아와도 의견 양식의 <code>/handoff</code> 링크에서 전체 의견 요청문을 다시 만들 수 있습니다. Pages나 Worker가 작업을 자동 제출하지는 않습니다.</div>
+            </div>
+            <div class="code-card"><header><span>한 번에 요청하는 문구 · index.js 247–249행</span><a href="https://github.com/orange-taco/traceback-artifacts/blob/9ad9b021d7dbdef0c114b7135166e6116698673e/feedback-worker/src/index.js#L247-L249">확인한 revision에서 보기</a></header><pre><code>function batchPrompt(recent = "") {
+  return `TRACEBACK Study (3 repos) Codex Cloud 환경에서 orange-taco/traceback-artifacts의 feedback/*.json을 모두 읽어 주세요.${recent} 각 의견의 document_url, section_id, location, comment, document_revision을 확인하고 현재 HTML 및 관련 원본 코드와 비교하세요. 중복되거나 이미 반영된 의견은 구분하고, 타당한 의견만 한 번의 아티팩트 변경으로 정리해 주세요. AGENTS.md와 auth-flow-visualizer 스킬을 따르고 python3 scripts/verify_site.py 및 좁은 화면과 데스크톱 화면을 확인하세요. 변경 이유와 반영하지 않은 의견을 설명하고 문서 PR을 만들어 주세요. 자동 병합은 하지 마세요.`;
+}</code></pre><p>Worker는 요청문을 만들어 복사를 돕습니다. Codex Cloud에 보내는 행위는 사용자에게 남겨 저장 API와 수정 작업을 분리합니다.</p></div>
             <div class="code-card"><header><span>정확한 코드 발췌 · index.js 211–219행</span><a href="https://github.com/orange-taco/traceback-artifacts/blob/55287f3374e9752c4ac9b3171feb7e6c95cba137/feedback-worker/src/index.js#L211-L219">확인한 revision에서 보기</a></header><pre><code>async function submit(request, env, url) {
   const owner = await session(request, env);
   if (!owner) return new Response("Unauthorized", { status: 401 });
