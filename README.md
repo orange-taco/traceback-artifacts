@@ -26,8 +26,9 @@ Codex Cloud에서는 새 작업을 시작해 의견 파일 ID를 지정합니다
 GitHub Pages는 계속 공개 읽기 사이트입니다. 의견 UI는 별도 Cloudflare
 Worker로 이동하며, Worker는 GitHub App을 통해 이 저장소의 `feedback/`에
 기록합니다. 의견 파일도 공개됩니다. iPad에서 의견을 저장해도 Codex 작업이나
-문서 수정은 시작되지 않습니다. 수정할 때는 본인이 Codex Cloud에서 별도
-작업을 시작하고 문서 PR을 검토합니다.
+문서 수정은 시작되지 않습니다. 저장 완료 화면에서 모든 의견을 한 작업으로
+검토하는 요청문을 복사하고 Codex Cloud를 열 수 있습니다. 본인이 게시된
+`TRACEBACK Study (3 repos)` 환경에서 요청문을 보내고 문서 PR을 검토합니다.
 
 ## iPad 의견 저장
 
@@ -44,7 +45,8 @@ ID가 포함됩니다. 이 파일은 이 공개 저장소의 [`feedback/`](feedb
 서버는 GitHub 로그인에서 확인한 계정 ID가 `oscar2272`의 ID인지 검사하고,
 로그인 세션과 CSRF 토큰을 다시 확인한 뒤 저장합니다. 브라우저에 GitHub
 토큰이나 OpenAI API 키를 넣지 않습니다. 의견 저장용 API는 Codex 작업이나
-artifact 수정 API를 제공하지 않습니다.
+artifact 수정 API를 제공하지 않습니다. 저장 완료 화면의 Codex 버튼은
+요청문 복사와 Codex Cloud 이동만 돕습니다. 작업 제출은 본인이 직접 합니다.
 
 ## 로컬 확인
 

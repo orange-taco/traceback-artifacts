@@ -5,7 +5,11 @@ This Worker provides a separate iPad-friendly feedback form. After checking the
 signed-in GitHub account's numeric ID, it writes public JSON files under
 `orange-taco/traceback-artifacts/feedback/`. Anyone can read the opinions;
 only the owner can submit through this form. Saving feedback never starts
-Codex or edits a guide.
+Codex or edits a guide. The saved page offers copyable prompts for the newest
+opinion or every `feedback/*.json`, then opens Codex Cloud. The owner selects
+the published environment and submits the prompt there. Later, the owner can
+open the feedback form from Pages and follow its saved-opinions link to
+`/handoff` for the same batch prompt.
 
 GitHub Pages and the public repository can stay on GitHub Free, and the Worker
 can run within [Cloudflare's free request allowance](https://developers.cloudflare.com/workers/platform/pricing/)
@@ -63,8 +67,10 @@ ChatGPT plan and its limits.
    when this config exists.
 6. Keep the personal Codex Cloud environment's existing three repositories,
    including `orange-taco/traceback-artifacts`. In a new Cloud task, ask Codex
-   to read `feedback/<id>.json` from that repository. The user must separately
-   ask Codex to revise an artifact and create a PR; saving never triggers a task.
+   to read `feedback/<id>.json` or all `feedback/*.json` from that repository.
+   The saved page prepares either prompt. The user must send it in Codex Cloud;
+   saving never triggers a task. Ask Codex to assess each opinion, revise the
+   relevant artifact, run site checks, and make one PR for review.
 
 ## Data and access
 
@@ -75,6 +81,9 @@ revision must be a 40-character commit ID. The server checks a signed,
 HTTP-only session for the fixed numeric GitHub account ID `88140361`, same-origin
 form submission, and a CSRF token. Other accounts receive HTTP 403 at login;
 unauthenticated saves receive HTTP 401. There is no modify or run endpoint.
+The owner-only `GET /handoff` page prepares a batch prompt. Its
+`GET /handoff.js` script only copies the visible prompt to the clipboard; the
+Codex link opens the Cloud UI and does not submit a task.
 
 The login and feedback form live on the Worker origin. This full-page navigation
 avoids third-party cookies between `github.io` and `workers.dev` in iPad Safari.

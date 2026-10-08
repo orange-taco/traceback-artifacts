@@ -56,6 +56,9 @@ test("only the owner can save feedback and saving cannot start an edit", async (
   try {
     const anonymous = await worker.fetch(request("/api/feedback", { method: "POST", headers: { Origin: root }, body: new URLSearchParams() }), env);
     assert.equal(anonymous.status, 401);
+    const anonymousHandoff = await worker.fetch(request("/handoff"), env);
+    assert.equal(anonymousHandoff.status, 303);
+    assert.match(anonymousHandoff.headers.get("Location"), /return_to=%2Fhandoff/);
     const anonymousExecute = await worker.fetch(request("/api/execute", { method: "POST" }), env);
     assert.equal(anonymousExecute.status, 404);
     assert.equal(githubCalls.length, 0);
@@ -73,6 +76,10 @@ test("only the owner can save feedback and saving cannot start an edit", async (
     assert.equal(form.status, 200);
     const formHtml = await form.text();
     assert.match(formHtml, /공개 저장소에 기록되어 누구나 읽을 수 있습니다/);
+    assert.match(formHtml, /이미 저장한 의견으로 Codex Cloud 수정 요청 준비/);
+    const batchHandoff = await worker.fetch(request("/handoff", { headers: { Cookie: session } }), env);
+    assert.equal(batchHandoff.status, 200);
+    assert.match(await batchHandoff.text(), /feedback\/\*\.json을 모두 읽어 주세요/);
     const csrf = formHtml.match(/name="csrf" value="([^"]+)"/)?.[1];
     assert.ok(csrf);
 
@@ -92,6 +99,13 @@ test("only the owner can save feedback and saving cannot start an edit", async (
     const savedHtml = await savedPage.text();
     assert.match(savedHtml, /공개 의견 보기/);
     assert.match(savedHtml, /github\.com\/orange-taco\/traceback-artifacts\/blob\/main\/feedback\//);
+    assert.match(savedHtml, /feedback\/\*\.json을 모두 읽어 주세요/);
+    assert.match(savedHtml, /이번 의견만 검토하려면/);
+    assert.match(savedHtml, /https:\/\/chatgpt\.com\/codex\/cloud/);
+    assert.match(savedHtml, /Codex 작업과 문서 수정은 아직 시작되지 않았습니다/);
+    const handoff = await worker.fetch(request("/handoff.js"), env);
+    assert.equal(handoff.status, 200);
+    assert.match(await handoff.text(), /navigator\.clipboard\.writeText/);
     const write = githubCalls.find((call) => call.url.includes("/contents/feedback/"));
     assert.ok(write);
     assert.match(write.url, /^https:\/\/api\.github\.com\/repos\/orange-taco\/traceback-artifacts\/contents\/feedback\/[^/]+\.json$/);
