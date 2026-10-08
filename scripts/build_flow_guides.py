@@ -21,17 +21,19 @@ PAGES = [
         "file": "flow-1-system.html",
         "num": "01",
         "kicker": "서비스의 전체 경계",
-        "title": "TRACEBACK은 어디서 화면을 보여주고, 어디서 요청을 처리할까?",
-        "lead": "TRACEBACK은 고객이 보는 프런트엔드와 Django API를 분리한 서비스입니다. 아래 그림은 고객 요청이 지나가도록 설계된 경로입니다. 실제 외부 요청 성공 여부는 단계별 상태를 따로 확인해야 합니다.",
+        "title": "TRACEBACK 스토어의 화면과 API는 어디에 있을까?",
+        "lead": "TRACEBACK은 상품 탐색·장바구니·결제·주문 조회를 목표로 하는 온라인 스토어입니다. 현재 개발 브랜치는 인증·계정 구현과 프런트 와이어프레임 중심입니다. 아래는 고객 요청이 지나가도록 설계한 인프라 경로입니다.",
         "nodes": [
-            ("고객", "브라우저", "화면 열기·API 요청", "client"),
+            ("고객", "브라우저", "스토어 화면·인증 요청", "client"),
             ("프런트엔드", "Vercel · React Router", "페이지 제공·API 경로 rewrite", "front"),
-            ("백엔드", "EC2 · Django", "인증·비즈니스 로직", "api"),
-            ("데이터", "RDS · PostgreSQL", "계정·서비스 데이터", "data"),
+            ("백엔드", "EC2 · Django", "인증 구현·다른 기능 계획", "api"),
+            ("데이터", "RDS · PostgreSQL", "DB 연결 검증 별도", "data"),
         ],
         "caption": "브라우저의 페이지 요청은 Vercel에서 처리합니다. /api, /accounts, /_allauth 요청은 Vercel 설정의 DJANGO_ORIGIN을 통해 Django 쪽으로 전달하도록 정의되어 있습니다. Django가 DB를 사용합니다.",
-        "status": "프런트와 rewrite는 개발 브랜치 코드에 정의되어 있습니다. 2026-10-04 관찰 기록에는 API HTTPS가 연결 거부 상태였습니다. 지금의 외부 접속은 별도로 다시 확인해야 합니다.",
+        "status": "스토어·장바구니·주문은 제품 목표이고, 현재 확인한 개발 코드는 인증·계정과 프런트 와이어프레임 중심입니다. Vercel rewrite는 코드에 정의되어 있지만 2026-10-04 관찰 기록에는 API HTTPS가 연결 거부 상태였습니다. 지금의 외부 접속은 다시 확인해야 합니다.",
         "links": [
+            source("traceback", BACKEND, "docs/system.md", "17-L24", "백엔드 development · 제품 범위 17–24행"),
+            source("traceback-client", CLIENT, "README.md", "1-L10", "클라이언트 development · 스토어 와이어프레임"),
             source("traceback-client", CLIENT, "vercel.ts", "1-L37", "클라이언트 development · Vercel rewrite 1–37행"),
             source("traceback", BACKEND, "config/settings/base.py", "1", "백엔드 development · Django 설정"),
             '<a href="traceback-system-guide.html">시스템·인증·CI/CD 상세 참고</a>',
@@ -131,6 +133,7 @@ CONCEPTS = [
         ],
         "flow": "flow-2-access.html", "deep": "1-aws-ssm-ssh-learning-guide.html",
         "deep_label": "VPC·Identity Center·SSH/SSM·실제 명령 상세",
+        "sources": [source("traceback", BACKEND, "docs/deployment.md", "83-L105", "백엔드 development · EC2 역할·SSM 요구사항")],
     },
     {
         "file": "concept-deploy.html",
@@ -144,6 +147,7 @@ CONCEPTS = [
         ],
         "flow": "flow-3-deploy.html", "deep": "2-dev-server-first-deployment.html",
         "deep_label": "OIDC·ECR·EC2·RDS·환경변수·첫 배포 상세",
+        "sources": [source("traceback", BACKEND, ".github/workflows/ci.yml", "1-L60", "백엔드 development · CI와 검증 단계")],
     },
     {
         "file": "concept-address.html",
@@ -157,6 +161,7 @@ CONCEPTS = [
         ],
         "flow": "flow-4-address.html", "deep": "3-development-ip-domain-guide.html",
         "deep_label": "IP·도메인·EIP의 프로젝트 값과 비용 상세",
+        "sources": [source("traceback-client", CLIENT, "vercel.ts", "1-L37", "클라이언트 development · API origin과 rewrite")],
     },
     {
         "file": "concept-dns.html",
@@ -170,6 +175,7 @@ CONCEPTS = [
         ],
         "flow": "flow-5-dns.html", "deep": "4-dns-resolution-map.html",
         "deep_label": "resolver·root·위임·캐시·TLS 상세 그림",
+        "sources": [source("traceback-client", CLIENT, "vercel.ts", "20-L35", "클라이언트 development · API 전달 경로")],
     },
     {
         "file": "concept-auth.html",
@@ -183,6 +189,7 @@ CONCEPTS = [
         ],
         "flow": "flow-1-system.html", "deep": "auth-session-allauth-guide.html",
         "deep_label": "세션·토큰·allauth Headless·Kakao 탈퇴 상세",
+        "sources": [source("traceback", BACKEND, "config/settings/base.py", "20-L28", "백엔드 development · allauth 구성"), source("traceback", BACKEND, "config/settings/base.py", "143-L147", "백엔드 development · Headless browser 설정")],
     },
     {
         "file": "concept-email.html",
@@ -196,6 +203,7 @@ CONCEPTS = [
         ],
         "flow": "flow-1-system.html", "deep": "email-smtp-ses-guide.html",
         "deep_label": "SMTP·SES·확인 링크·설정 근거 상세",
+        "sources": [source("traceback", BACKEND, "config/settings/base.py", "95-L112", "백엔드 development · Django SMTP 설정"), source("traceback", BACKEND, "config/server.env.example", "9-L15", "백엔드 development · SES 환경변수 예시")],
     },
 ]
 
@@ -231,7 +239,7 @@ def render(page: dict, index: int) -> str:
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{escape(page["num"] + " · " + page["title"])} · TRACEBACK</title><style>{STYLE}</style></head>
 <body><main><nav class="top" aria-label="문서 탐색"><a href="index.html">← TRACEBACK 전체 구조</a><button type="button" onclick="window.print()">PDF로 저장</button></nav>
-<header class="hero"><p class="eyebrow">TRACEBACK 실제 구성 · {page["num"]} / 05 · {escape(page["kicker"])}</p><h1>{escape(page["title"])}</h1><p class="lead">{escape(page["lead"])}</p></header>
+<header class="hero"><p class="eyebrow">TRACEBACK 설계·구현 · {page["num"]} / 05 · {escape(page["kicker"])}</p><h1>{escape(page["title"])}</h1><p class="lead">{escape(page["lead"])}</p></header>
 <section class="panel" aria-labelledby="flow-title"><h2 id="flow-title">한눈에 보는 경로</h2><ol class="flow" aria-label="{escape(page["caption"])}">{nodes}</ol><p class="caption">{escape(page["caption"])}</p></section>
 <section class="panel" aria-labelledby="status-title"><h2 id="status-title">현재 확인 범위</h2><p class="status">{escape(page["status"])}</p></section>
 <section class="panel" aria-labelledby="more-title"><h2 id="more-title">이 그림을 이해하거나 확인하려면</h2><ul class="links">{links}</ul><p class="source-note">코드 링크: backend development {BACKEND[:12]} · client development {CLIENT[:12]}. AWS·Vercel 콘솔 상태는 코드와 별도이며, 이전 관찰 날짜를 표시했습니다.</p></section>
@@ -248,6 +256,7 @@ def render_concept(page: dict) -> str:
         f'<article><h3>{escape(title)}</h3><p>{escape(body)}</p></article>'
         for title, body in page["facts"]
     )
+    sources = "".join(f"<li>{link}</li>" for link in page["sources"])
     return f'''<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{escape(page["title"])} · TRACEBACK 개념</title><style>{STYLE}</style></head>
@@ -255,7 +264,7 @@ def render_concept(page: dict) -> str:
 <header class="hero"><p class="eyebrow">TRACEBACK을 이해하기 위한 개념</p><h1>{escape(page["title"])}</h1><p class="lead">{escape(page["lead"])}</p></header>
 <section class="panel" aria-labelledby="model-title"><h2 id="model-title">일반적인 연결 그림</h2><ol class="flow">{nodes}</ol></section>
 <section class="panel" aria-labelledby="explain-title"><h2 id="explain-title">각 선택의 의미</h2><div class="facts">{facts}</div></section>
-<section class="panel" aria-labelledby="more-title"><h2 id="more-title">TRACEBACK 사례와 더 깊은 설명</h2><ul class="links"><li><a href="{page["flow"]}">우리 프로젝트의 짧은 흐름 →</a></li><li><a href="{page["deep"]}">{escape(page["deep_label"])} →</a></li></ul><p class="source-note">프로젝트 구현 근거와 확인 날짜는 연결한 흐름·심화 문서에 표시했습니다. 이 페이지의 첫 그림은 일반 개념입니다.</p></section>
+<section class="panel" aria-labelledby="more-title"><h2 id="more-title">TRACEBACK 사례와 더 깊은 설명</h2><ul class="links"><li><a href="{page["flow"]}">우리 프로젝트의 짧은 흐름 →</a></li><li><a href="{page["deep"]}">{escape(page["deep_label"])} →</a></li>{sources}</ul><p class="source-note">소스 링크는 backend development {BACKEND[:12]} 또는 client development {CLIENT[:12]}에 고정했습니다. AWS·Vercel 콘솔에서 관찰한 값은 상세 문서의 날짜를 확인하세요. 이 페이지의 첫 그림은 일반 개념입니다.</p></section>
 <nav class="next"><a href="index.html">← 전체 구조와 다른 개념</a></nav></main><script src="feedback.js" defer></script></body></html>
 '''
 
