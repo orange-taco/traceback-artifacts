@@ -142,7 +142,7 @@ async function newForm(request, env, url) {
   const section = url.searchParams.get("section") || "";
   if (!documentUrl || !/^[a-f0-9]{40}$/.test(revision) || section.length > 180 || /[\u0000-\u001f\u007f]/.test(section)) return html('<div class="card"><h1>문서 정보가 올바르지 않습니다</h1><p>학습 페이지에서 다시 의견 남기기를 누르세요.</p></div>', 400);
   const csrf = await sign({ nonce: owner.nonce, exp: owner.exp }, env.SESSION_SECRET);
-  return html(`<div class="card"><p><a href="${htmlEscape(documentUrl)}${section ? `#${encodeURIComponent(section)}` : ""}">← 문서로 돌아가기</a></p><h1>이 문서에 의견 남기기</h1><p class="muted">의견 저장만 수행합니다. 문서는 수정되지 않고 Codex 작업도 시작되지 않습니다.</p>
+  return html(`<div class="card"><p><a href="${htmlEscape(documentUrl)}${section ? `#${encodeURIComponent(section)}` : ""}">← 문서로 돌아가기</a></p><h1>이 문서에 의견 남기기</h1><p class="muted">의견은 공개 저장소에 기록되어 누구나 읽을 수 있습니다. 저장만 수행하며 문서는 수정되지 않고 Codex 작업도 시작되지 않습니다.</p>
     <p class="meta"><strong>문서</strong> ${htmlEscape(documentUrl)}<br><strong>절 ID</strong> ${htmlEscape(section || "전체 문서")}<br><strong>게시 revision</strong> <code>${htmlEscape(revision.slice(0, 12))}</code></p>
     <form method="post" action="/api/feedback"><input type="hidden" name="csrf" value="${htmlEscape(csrf)}"><input type="hidden" name="document_url" value="${htmlEscape(documentUrl)}"><input type="hidden" name="document_revision" value="${htmlEscape(revision)}"><input type="hidden" name="section_id" value="${htmlEscape(section)}">
       <label for="location">어느 부분인가요?</label><input id="location" name="location" maxlength="500" required placeholder="예: 첫 번째 그림의 전체 흐름, 또는 문서 전반" autocomplete="off">
@@ -235,7 +235,7 @@ async function saved(request, env, url) {
   const documentUrl = validDocument(url.searchParams.get("doc"), env.PUBLIC_SITE_ORIGIN);
   if (!/^[0-9a-f-]{36}$/.test(id) || !documentUrl) return new Response("Invalid feedback reference", { status: 400 });
   const repoUrl = `https://github.com/${env.GITHUB_OWNER}/${env.FEEDBACK_REPO}/blob/main/feedback/${id}.json`;
-  return html(`<div class="card"><h1>의견을 저장했습니다</h1><p>의견 ID: <code>${htmlEscape(id)}</code></p><p><a href="${htmlEscape(repoUrl)}">비공개 저장소에서 의견 보기</a></p><p class="muted">Codex 작업은 시작되지 않았습니다. 수정이 필요할 때 Codex Cloud에서 이 의견 ID를 지정해 별도로 요청하세요.</p><p><a href="${htmlEscape(documentUrl)}">문서로 돌아가기</a></p></div>`);
+  return html(`<div class="card"><h1>의견을 저장했습니다</h1><p>의견 ID: <code>${htmlEscape(id)}</code></p><p><a href="${htmlEscape(repoUrl)}">공개 의견 보기</a></p><p class="muted">Codex 작업은 시작되지 않았습니다. 수정이 필요할 때 Codex Cloud에서 이 의견 ID를 지정해 별도로 요청하세요.</p><p><a href="${htmlEscape(documentUrl)}">문서로 돌아가기</a></p></div>`);
 }
 
 export default {

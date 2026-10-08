@@ -15,7 +15,7 @@
 
       const link = document.createElement("a");
       link.textContent = "의견 남기기";
-      link.setAttribute("aria-label", "현재 문서에 대한 비공개 의견 남기기");
+      link.setAttribute("aria-label", "현재 문서에 공개 의견 남기기");
       link.className = "traceback-feedback-link";
       const style = document.createElement("style");
       style.textContent = `.traceback-feedback-link{position:fixed;left:16px;bottom:16px;z-index:40;display:inline-flex;align-items:center;min-height:44px;padding:8px 16px;border-radius:999px;background:#176b91;color:#fff!important;font:700 15px/1.4 system-ui,"Apple SD Gothic Neo",sans-serif;text-decoration:none;box-shadow:0 5px 18px #172b3840}.traceback-feedback-link:focus-visible{outline:3px solid #172b38;outline-offset:3px}@media print{.traceback-feedback-link{display:none}}`;
