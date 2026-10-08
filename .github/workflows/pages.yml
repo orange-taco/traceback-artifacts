@@ -30,9 +30,28 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 scripts/verify_site.py
+      - name: Prepare published files and revision
+        env:
+          FEEDBACK_WORKER_ORIGIN: ${{ vars.FEEDBACK_WORKER_ORIGIN }}
+        run: |
+          cp -R docs/artifact "$RUNNER_TEMP/artifact-site"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from urllib.parse import urlsplit
+
+          origin = os.environ.get("FEEDBACK_WORKER_ORIGIN", "").rstrip("/")
+          if origin:
+              parsed = urlsplit(origin)
+              if parsed.scheme != "https" or not parsed.hostname or parsed.path or parsed.query or parsed.fragment:
+                  raise SystemExit("FEEDBACK_WORKER_ORIGIN must be an HTTPS origin")
+              config = {"revision": os.environ["GITHUB_SHA"], "feedback_origin": origin}
+              (Path(os.environ["RUNNER_TEMP"]) / "artifact-site/site-config.json").write_text(json.dumps(config), encoding="utf-8")
+          PY
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b  # v5
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b  # v4
         with:
-          path: docs/artifact
+          path: ${{ runner.temp }}/artifact-site
       - uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e  # v4
         id: deploy

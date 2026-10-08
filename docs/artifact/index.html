@@ -39,11 +39,11 @@
       <h2 id="publish-title">이 학습 사이트는 어떻게 공개되나요?</h2>
       <p>저장소에 HTML 파일이 있어도 공개 사이트는 자동으로 생기지 않습니다. 게시 작업이 실행되고 성공해야 URL에서 읽을 수 있습니다.</p>
       <div class="publish-path" role="img" aria-label="문서가 게시 브랜치에 반영되고 GitHub Pages 작업이 성공하면 공개 URL에서 열립니다">
-        <div><strong>① 문서가 게시 브랜치에 도착</strong><small>TRACEBACK: PR을 <code>development</code>에 병합</small></div>
-        <div><strong>② Pages 작업 성공</strong><small><code>artifact-pages.yml</code>이 문서·이미지를 업로드</small></div>
-        <div><strong>③ 공개 URL 확인</strong><small><code>orange-taco.github.io/traceback/</code>에서 목차 열기</small></div>
+        <div><strong>① 문서가 게시 브랜치에 도착</strong><small>이 저장소의 PR을 <code>main</code>에 병합</small></div>
+        <div><strong>② Pages 작업 성공</strong><small><code>pages.yml</code>이 문서·이미지를 업로드</small></div>
+        <div><strong>③ 공개 URL 확인</strong><small><code>orange-taco.github.io/traceback-artifacts/</code>에서 목차 열기</small></div>
       </div>
-      <details><summary>첫 공개 전에 URL이 404였던 이유는?</summary><p>2026-10-04 기준 게시 workflow는 PR 브랜치에만 있었습니다. 이 저장소는 <code>development</code> push에서 Pages를 게시하도록 설정했고 <code>github-pages</code> 환경도 그 브랜치만 허용합니다. PR의 Quality/Test 성공은 Pages 게시 성공을 뜻하지 않습니다. 병합 뒤 Pages 실행 결과와 실제 URL을 확인해야 합니다. API 서버의 ECR 이미지 빌드·EC2 배포는 별도 workflow이므로 Pages 404와 원인이 다릅니다. <a href="https://github.com/orange-taco/traceback/blob/development/.github/workflows/artifact-pages.yml">게시 workflow 원문</a></p></details>
+      <details><summary>PR을 병합했는데도 URL이 열리지 않나요?</summary><p>이 저장소의 <code>main</code>에 문서가 반영된 뒤 <code>pages.yml</code> 작업이 성공해야 공개됩니다. PR 검사 성공과 Pages 게시 성공은 다릅니다. 병합 뒤 Pages 실행 결과와 실제 URL을 확인하세요. API 서버의 ECR 이미지 빌드·EC2 배포는 별도 작업입니다. <a href="https://github.com/orange-taco/traceback-artifacts/blob/main/.github/workflows/pages.yml">이 저장소의 Pages workflow</a></p></details>
     </section>
     <div class="section-head"><h2>추천 읽기 순서</h2><p>먼저 그림을 보고, 더 궁금한 부분을 펼쳐 읽으세요.</p></div>
     <nav class="cards" aria-label="시스템과 AWS 인프라 학습 문서">
@@ -60,5 +60,6 @@
     </nav>
     <p class="foot">문서는 공개 학습 자료입니다. TRACEBACK의 실제 설정 상태는 각 문서에 표시된 확인 날짜를 기준으로 읽으세요.</p>
   </main>
+  <script src="feedback.js" defer></script>
 </body>
 </html>
