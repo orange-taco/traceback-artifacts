@@ -7,7 +7,9 @@ signed-in GitHub account's numeric ID, it writes public JSON files under
 only the owner can submit through this form. Saving feedback never starts
 Codex or edits a guide. The saved page offers copyable prompts for the newest
 opinion or every `feedback/*.json`, then opens Codex Cloud. The owner selects
-the published environment and submits the prompt there.
+the published environment and submits the prompt there. Later, the owner can
+open the feedback form from Pages and follow its saved-opinions link to
+`/handoff` for the same batch prompt.
 
 GitHub Pages and the public repository can stay on GitHub Free, and the Worker
 can run within [Cloudflare's free request allowance](https://developers.cloudflare.com/workers/platform/pricing/)
@@ -77,8 +79,9 @@ revision must be a 40-character commit ID. The server checks a signed,
 HTTP-only session for the fixed numeric GitHub account ID `88140361`, same-origin
 form submission, and a CSRF token. Other accounts receive HTTP 403 at login;
 unauthenticated saves receive HTTP 401. There is no modify or run endpoint.
-The `GET /handoff.js` script only copies the visible prompt to the clipboard;
-the Codex link opens the Cloud UI and does not submit a task.
+The owner-only `GET /handoff` page prepares a batch prompt. Its
+`GET /handoff.js` script only copies the visible prompt to the clipboard; the
+Codex link opens the Cloud UI and does not submit a task.
 
 The login and feedback form live on the Worker origin. This full-page navigation
 avoids third-party cookies between `github.io` and `workers.dev` in iPad Safari.

@@ -99,7 +99,7 @@ async function session(request, env) {
 
 async function startLogin(request, env, url) {
   const returnTo = url.searchParams.get("return_to") || "/new";
-  if (!returnTo.startsWith("/new?") && returnTo !== "/new") return new Response("Invalid return path", { status: 400 });
+  if (!returnTo.startsWith("/new?") && returnTo !== "/new" && returnTo !== "/handoff") return new Response("Invalid return path", { status: 400 });
   const state = randomString();
   const verifier = randomString();
   const digest = await crypto.subtle.digest("SHA-256", encoder.encode(verifier));
@@ -142,7 +142,7 @@ async function newForm(request, env, url) {
   const section = url.searchParams.get("section") || "";
   if (!documentUrl || !/^[a-f0-9]{40}$/.test(revision) || section.length > 180 || /[\u0000-\u001f\u007f]/.test(section)) return html('<div class="card"><h1>문서 정보가 올바르지 않습니다</h1><p>학습 페이지에서 다시 의견 남기기를 누르세요.</p></div>', 400);
   const csrf = await sign({ nonce: owner.nonce, exp: owner.exp }, env.SESSION_SECRET);
-  return html(`<div class="card"><p><a href="${htmlEscape(documentUrl)}${section ? `#${encodeURIComponent(section)}` : ""}">← 문서로 돌아가기</a></p><h1>이 문서에 의견 남기기</h1><p class="muted">의견은 공개 저장소에 기록되어 누구나 읽을 수 있습니다. 저장만 수행하며 문서는 수정되지 않고 Codex 작업도 시작되지 않습니다.</p>
+  return html(`<div class="card"><p><a href="${htmlEscape(documentUrl)}${section ? `#${encodeURIComponent(section)}` : ""}">← 문서로 돌아가기</a></p><h1>이 문서에 의견 남기기</h1><p class="muted">의견은 공개 저장소에 기록되어 누구나 읽을 수 있습니다. 저장만 수행하며 문서는 수정되지 않고 Codex 작업도 시작되지 않습니다.</p><p><a href="/handoff">이미 저장한 의견으로 Codex Cloud 수정 요청 준비</a></p>
     <p class="meta"><strong>문서</strong> ${htmlEscape(documentUrl)}<br><strong>절 ID</strong> ${htmlEscape(section || "전체 문서")}<br><strong>게시 revision</strong> <code>${htmlEscape(revision.slice(0, 12))}</code></p>
     <form method="post" action="/api/feedback"><input type="hidden" name="csrf" value="${htmlEscape(csrf)}"><input type="hidden" name="document_url" value="${htmlEscape(documentUrl)}"><input type="hidden" name="document_revision" value="${htmlEscape(revision)}"><input type="hidden" name="section_id" value="${htmlEscape(section)}">
       <label for="location">어느 부분인가요?</label><input id="location" name="location" maxlength="500" required placeholder="예: 첫 번째 그림의 전체 흐름, 또는 문서 전반" autocomplete="off">
@@ -235,13 +235,22 @@ async function saved(request, env, url) {
   const documentUrl = validDocument(url.searchParams.get("doc"), env.PUBLIC_SITE_ORIGIN);
   if (!/^[0-9a-f-]{36}$/.test(id) || !documentUrl) return new Response("Invalid feedback reference", { status: 400 });
   const repoUrl = `https://github.com/${env.GITHUB_OWNER}/${env.FEEDBACK_REPO}/blob/main/feedback/${id}.json`;
-  const allPrompt = `TRACEBACK Study (3 repos) Codex Cloud 환경에서 orange-taco/traceback-artifacts의 feedback/*.json을 모두 읽어 주세요. 특히 방금 저장한 feedback/${id}.json을 포함하세요. 각 의견의 document_url, section_id, location, comment, document_revision을 확인하고 현재 HTML 및 관련 원본 코드와 비교하세요. 중복되거나 이미 반영된 의견은 구분하고, 타당한 의견만 한 번의 아티팩트 변경으로 정리해 주세요. AGENTS.md와 auth-flow-visualizer 스킬을 따르고 python3 scripts/verify_site.py 및 좁은 화면과 데스크톱 화면을 확인하세요. 변경 이유와 반영하지 않은 의견을 설명하고 문서 PR을 만들어 주세요. 자동 병합은 하지 마세요.`;
+  const allPrompt = batchPrompt(` 특히 방금 저장한 feedback/${id}.json을 포함하세요.`);
   const onePrompt = `TRACEBACK Study (3 repos) Codex Cloud 환경에서 orange-taco/traceback-artifacts의 feedback/${id}.json을 읽어 주세요. 의견의 문서 URL과 게시 revision을 현재 HTML 및 관련 원본 코드와 비교하고, 타당한 수정만 AGENTS.md와 auth-flow-visualizer 스킬에 따라 반영해 주세요. python3 scripts/verify_site.py와 좁은 화면 및 데스크톱 화면을 확인하고 문서 PR을 만들어 주세요. 자동 병합은 하지 마세요.`;
   return html(`<div class="card"><h1>의견을 저장했습니다</h1><p>의견 ID: <code>${htmlEscape(id)}</code></p><p><a href="${htmlEscape(repoUrl)}">공개 의견 보기</a></p><p class="muted">저장만 완료됐습니다. Codex 작업과 문서 수정은 아직 시작되지 않았습니다.</p>
     <h2>Codex Cloud에서 수정 요청</h2><p>다음 요청을 복사하고 <strong>TRACEBACK Study (3 repos)</strong> 환경에서 새 작업으로 보내세요. 여러 의견을 한 작업에서 검토할 수 있습니다.</p>
     <label for="prompt-all">모든 의견을 한 번에 검토</label><textarea id="prompt-all" readonly>${htmlEscape(allPrompt)}</textarea><button type="button" data-copy="prompt-all">요청 복사</button>
     <details><summary>이번 의견만 검토하려면</summary><label for="prompt-one">이번 의견</label><textarea id="prompt-one" readonly>${htmlEscape(onePrompt)}</textarea><button type="button" data-copy="prompt-one">이번 의견 요청 복사</button></details>
     <p id="copy-status" role="status" aria-live="polite"></p><p><a href="https://chatgpt.com/codex/cloud" target="_blank" rel="noopener noreferrer">Codex Cloud 열기</a> · <a href="${htmlEscape(documentUrl)}">문서로 돌아가기</a></p></div><script src="/handoff.js" defer></script>`);
+}
+
+function batchPrompt(recent = "") {
+  return `TRACEBACK Study (3 repos) Codex Cloud 환경에서 orange-taco/traceback-artifacts의 feedback/*.json을 모두 읽어 주세요.${recent} 각 의견의 document_url, section_id, location, comment, document_revision을 확인하고 현재 HTML 및 관련 원본 코드와 비교하세요. 중복되거나 이미 반영된 의견은 구분하고, 타당한 의견만 한 번의 아티팩트 변경으로 정리해 주세요. AGENTS.md와 auth-flow-visualizer 스킬을 따르고 python3 scripts/verify_site.py 및 좁은 화면과 데스크톱 화면을 확인하세요. 변경 이유와 반영하지 않은 의견을 설명하고 문서 PR을 만들어 주세요. 자동 병합은 하지 마세요.`;
+}
+
+async function handoff(request, env) {
+  if (!await session(request, env)) return redirect(`/login?return_to=${encodeURIComponent("/handoff")}`);
+  return html(`<div class="card"><h1>저장된 의견으로 수정 요청 준비</h1><p>이 공개 저장소의 모든 의견을 한 번의 Codex Cloud 작업에서 검토합니다. 아직 작업은 시작되지 않았습니다.</p><label for="prompt-all">모든 의견을 검토할 요청</label><textarea id="prompt-all" readonly>${htmlEscape(batchPrompt())}</textarea><button type="button" data-copy="prompt-all">요청 복사</button><p id="copy-status" role="status" aria-live="polite"></p><p><a href="https://chatgpt.com/codex/cloud" target="_blank" rel="noopener noreferrer">Codex Cloud 열기</a> · <a href="${htmlEscape(env.PUBLIC_SITE_ORIGIN)}/traceback-artifacts/">학습 목차로 돌아가기</a></p></div><script src="/handoff.js" defer></script>`);
 }
 
 const handoffScript = `document.querySelectorAll('[data-copy]').forEach((button) => {
@@ -268,6 +277,7 @@ export default {
     if (url.pathname === "/new" && request.method === "GET") return newForm(request, env, url);
     if (url.pathname === "/api/feedback" && request.method === "POST") return submit(request, env, url);
     if (url.pathname === "/saved" && request.method === "GET") return saved(request, env, url);
+    if (url.pathname === "/handoff" && request.method === "GET") return handoff(request, env);
     if (url.pathname === "/handoff.js" && request.method === "GET") return new Response(handoffScript, { headers: { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
     return new Response("Not found", { status: 404 });
   },
