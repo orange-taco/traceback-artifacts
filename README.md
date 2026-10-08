@@ -60,7 +60,8 @@ HTML은 브라우저에서 `docs/artifact/index.html`로 열 수 있습니다. `
 
 1. 설명 대상에 따라 `orange-taco/traceback`과
    `orange-taco/traceback-client`의 대상 브랜치와 파일을 확인합니다.
-   Cloud 환경에 세 저장소를 연결하면 iPad에 clone을 둘 필요가 없습니다.
+   의견을 근거로 수정할 때는 Cloud 환경에 코드·프런트·문서·비공개 의견
+   저장소 네 개를 연결합니다. iPad에 clone을 둘 필요는 없습니다.
    두 코드 저장소의 기본 브랜치는 `main`이므로, 개발 중인 내용은
    `development` 또는 대상 PR 브랜치를 명시해 확인합니다.
 2. 문서 작성 스킬에 따라 HTML·이미지와 링크를 수정합니다.
