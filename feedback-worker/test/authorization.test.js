@@ -99,9 +99,16 @@ test("only the owner can save feedback and saving cannot start an edit", async (
     assert.equal(record.comment, "전체 맥락을 더 분명히 설명해 주세요.");
     assert.equal(record.author.github_id, 88140361);
 
+    const longestComment = new URLSearchParams({ ...Object.fromEntries(fields), comment: "가".repeat(10000) });
+    const acceptedLong = await worker.fetch(request("/api/feedback", { method: "POST", headers: { Cookie: session, Origin: root }, body: longestComment }), env);
+    assert.equal(acceptedLong.status, 303);
+    const tooLarge = new URLSearchParams({ ...Object.fromEntries(fields), comment: "가".repeat(20000) });
+    const rejectedLarge = await worker.fetch(request("/api/feedback", { method: "POST", headers: { Cookie: session, Origin: root }, body: tooLarge }), env);
+    assert.equal(rejectedLarge.status, 413);
+
     const edit = await worker.fetch(request("/api/modify", { method: "POST", headers: { Cookie: session, Origin: root } }), env);
     assert.equal(edit.status, 404);
-    assert.equal(githubCalls.filter((call) => call.url.includes("/contents/")).length, 1);
+    assert.equal(githubCalls.filter((call) => call.url.includes("/contents/")).length, 2);
   } finally {
     globalThis.fetch = originalFetch;
   }

@@ -181,12 +181,40 @@ async function saveFeedback(env, record) {
   return path;
 }
 
+async function limitedFormData(request) {
+  // A 10,000-character Korean comment can approach 90 KB when URL-encoded.
+  const maxBytes = 128 * 1024;
+  if (Number(request.headers.get("Content-Length")) > maxBytes) return null;
+  const reader = request.body?.getReader();
+  if (!reader) return new FormData();
+  const chunks = [];
+  let size = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > maxBytes) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new Response(bytes, { headers: { "Content-Type": request.headers.get("Content-Type") || "" } }).formData();
+}
+
 async function submit(request, env, url) {
   const owner = await session(request, env);
   if (!owner) return new Response("Unauthorized", { status: 401 });
   if (request.headers.get("Origin") !== url.origin) return new Response("Forbidden origin", { status: 403 });
-  if (Number(request.headers.get("Content-Length") || 0) > 25000) return new Response("Request too large", { status: 413 });
-  const fields = await request.formData();
+  let fields;
+  try { fields = await limitedFormData(request); } catch { return new Response("Invalid form", { status: 400 }); }
+  if (!fields) return new Response("Request too large", { status: 413 });
   const csrf = await verify(fields.get("csrf"), env.SESSION_SECRET);
   if (!csrf || csrf.nonce !== owner.nonce) return new Response("Invalid CSRF token", { status: 403 });
   const values = validFields(fields, env);
