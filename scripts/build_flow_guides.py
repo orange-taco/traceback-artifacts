@@ -269,8 +269,9 @@ def render_concept(page: dict) -> str:
 '''
 
 
-for index, page in enumerate(PAGES):
-    (ROOT / page["file"]).write_text(render(page, index))
+if __name__ == "__main__":
+    for index, page in enumerate(PAGES):
+        (ROOT / page["file"]).write_text(render(page, index), encoding="utf-8")
 
-for page in CONCEPTS:
-    (ROOT / page["file"]).write_text(render_concept(page))
+    for page in CONCEPTS:
+        (ROOT / page["file"]).write_text(render_concept(page), encoding="utf-8")
