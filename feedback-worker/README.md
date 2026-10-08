@@ -84,8 +84,11 @@ npx wrangler deploy --dry-run
 python3 ../scripts/verify_site.py
 ```
 
-After deployment, verify on an iPad-size viewport that the feedback link opens
-the form, the GitHub login returns to the same document, an `oscar2272` save
-creates one private JSON file, and a different GitHub account gets HTTP 403.
-Start a new Codex Cloud task and confirm it can read that file. No live login,
-private write, or Cloud read is claimed until those checks actually succeed.
+On 2026-10-08, the public Pages link opened the form at an 834px viewport,
+carried the `#auth` section and deployed revision, and an `oscar2272` save
+created a private JSON file. A live unauthenticated save returned HTTP 401.
+The other-account HTTP 403 check is covered by Worker tests; it has not been
+repeated with a second real GitHub account. After republishing the personal
+Codex Cloud environment, start a new task and confirm it can read the file.
+The [visual operations guide](../docs/artifact/artifact-feedback-operations.html)
+records the configuration sequence, rendered settings, and live page captures.
