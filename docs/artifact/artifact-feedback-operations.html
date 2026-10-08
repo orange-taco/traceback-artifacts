@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TRACEBACK 공개 문서와 공개 의견을 단일 저장소에서 운영하고 Codex Cloud로 검토하는 설정 기록">
+  <title>TRACEBACK · 문서 의견과 Codex Cloud 운영 지도</title>
+  <style>
+    :root{color-scheme:light;--ink:#172b38;--muted:#4c6472;--line:#cbd8df;--blue:#176b91;--sky:#e8f3f8;--mint:#e8f7ed;--amber:#fff3d8;--paper:#fff;--bg:#f4f7f9;font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65}a{color:var(--blue)}button{font:inherit}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.1rem,5.5vw,4.1rem);line-height:1.14;letter-spacing:-.04em;word-break:keep-all}h2{font-size:clamp(1.5rem,3vw,2.2rem);line-height:1.25;letter-spacing:-.025em}h3{font-size:1.06rem;line-height:1.35}p{color:var(--muted)}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}code{overflow-wrap:anywhere}main{width:min(1120px,calc(100% - 32px));margin:auto;padding:24px 0 100px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:45px}.back{font-weight:800;text-decoration:none}.tag{display:inline-block;padding:5px 10px;border:1px solid #a7cbdc;border-radius:999px;background:var(--sky);color:var(--blue);font-size:.75rem;font-weight:800;letter-spacing:.05em}.eyebrow{color:var(--blue);font-size:.78rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}.lede{max-width:820px;margin:17px 0 24px;font-size:1.06rem}.status-line{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 40px}.status-line span{padding:7px 10px;border-radius:7px;background:var(--paper);border:1px solid var(--line);font-size:.82rem;font-weight:700}.section{margin-top:70px}.section-intro{max-width:790px;margin:10px 0 25px}.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;counter-reset:flow}.flow-node{position:relative;min-height:162px;padding:18px;border-radius:14px;border:1px solid var(--line);background:var(--paper)}.flow-node:not(:last-child)::after{content:"→";position:absolute;right:-17px;top:45%;z-index:2;color:var(--blue);font-size:1.3rem;font-weight:900}.flow-node small{display:block;color:var(--blue);font-size:.73rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase}.flow-node strong{display:block;margin:9px 0 7px;font-size:1.04rem;line-height:1.25}.flow-node p{font-size:.82rem}.flow-node.private{background:var(--mint);border-color:#a6d6b7}.flow-node.action{background:var(--amber);border-color:#e3cb8f}.flow-note{margin:14px 0 0;padding:12px 16px;border-left:4px solid var(--blue);background:var(--sky);font-size:.9rem}.boundary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.boundary div{padding:15px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}.boundary strong{display:block}.boundary p{font-size:.84rem}.decision-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.decision{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}.decision h3{margin:8px 0}.decision p{font-size:.88rem}.choice{display:inline-block;font-size:.75rem;font-weight:900;color:var(--blue)}.alt{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}.chronicle{display:grid;grid-template-columns:196px minmax(0,1fr);gap:24px;align-items:start}.step-nav{position:sticky;top:16px;display:grid;gap:6px}.step-nav button{width:100%;padding:9px 11px;text-align:left;border:1px solid var(--line);border-radius:9px;background:var(--paper);color:var(--muted);cursor:pointer;font-size:.83rem}.step-nav button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:800}.timeline{position:relative;padding-left:29px;border-left:2px solid #9ac7dc}.step{position:relative;margin:0 0 18px;padding:23px;border:1px solid var(--line);border-radius:15px;background:var(--paper);scroll-margin-top:18px;break-inside:avoid}.step::before{content:"";position:absolute;left:-38px;top:31px;width:14px;height:14px;border-radius:50%;background:var(--blue);border:4px solid var(--bg)}.step.active{box-shadow:0 0 0 2px #8abed5}.step-kicker{color:var(--blue);font-size:.78rem;font-weight:900;letter-spacing:.08em}.step h3{font-size:1.25rem;margin:4px 0 8px}.step>p{font-size:.91rem}.why{margin:12px 0;padding:9px 12px;border-left:3px solid #74b79b;background:#f1faf4;font-size:.86rem;color:var(--ink)}.screen{margin:18px 0 12px;border:1px solid #b5c7d1;border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 5px 16px #172b3812}.screen-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 13px;background:#eaf0f3;border-bottom:1px solid #c3d1d8;font-size:.72rem;color:#365361}.screen-bar b{font-size:.69rem;letter-spacing:.04em}.screen-body{padding:17px}.screen-title{font-size:1rem;font-weight:850;color:var(--ink)}.screen-help{font-size:.78rem;margin:3px 0 13px}.ui-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid #e2e9ed;font-size:.79rem}.ui-row:first-of-type{border-top:0}.ui-row strong{font-weight:750}.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:var(--mint);color:#20623b;font-size:.69rem;font-weight:850}.pill.gray{background:#edf0f2;color:#51636b}.pill.gold{background:var(--amber);color:#745a17}.mock-button{display:inline-block;margin-top:11px;padding:7px 12px;border-radius:7px;background:var(--blue);color:#fff;font-size:.77rem;font-weight:800}.secret{font-family:ui-monospace,monospace;letter-spacing:.08em}.screen figcaption,.screen-caption{padding:9px 14px;border-top:1px solid #e2e9ed;background:#fafcfd;color:var(--muted);font-size:.73rem}.code-card{margin:14px 0;border:1px solid #c6d9e2;border-radius:10px;background:#f8fbfc;overflow:hidden}.code-card header{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;border-bottom:1px solid #c6d9e2;font-size:.75rem;font-weight:800}.code-card pre{margin:0;padding:12px;overflow:auto;font-size:.75rem;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.code-card p{padding:0 12px 11px;font-size:.78rem}.compact-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;font-size:.78rem}.compact-links a{padding:4px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}.step details{margin-top:13px;padding-top:11px;border-top:1px solid var(--line)}.step summary{cursor:pointer;color:var(--blue);font-weight:850;font-size:.86rem}.step details p,.step details li{font-size:.83rem;color:var(--muted)}.step details ul{margin:8px 0 0;padding-left:20px}.recipe{margin:11px 0;padding-left:22px;color:var(--muted);font-size:.83rem}.recipe li{margin:5px 0}.state-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.state{padding:16px;border-radius:12px;border:1px solid var(--line);background:var(--paper)}.state h3{margin:8px 0}.state p{font-size:.83rem}.state.ok{border-top:5px solid #4aaf71}.state.partial{border-top:5px solid #dcaa42}.state.pending{border-top:5px solid #7d91a0}.failure{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.failure details{padding:15px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}.failure summary{cursor:pointer;font-weight:800;color:var(--ink)}.failure p{margin-top:8px;font-size:.83rem}.refs{margin-top:65px;padding:23px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}.refs ul{margin:12px 0 0;padding-left:20px;font-size:.84rem}.refs li{margin:5px 0}.print{position:fixed;right:16px;bottom:16px;z-index:50;padding:11px 15px;border:1px solid var(--blue);border-radius:999px;background:#fff;color:var(--blue);font-size:.82rem;font-weight:900;box-shadow:0 5px 18px #172b3824;cursor:pointer}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #176b91;outline-offset:3px}
+    .capture{margin:18px 0 12px}.capture a{display:block}.capture img{display:block;width:100%;max-width:834px;height:auto;border:1px solid var(--line);border-radius:10px}.capture figcaption{max-width:834px;margin-top:6px;color:var(--muted);font-size:.78rem}.state-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cost{margin-top:17px;padding:16px;border:1px solid #a7cbdc;border-radius:12px;background:var(--sky);font-size:.88rem}.cost strong{color:var(--ink)}
+    @media(max-width:850px){.flow{grid-template-columns:1fr}.flow-node{min-height:0}.flow-node:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-22px}.chronicle{grid-template-columns:1fr}.step-nav{position:static;display:flex;overflow:auto;padding-bottom:5px}.step-nav button{min-width:133px}.timeline{margin-left:7px}.decision-grid,.boundary,.failure{grid-template-columns:1fr}.state-grid{grid-template-columns:1fr}}
+    @media(max-width:500px){main{width:calc(100% - 26px)}.top{margin-bottom:30px}.step{padding:17px}.timeline{padding-left:21px}.step::before{left:-30px}.screen-body{padding:13px}.ui-row{align-items:flex-start;flex-direction:column;gap:3px}.status-line span{font-size:.74rem}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{body{background:#fff}main{width:100%;padding:0}.top{margin:0 0 22px}.print,.step-nav,.back{display:none}.section{margin-top:36px}.chronicle{display:block}.timeline{border:0;padding:0}.step{break-inside:avoid;margin-bottom:12px;box-shadow:none!important}.step::before{display:none}.screen,.flow-node,.decision,.state,.failure details{box-shadow:none;break-inside:avoid}details>*{display:block!important}a{color:#164e68;text-decoration:underline}.flow{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.flow-node{padding:9px;min-height:0}.flow-node strong{font-size:.75rem}.flow-node p{font-size:.66rem}.flow-node:not(:last-child)::after{right:-9px;bottom:auto;top:45%;left:auto;content:"→"}.state-grid{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+  <button class="print" type="button" id="print">PDF로 저장</button>
+  <main>
+    <div class="top"><a class="back" href="index.html">← TRACEBACK 학습 목차</a><span class="tag">문서 프로젝트 운영 · AWS 01–04와 별도</span></div>
+    <header>
+      <p class="eyebrow">TRACEBACK · artifact operations</p>
+      <h1>공개 문서에서 의견을 남기고,<br>Codex Cloud에서 수정 결정하기</h1>
+      <p class="lede">iPad에서 HTML 전체 맥락을 읽다가 위치와 의견을 적고, 나중에 Codex Cloud에서 그 기록을 열어 수정 여부를 결정하는 설정 지도입니다. 2026년 10월 8일에 확인한 구성과 재설정 순서를 함께 남깁니다.</p>
+      <div class="status-line" aria-label="현재 구성 핵심">
+        <span>공개 읽기 · GitHub Pages</span><span>공개 의견 · 같은 GitHub 저장소</span><span>저장 권한 · oscar2272만</span><span>수정 결정 · Codex Cloud에서 수동</span>
+      </div>
+    </header>
+
+    <section class="section" aria-labelledby="flow-title">
+      <p class="eyebrow">먼저 전체 경로</p>
+      <h2 id="flow-title">일반적으로 이 다섯 경계가 필요합니다</h2>
+      <p class="section-intro">화살표는 데이터 또는 작업이 다음 주체로 넘어간다는 뜻입니다. 의견을 누구나 읽을 수 있어도, 저장 권한은 서버가 판단해야 합니다.</p>
+      <div class="flow" role="img" aria-label="공개 문서 호스트에서 의견 서버로, 같은 공개 저장소의 의견 파일로, 사용자가 시작한 Codex 작업으로, 검토한 PR과 공개 게시로 이어지는 경로">
+        <div class="flow-node"><small>Public · host</small><strong>① 누구나 문서 읽기</strong><p>정적 HTML은 로그인 없이 열린다. 링크에 문서 URL과 게시 revision을 실어 보낸다.</p></div>
+        <div class="flow-node"><small>Auth · server</small><strong>② 작성자 확인</strong><p>서버가 GitHub 계정 ID와 세션·CSRF를 검사한다. 방문자에게는 저장 권한이 없다.</p></div>
+        <div class="flow-node private"><small>Public · storage</small><strong>③ 의견만 보관</strong><p>같은 공개 저장소의 feedback/에 JSON을 기록한다. 원본 HTML은 바뀌지 않는다.</p></div>
+        <div class="flow-node action"><small>Manual · agent</small><strong>④ 수정 여부 결정</strong><p>소유자가 Codex Cloud 작업을 따로 시작해 의견 파일을 읽고 수정 방향을 정한다.</p></div>
+        <div class="flow-node"><small>Review · publish</small><strong>⑤ PR 검토 뒤 게시</strong><p>문서 변경 PR을 검토하고 병합하면 공개 Pages가 새 HTML을 배포한다.</p></div>
+      </div>
+      <p class="flow-note">TRACEBACK 대응: GitHub Pages → Cloudflare Worker → <code>orange-taco/traceback-artifacts/feedback/</code> → 세 저장소를 연결한 개인 Codex Cloud 환경 → 문서 PR과 Pages. 의견 저장은 Codex 실행 요청이 아닙니다.</p>
+      <div class="boundary">
+        <div><strong>방문자 경로</strong><p>Pages의 HTML은 읽을 수 있습니다. Worker는 로그인하지 않은 저장 요청에 HTTP 401을 반환합니다.</p></div>
+        <div><strong>소유자 경로</strong><p>GitHub ID <code>88140361</code>로 로그인한 세션만 저장할 수 있습니다. 다른 ID는 로그인 콜백에서 HTTP 403을 받습니다.</p></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="decisions-title">
+      <p class="eyebrow">도구를 고른 이유</p>
+      <h2 id="decisions-title">각 층의 선택은 서로 독립적입니다</h2>
+      <p class="section-intro">공개 문서, 계정 인증, 공개 의견 저장, Codex 작업은 서로 다른 단계입니다. 아래 선택을 바꾸면 어느 경계가 달라지는지 먼저 봅니다.</p>
+      <div class="decision-grid">
+        <article class="decision"><span class="choice">공개 문서 · GitHub Pages</span><h3>이미 쓰는 URL과 PR 검토를 유지</h3><p>정적 문서 배포는 Pages가 맡습니다. HTML 변경 PR에서 CodeRabbit 검토를 받을 수 있고, iPad에는 로컬 clone이 필요하지 않습니다.</p><p class="alt"><strong>대안:</strong> 전체 웹앱 서버는 한 곳에서 UI와 API를 제공하지만 호스팅·운영 부담이 커집니다. Pages만으로는 서버 측 소유자 검사와 저장 API를 만들 수 없습니다.</p></article>
+        <article class="decision"><span class="choice">의견 저장 · 같은 공개 GitHub 저장소</span><h3>JSON 파일이 곧 Codex의 입력</h3><p>의견마다 <code>feedback/ID.json</code> 파일 하나를 커밋합니다. 기존 Codex Cloud 환경에 문서 저장소가 연결되어 있어 DB 조회용 MCP나 네 번째 저장소 없이 파일을 읽을 수 있습니다.</p><p class="alt"><strong>대안:</strong> 별도 비공개 저장소는 의견의 비공개성이 필요할 때 적합하지만 추가 접근 설정이 필요합니다. Issues는 토론에 편리하지만 파일처럼 읽으려면 별도 조회 과정이 필요합니다.</p></article>
+        <article class="decision"><span class="choice">인증·쓰기 · GitHub App + Worker</span><h3>권한 검사는 브라우저 밖에서</h3><p>GitHub OAuth는 사용자 신원 확인, App 설치 토큰은 공개 저장소 쓰기에 사용합니다. 키는 Worker 비밀값에만 둡니다.</p><p class="alt"><strong>대안:</strong> 브라우저에 PAT나 OpenAI API 키를 넣으면 공개 JS를 읽는 누구나 키를 가져갈 수 있습니다. 서버 없는 개인 프롬프트 생성은 의견을 저장하지 못합니다.</p></article>
+        <article class="decision"><span class="choice">수정 · 수동 Codex Cloud 작업</span><h3>저장과 수정은 별도 결정</h3><p>의견 파일이 생겨도 작업은 시작되지 않습니다. 소유자가 의견 ID를 지정해 Codex에 읽기 또는 수정 요청을 따로 보냅니다.</p><p class="alt"><strong>대안:</strong> 자동 실행 파이프라인은 편하지만 별도 실행 API, 권한 경계와 비용을 설계해야 합니다. 이 구성은 지원되지 않는 Codex 자동 실행을 주장하지 않습니다.</p></article>
+      </div>
+      <p class="cost"><strong>추가 요금 경계 · 2026-10-08:</strong> 공개 문서와 의견 파일은 <a href="https://docs.github.com/en/pages/quickstart">GitHub Free의 Pages</a>와 기존 공개 저장소를 사용합니다. Worker는 <a href="https://developers.cloudflare.com/workers/platform/pricing/">Cloudflare 무료 요청 한도</a> 안에서 사용합니다. Codex Cloud는 <a href="https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan">기존 ChatGPT Plus 사용량</a>을 쓰며, 이 구성은 OpenAI API를 호출하지 않습니다. 각 서비스의 한도와 남은 Codex 사용량은 다시 설정할 때 확인하세요.</p>
+    </section>
+
+    <section class="section" aria-labelledby="timeline-title">
+      <p class="eyebrow">실제 설정을 다시 따라가기</p>
+      <h2 id="timeline-title">처음부터 한 번 더 설정한다면</h2>
+      <p class="section-intro">화면은 2026년 10월 8일 확인한 설정을 바탕으로 다시 그렸습니다. 인증정보와 개인 화면 캡처는 공개 문서에 포함하지 않았습니다. 왼쪽 단계를 누르면 해당 위치가 강조됩니다.</p>
+      <div class="chronicle">
+        <nav class="step-nav" aria-label="설정 단계">
+          <button type="button" data-step="s1" aria-pressed="true">01 · 문서와 PR</button>
+          <button type="button" data-step="s2" aria-pressed="false">02 · 같은 저장소</button>
+          <button type="button" data-step="s3" aria-pressed="false">03 · Worker</button>
+          <button type="button" data-step="s4" aria-pressed="false">04 · GitHub App</button>
+          <button type="button" data-step="s5" aria-pressed="false">05 · 비밀값</button>
+          <button type="button" data-step="s6" aria-pressed="false">06 · Pages 연결</button>
+          <button type="button" data-step="s7" aria-pressed="false">07 · Codex 연결</button>
+          <button type="button" data-step="s8" aria-pressed="false">08 · 동작 검증</button>
+        </nav>
+        <div class="timeline">
+          <article class="step active" id="s1">
+            <span class="step-kicker">01 · Artifact repository · 2026-10-07</span>
+            <h3>문서 코드와 의견 UI를 PR에 준비</h3>
+            <p><code>orange-taco/traceback-artifacts</code>가 HTML, 이미지, 작성 스킬의 원본입니다. 새 의견 링크는 배포 설정이 있을 때만 나타나고, 절 ID가 있으면 함께 전달합니다. 문구 선택은 요구하지 않습니다.</p>
+            <div class="why"><strong>왜 먼저?</strong> 기능과 문서 변경을 PR로 검토하고, 배포 전 <code>verify_site.py</code>로 로컬 링크를 확인하기 위해서입니다.</div>
+            <div class="screen" role="img" aria-label="Artifact PR에 Pages 문서와 Worker 코드가 있고 CodeRabbit 검사 결과가 통과한 화면 재현">
+              <div class="screen-bar"><span>github.com / orange-taco / traceback-artifacts</span><b>화면 재현</b></div>
+              <div class="screen-body"><div class="screen-title">PR #1 · 공개 가이드에 의견 링크 추가</div><p class="screen-help">HTML · feedback.js · Worker · 테스트 · Pages workflow</p><div class="ui-row"><strong>CodeRabbit 리뷰</strong><span class="pill">검토 완료</span></div><div class="ui-row"><strong>문서 내부 링크</strong><span class="pill">8개 검사</span></div><div class="ui-row"><strong>게시</strong><span class="pill">main · Pages 성공</span></div></div>
+              <div class="screen-caption">PR 검토 성공과 공개 Pages 게시 성공은 서로 다른 확인 단계입니다.</div>
+            </div>
+            <div class="code-card"><header><span>정확한 코드 발췌 · feedback.js 23–29행</span><a href="https://github.com/orange-taco/traceback-artifacts/blob/55287f3374e9752c4ac9b3171feb7e6c95cba137/docs/artifact/feedback.js#L23-L29">확인한 revision에서 보기</a></header><pre><code>const target = new URL("/new", worker);
+target.searchParams.set("doc", location.origin + location.pathname);
+target.searchParams.set("rev", revision);
+let section = "";
+try { section = decodeURIComponent(location.hash.slice(1)); } catch { /* Invalid fragments are treated as the whole document. */ }
+if (section && document.getElementById(section)) target.searchParams.set("section", section);
+link.href = target.href;</code></pre><p>Pages 브라우저가 Worker의 새 의견 화면으로 이동할 때 문서·revision·유효한 절 ID를 보냅니다. 절이 없으면 문서 전체를 대상으로 삼습니다.</p></div>
+            <details><summary>다시 실행할 때 · verify_site.py의 범위</summary><ol class="recipe"><li>이 저장소에서 변경 브랜치와 PR을 만듭니다.</li><li><code>python3 scripts/verify_site.py</code>를 실행합니다. <a href="https://github.com/orange-taco/traceback-artifacts/blob/55287f3374e9752c4ac9b3171feb7e6c95cba137/scripts/verify_site.py#L35-L56">검사 코드</a>는 모든 HTML의 로컬 <code>href</code>·<code>src</code> 대상과 HTML fragment ID를 찾습니다. 외부 URL은 검사하지 않습니다.</li><li>CodeRabbit과 PR 검사 결과를 확인합니다. 이 스크립트만으로 실제 Pages 배포, Worker 로그인, GitHub 파일 저장은 검증되지 않으므로 08단계에서 따로 확인합니다.</li></ol></details>
+          </article>
+
+          <article class="step" id="s2">
+            <span class="step-kicker">02 · One public repository · 2026-10-08</span>
+            <h3>공개 의견을 문서 저장소 안에 보관</h3>
+            <p>의견을 공개해도 괜찮다는 결정에 따라 <code>orange-taco/traceback-artifacts</code> 안의 <code>feedback/</code>를 저장 위치로 정했습니다. Worker는 의견 하나당 <code>ID.json</code>을 <code>main</code>에 추가합니다. 누구나 파일을 읽을 수 있습니다.</p>
+            <div class="why"><strong>왜 바꿨나?</strong> 처음에는 비공개가 필요해 <code>oscar2272/traceback-feedback</code>를 만들었습니다. 공개를 허용하면서 별도 저장소와 Codex의 네 번째 연결이 불필요해졌습니다. 이 저장소는 이전 설정의 기록일 뿐, 새 의견의 대상이 아닙니다.</div>
+            <div class="screen" role="img" aria-label="같은 공개 저장소 안에 문서와 의견 파일을 각각 보관하는 구조 재현">
+              <div class="screen-bar"><span>GitHub / orange-taco / traceback-artifacts</span><b>구조 재현</b></div>
+              <div class="screen-body"><div class="screen-title">traceback-artifacts <span class="pill">Public</span></div><div class="ui-row"><strong>docs/artifact/</strong><span>Pages에 게시하는 HTML·이미지</span></div><div class="ui-row"><strong>feedback/</strong><span>누구나 읽는 의견 JSON</span></div><div class="ui-row"><strong>Codex Cloud</strong><span>이미 연결한 문서 저장소에서 읽기</span></div></div>
+              <div class="screen-caption">Pages workflow의 push 경로는 <code>feedback/**</code>를 포함하지 않아 의견만 추가한 커밋은 사이트를 다시 배포하지 않습니다.</div>
+            </div>
+            <details><summary>다시 실행할 때</summary><ol class="recipe"><li>기존 공개 문서 저장소의 <code>feedback/README.md</code>를 확인합니다.</li><li>GitHub App이 이 저장소 한 곳에만 설치되도록 준비합니다.</li><li>의견 내용은 공개되므로 비밀값과 개인 정보를 적지 않습니다.</li></ol></details>
+          </article>
+
+          <article class="step" id="s3">
+            <span class="step-kicker">03 · Cloudflare Worker</span>
+            <h3>공개 Pages와 분리된 의견 서버 배포</h3>
+            <p>Cloudflare Worker <code>traceback-feedback</code>가 GitHub 로그인, 양식, 저장 API를 제공합니다. Pages 주소는 계속 공개 읽기 URL입니다. Worker는 별도 <code>workers.dev</code> HTTPS 주소를 사용합니다.</p>
+            <div class="why"><strong>왜 서버가 필요한가?</strong> 공개 JS는 방문자 모두가 읽습니다. 의견을 읽는 것은 누구나 가능하지만 저장은 소유자만 할 수 있도록 Worker가 GitHub ID를 검사합니다. 저장소 쓰기 키도 Worker에만 둡니다.</div>
+            <div class="screen" role="img" aria-label="Cloudflare Worker 배포 상태 화면 재현: traceback-feedback, workers.dev, healthz 200">
+              <div class="screen-bar"><span>Cloudflare / Workers &amp; Pages</span><b>화면 재현</b></div>
+              <div class="screen-body"><div class="screen-title">traceback-feedback <span class="pill">배포됨</span></div><p class="screen-help"><code>https://traceback-feedback.traceback-feedback-worker.workers.dev</code></p><div class="ui-row"><strong>GET /healthz</strong><span class="pill">HTTP 200</span></div><div class="ui-row"><strong>POST /api/feedback · 익명</strong><span class="pill gray">HTTP 401</span></div><div class="ui-row"><strong>수정·실행 API</strong><span class="pill gray">없음 · 404</span></div></div>
+              <div class="screen-caption">상태 응답은 Worker 동작만 증명합니다. GitHub 저장 성공은 08단계에서 별도로 확인합니다.</div>
+            </div>
+            <div class="code-card"><header><span>정확한 설정 발췌 · wrangler.toml 6–10행</span><a href="https://github.com/orange-taco/traceback-artifacts/blob/c1802be4fd12fb5840e5f776aa1ae4c759aa24aa/feedback-worker/wrangler.toml#L6-L10">확인한 revision에서 보기</a></header><pre><code>[vars]
+GITHUB_OWNER = "orange-taco"
+FEEDBACK_REPO = "traceback-artifacts"
+ALLOWED_GITHUB_USER_ID = "88140361"
+PUBLIC_SITE_ORIGIN = "https://orange-taco.github.io"</code></pre><p>Worker가 이 공개 설정을 읽어 허용 GitHub ID, 기록 대상 저장소와 허용 문서 출처를 확인합니다. 인증 비밀값은 이 파일에 넣지 않습니다.</p></div>
+            <details><summary>다시 배포할 때</summary><ol class="recipe"><li><code>feedback-worker/</code>에서 <code>npm ci</code> 후 <code>npx wrangler login</code>으로 본인 Cloudflare 계정에 로그인합니다.</li><li>App 설치 ID가 조직 저장소를 가리키는지 확인한 뒤 <code>npx wrangler deploy</code>를 실행합니다.</li><li><code>curl -i https://…/healthz</code>가 200인지 확인합니다. 이 응답만으로 실제 GitHub 저장은 증명되지 않습니다.</li></ol></details>
+          </article>
+
+          <article class="step" id="s4">
+            <span class="step-kicker">04 · GitHub App · 조직 설치 전</span>
+            <h3>App을 문서 저장소에만 설치</h3>
+            <p>처음 만든 개인 소유 비공개 App <strong>TRACEBACK Feedback Oscar2272</strong>는 개인 의견 저장소에만 설치되어 있었습니다. <a href="https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/making-a-github-app-public-or-private">비공개 GitHub App은 소유 계정에만 설치</a>할 수 있어 2026년 10월 8일 App을 <code>orange-taco</code> 조직으로 이전했습니다. GitHub 화면에서 새 소유자와 기존 App ID·Client ID 유지를 확인했습니다. 이전 완료와 함께 개인 계정 설치는 자동 제거됐습니다.</p>
+            <div class="why"><strong>두 토큰의 역할:</strong> OAuth 사용자 토큰은 <code>/user</code>로 소유자를 확인한 뒤 버립니다. App 설치 토큰은 Worker가 짧게 발급받아 의견 JSON 한 건을 씁니다.</div>
+            <div class="screen" role="img" aria-label="전환 전 GitHub App 설치 화면 재현: 개인 의견 저장소 하나, Contents read/write">
+              <div class="screen-bar"><span>GitHub / Apps / TRACEBACK Feedback Oscar2272</span><b>화면 재현</b></div>
+              <div class="screen-body"><div class="screen-title">Install on oscar2272</div><div class="ui-row"><strong>Repository access</strong><span class="pill">Only select repositories</span></div><div class="ui-row"><strong>선택한 저장소</strong><span>oscar2272/traceback-feedback</span></div><div class="ui-row"><strong>Repository permissions</strong><span>Metadata 읽기 · Contents 읽기/쓰기</span></div><div class="ui-row"><strong>App ID · 설치 ID</strong><span>5232748 · 169112765</span></div><div class="ui-row"><strong>Client ID</strong><span>Iv23liEhxT16HdVO5bvG</span></div><div class="ui-row"><strong>Callback</strong><span><code>…workers.dev/oauth/callback</code></span></div></div>
+              <div class="screen-caption">이 화면은 전환 전 상태입니다. 이전 후 조직 <code>orange-taco</code>의 <code>traceback-artifacts</code>만 선택해 새로 설치합니다. GitHub 권한은 저장소 Contents 전체에 적용되므로 Worker 코드가 기록 경로를 <code>feedback/</code>로 제한합니다.</div>
+            </div>
+            <details><summary>전환할 때</summary><ol class="recipe"><li><a href="https://docs.github.com/en/apps/maintaining-github-apps/transferring-ownership-of-a-github-app">기존 App을 orange-taco로 이전</a>하고 조직 소유 상태를 확인합니다.</li><li>callback은 <code>https://traceback-feedback.traceback-feedback-worker.workers.dev/oauth/callback</code>으로 유지하고 웹훅은 끕니다.</li><li>Repository permission은 Contents 읽기/쓰기로 제한하며, <strong>Only select repositories</strong>에서 <code>traceback-artifacts</code>만 골라 설치합니다.</li><li>새 조직 설치 ID를 Worker secret에 등록합니다. 비밀값은 공개 문서에 적지 않습니다.</li></ol></details>
+          </article>
+
+          <article class="step" id="s5">
+            <span class="step-kicker">05 · Worker secrets</span>
+            <h3>키는 Worker에만 등록</h3>
+            <p>client secret, App private key, 세션 서명 비밀값을 Cloudflare Worker secret으로 저장했습니다. 현재 설치 ID는 아직 개인 비공개 저장소를 가리킵니다. 조직 설치가 끝나면 이 값을 교체합니다. private key 원본 PEM은 로컬 <code>~/.ssh/</code>에 보관하며 파일 권한은 <code>600</code>입니다.</p>
+            <div class="why"><strong>왜 secret인가?</strong> Pages HTML, <code>feedback.js</code>, PR diff, 브라우저 저장소에는 GitHub 토큰이나 OpenAI API 키가 없어야 합니다.</div>
+            <div class="screen" role="img" aria-label="Cloudflare Worker의 secret 이름 목록 재현. 값은 보이지 않음">
+              <div class="screen-bar"><span>Cloudflare / Worker / Variables and Secrets</span><b>화면 재현 · 값 제외</b></div>
+              <div class="screen-body"><div class="screen-title">Secret names <span class="pill gray">값 숨김</span></div><div class="ui-row"><strong>GITHUB_APP_CLIENT_ID · GITHUB_APP_ID</strong><span class="secret">••••••••</span></div><div class="ui-row"><strong>GITHUB_APP_CLIENT_SECRET</strong><span class="secret">••••••••</span></div><div class="ui-row"><strong>GITHUB_APP_INSTALLATION_ID</strong><span class="secret">••••••••</span></div><div class="ui-row"><strong>GITHUB_APP_PRIVATE_KEY</strong><span class="secret">••••••••</span></div><div class="ui-row"><strong>SESSION_SECRET</strong><span class="secret">••••••••</span></div></div>
+              <div class="screen-caption">이 그림은 이름만 보여줍니다. 실제 값이나 PEM 내용은 문서·스크린샷에 넣지 않습니다.</div>
+            </div>
+            <details><summary>다시 등록할 때</summary><ol class="recipe"><li><code>feedback-worker/</code>에서 <code>npx wrangler secret put GITHUB_APP_CLIENT_SECRET</code>을 실행하고 프롬프트에 직접 붙여넣습니다.</li><li>GitHub App PEM이 PKCS#1 형식이면 PKCS#8로 변환해 <code>GITHUB_APP_PRIVATE_KEY</code>에 등록합니다.</li><li>App ID, Client ID, 설치 ID와 32바이트 이상의 임의 <code>SESSION_SECRET</code>도 secret으로 등록합니다.</li><li><code>npx wrangler secret list</code>에는 이름만 보여야 합니다.</li></ol></details>
+          </article>
+
+          <article class="step" id="s6">
+            <span class="step-kicker">06 · Public GitHub Pages</span>
+            <h3>Worker 주소를 Pages 배포에 연결</h3>
+            <p>공개 저장소의 Actions variable <code>FEEDBACK_WORKER_ORIGIN</code>에 Worker HTTPS origin을 등록했습니다. <code>main</code> 배포 때 <code>site-config.json</code>이 게시 SHA와 origin만 담아 생성됩니다.</p>
+            <div class="why"><strong>왜 revision을 기록하나?</strong> 나중에 문서가 바뀌어도 의견이 어느 게시본을 보고 작성됐는지 알 수 있습니다. 브라우저가 절 ID를 함께 보내면 더 정확해집니다.</div>
+            <div class="screen" role="img" aria-label="GitHub Actions variable과 Pages 배포 화면 재현">
+              <div class="screen-bar"><span>GitHub / traceback-artifacts / Settings / Actions variables</span><b>화면 재현</b></div>
+              <div class="screen-body"><div class="screen-title">FEEDBACK_WORKER_ORIGIN</div><p class="screen-help"><code>https://traceback-feedback.traceback-feedback-worker.workers.dev</code></p><div class="ui-row"><strong>PR · CodeRabbit 검토</strong><span class="pill">통과</span></div><div class="ui-row"><strong>main 병합</strong><span>Pages workflow 실행</span></div><div class="ui-row"><strong>site-config.json</strong><span>게시 SHA · Worker origin</span></div></div>
+              <div class="screen-caption">이 변수는 공개 주소입니다. Worker secret은 Actions variable에 넣지 않습니다.</div>
+            </div>
+            <div class="code-card"><header><span>정확한 코드 발췌 · pages.yml 44–50행</span><a href="https://github.com/orange-taco/traceback-artifacts/blob/55287f3374e9752c4ac9b3171feb7e6c95cba137/.github/workflows/pages.yml#L44-L50">확인한 revision에서 보기</a></header><pre><code>origin = os.environ.get("FEEDBACK_WORKER_ORIGIN", "").rstrip("/")
+if origin:
+    parsed = urlsplit(origin)
+    if parsed.scheme != "https" or not parsed.hostname or parsed.path or parsed.query or parsed.fragment:
+        raise SystemExit("FEEDBACK_WORKER_ORIGIN must be an HTTPS origin")
+    config = {"revision": os.environ["GITHUB_SHA"], "feedback_origin": origin}
+    (Path(os.environ["RUNNER_TEMP"]) / "artifact-site/site-config.json").write_text(json.dumps(config), encoding="utf-8")</code></pre><p>Pages workflow가 배포할 때만 공개 설정을 만듭니다. <code>feedback.js</code>는 이를 읽어 의견 링크를 표시합니다.</p></div>
+            <details><summary>다시 게시할 때</summary><ol class="recipe"><li>Actions variable에 Worker origin을 경로·끝 슬래시 없이 설정합니다.</li><li>PR을 검토해 <code>main</code>으로 병합합니다.</li><li>Pages workflow 성공과 공개 주소의 <code>site-config.json</code>을 따로 확인합니다.</li></ol></details>
+          </article>
+
+          <article class="step" id="s7">
+            <span class="step-kicker">07 · Codex Cloud</span>
+            <h3>기존 세 저장소 환경에서 의견을 읽기</h3>
+            <p>개인 Codex Cloud 환경 <strong>TRACEBACK Study (3 repos)</strong>에는 백엔드, 프런트, 문서 저장소가 이미 연결되어 있습니다. 공개 의견은 문서 저장소의 <code>feedback/</code>에 있으므로 네 번째 저장소를 연결하지 않습니다. 환경 사용 대상은 <strong>나만</strong>입니다.</p>
+            <div class="why"><strong>왜 추가 연결이 없나?</strong> Codex Cloud는 환경에 연결된 저장소를 checkout합니다. 이제 의견 파일이 이미 연결한 문서 저장소에 들어가므로 같은 작업에서 바로 열 수 있습니다.</div>
+            <div class="screen" role="img" aria-label="Codex Cloud 개인 환경 화면 재현: 세 저장소, 사용 대상 나만">
+              <div class="screen-bar"><span>ChatGPT / Settings / Codex Cloud / Environments</span><b>화면 재현</b></div>
+              <div class="screen-body"><div class="screen-title">TRACEBACK Study (3 repos)</div><div class="ui-row"><strong>코드 원본</strong><span>orange-taco/traceback</span></div><div class="ui-row"><strong>프런트 원본</strong><span>orange-taco/traceback-client</span></div><div class="ui-row"><strong>문서와 의견</strong><span>orange-taco/traceback-artifacts</span></div><div class="ui-row"><strong>사용 가능 대상</strong><span class="pill">나만</span></div></div>
+              <div class="screen-caption">공개 저장소의 의견 파일은 연결한 문서 checkout 안에 있습니다. 새 작업을 시작해 실제 파일 읽기를 확인해야 합니다.</div>
+            </div>
+            <details><summary>새 작업에서 읽을 때</summary><ol class="recipe"><li>Codex Cloud에서 게시된 <strong>TRACEBACK Study (3 repos)</strong> 환경을 선택합니다.</li><li><code>traceback-artifacts/feedback/&lt;id&gt;.json</code>을 읽고 의견만 정리해 달라고 요청할 수 있습니다.</li><li>수정이 필요하면 별도 요청에서 대상 HTML의 변경과 PR을 지시합니다.</li><li>기존 Cloud 작업이 새 의견 파일을 자동으로 받았다고 가정하지 말고 새 작업에서 읽기를 확인합니다.</li></ol></details>
+          </article>
+
+          <article class="step" id="s8">
+            <span class="step-kicker">08 · Live verification</span>
+            <h3>iPad 흐름과 서버 거부를 각각 확인</h3>
+            <p>기존 비공개 경로에서는 소유자 로그인 뒤 테스트 의견 저장과 834px 화면 흐름을 확인했습니다. 단일 저장소 전환 후에는 새 공개 JSON의 문서 URL, 절 ID, 선택 문구(null), 위치, 의견, 게시 revision과 작성자 ID를 다시 확인해야 합니다.</p>
+            <div class="why"><strong>검증 경계:</strong> UI가 버튼을 숨기더라도 서버 검사가 최종 기준입니다. 익명 저장은 실서버 401, 다른 계정은 Worker 테스트에서 403, 수정·실행 경로는 404를 확인했습니다. 새 저장 대상의 실제 저장은 아직 검증 전입니다.</div>
+            <div class="screen" role="img" aria-label="iPad 의견 저장 화면 재현: 문서 URL, 전체 문서, 위치, 의견, 의견만 저장">
+              <div class="screen-bar"><span>iPad Safari 흐름 · Pages → Worker</span><b>양식 재현</b></div>
+              <div class="screen-body"><div class="screen-title">이 문서에 의견 남기기</div><p class="screen-help">문서 URL · 게시 revision · 절 ID(없으면 전체 문서)</p><div class="ui-row"><strong>어느 부분인가요?</strong><span>예: 첫 번째 그림의 전체 흐름</span></div><div class="ui-row"><strong>어떤 점이 아쉽거나 궁금한가요?</strong><span>전체 문맥을 기준으로 자유롭게 작성</span></div><span class="mock-button">의견만 저장</span></div>
+              <div class="screen-caption">문구를 선택하지 않아도 됩니다. 화면 전체나 특정 그림에 대한 의견을 위치 필드에 적습니다.</div>
+            </div>
+            <figure class="capture"><a href="images/feedback-pages-ipad.jpg"><img src="images/feedback-pages-ipad.jpg" alt="실제 공개 시스템 가이드의 iPad 폭 화면. 인증 절과 왼쪽 아래 의견 남기기 버튼이 보인다"></a><figcaption>실제 Pages 화면 · 834px 폭. 왼쪽 아래 의견 남기기 버튼을 누르면 현재 문서와 절 ID가 전달됩니다. 그림을 누르면 원본 크기로 열립니다.</figcaption></figure>
+            <figure class="capture"><a href="images/feedback-form-ipad.jpg"><img src="images/feedback-form-ipad.jpg" alt="이전 비공개 저장 방식의 iPad 폭 의견 양식. 문서 URL, auth 절 ID, 게시 revision, 위치와 의견 입력 필드, 의견만 저장 버튼이 보인다"></a><figcaption>이전 Worker 양식 · 같은 폭. 공개 저장 안내가 추가된 새 화면은 단일 저장소 전환 후 다시 캡처합니다. 이 캡처에는 의견이나 인증 비밀값이 없습니다.</figcaption></figure>
+            <div class="screen" role="img" aria-label="저장 완료 후 이번 의견 또는 모든 의견 요청문을 복사하고 Codex Cloud를 여는 흐름 재현">
+              <div class="screen-bar"><span>Worker / 저장 완료 → Codex Cloud</span><b>현재 코드 화면 재현</b></div>
+              <div class="screen-body"><div class="screen-title">의견을 저장했습니다</div><p class="screen-help">의견 파일은 공개 저장소의 feedback/에 있습니다. Codex 작업은 아직 시작되지 않았습니다.</p><div class="ui-row"><strong>모든 의견을 한 번에 검토</strong><span class="mock-button">요청 복사</span></div><div class="ui-row"><strong>이번 의견만 검토</strong><span>접어서 선택</span></div><div class="ui-row"><strong>다음 단계</strong><span>Codex Cloud 열기 → 새 작업에 붙여넣기 → 보내기</span></div></div>
+              <div class="screen-caption">나중에 돌아와도 의견 양식의 <code>/handoff</code> 링크에서 전체 의견 요청문을 다시 만들 수 있습니다. Pages나 Worker가 작업을 자동 제출하지는 않습니다.</div>
+            </div>
+            <div class="code-card"><header><span>한 번에 요청하는 문구 · index.js 247–249행</span><a href="https://github.com/orange-taco/traceback-artifacts/blob/9ad9b021d7dbdef0c114b7135166e6116698673e/feedback-worker/src/index.js#L247-L249">확인한 revision에서 보기</a></header><pre><code>function batchPrompt(recent = "") {
+  return `TRACEBACK Study (3 repos) Codex Cloud 환경에서 orange-taco/traceback-artifacts의 feedback/*.json을 모두 읽어 주세요.${recent} 각 의견의 document_url, section_id, location, comment, document_revision을 확인하고 현재 HTML 및 관련 원본 코드와 비교하세요. 중복되거나 이미 반영된 의견은 구분하고, 타당한 의견만 한 번의 아티팩트 변경으로 정리해 주세요. AGENTS.md와 auth-flow-visualizer 스킬을 따르고 python3 scripts/verify_site.py 및 좁은 화면과 데스크톱 화면을 확인하세요. 변경 이유와 반영하지 않은 의견을 설명하고 문서 PR을 만들어 주세요. 자동 병합은 하지 마세요.`;
+}</code></pre><p>Worker는 요청문을 만들어 복사를 돕습니다. Codex Cloud에 보내는 행위는 사용자에게 남겨 저장 API와 수정 작업을 분리합니다.</p></div>
+            <div class="code-card"><header><span>정확한 코드 발췌 · index.js 211–219행</span><a href="https://github.com/orange-taco/traceback-artifacts/blob/55287f3374e9752c4ac9b3171feb7e6c95cba137/feedback-worker/src/index.js#L211-L219">확인한 revision에서 보기</a></header><pre><code>async function submit(request, env, url) {
+  const owner = await session(request, env);
+  if (!owner) return new Response("Unauthorized", { status: 401 });
+  if (request.headers.get("Origin") !== url.origin) return new Response("Forbidden origin", { status: 403 });
+  let fields;
+  try { fields = await limitedFormData(request); } catch { return new Response("Invalid form", { status: 400 }); }
+  if (!fields) return new Response("Request too large", { status: 413 });
+  const csrf = await verify(fields.get("csrf"), env.SESSION_SECRET);
+  if (!csrf || csrf.nonce !== owner.nonce) return new Response("Invalid CSRF token", { status: 403 });</code></pre><p>Worker가 요청을 받고 서버에서 소유자 세션, Origin, 크기, CSRF를 순서대로 검사합니다. 브라우저 코드는 이 검사를 대신할 수 없습니다.</p></div>
+            <details><summary>Codex에서 의견을 읽고 수정하려면</summary><ol class="recipe"><li>저장 완료 화면에서 의견 ID를 확인합니다.</li><li>Codex Cloud의 <strong>TRACEBACK Study (3 repos)</strong>에서 새 작업을 시작합니다.</li><li>먼저 <code>/workspace/traceback-artifacts/feedback/&lt;id&gt;.json</code>을 읽고 내용만 정리하도록 요청합니다.</li><li>수정이 필요하다고 결정한 뒤 문서 HTML 변경과 PR을 별도로 요청합니다.</li></ol></details>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="state-title">
+      <p class="eyebrow">2026-10-08 확인 상태</p>
+      <h2 id="state-title">무엇이 실제로 확인됐나</h2>
+      <div class="state-grid">
+        <div class="state partial"><span class="pill gold">이전 경로 확인</span><h3>Worker와 기존 저장</h3><p><code>/healthz</code> 200, 익명 저장 401, 소유자 로그인과 비공개 저장소 테스트 JSON은 확인했습니다. 같은 공개 저장소로의 실제 쓰기는 아직 확인 전입니다.</p></div>
+        <div class="state partial"><span class="pill gold">코드·테스트 확인</span><h3>다른 사용자 거부</h3><p>다른 GitHub ID 로그인 403과 저장 거부를 자동 테스트했습니다. 실제 다른 계정으로 로그인하는 검사는 수행하지 않았습니다.</p></div>
+        <div class="state ok"><span class="pill">실배포 확인</span><h3>Pages와 iPad 경로</h3><p>첫 배포 SHA <code>a8556579e4eb</code>에서 의견 버튼, <code>#auth</code> 절 전달과 834px 작성 화면을 확인했습니다. 새 공개 저장 안내 화면은 전환 뒤 다시 확인합니다.</p></div>
+        <div class="state pending"><span class="pill gray">새 파일 뒤 확인</span><h3>Cloud 새 작업</h3><p>게시된 세 저장소 환경은 유지합니다. 공개 의견 파일을 만든 뒤 새 Cloud 작업에서 실제 읽기를 확인해야 합니다.</p></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="failure-title">
+      <p class="eyebrow">문제가 생기면</p>
+      <h2 id="failure-title">멈춘 지점에서 되돌아가기</h2>
+      <div class="failure">
+        <details><summary>Pages에 의견 버튼이 없다</summary><p><code>FEEDBACK_WORKER_ORIGIN</code> 변수, Pages workflow 성공, 공개 <code>site-config.json</code>의 revision과 origin을 순서대로 확인합니다. HTML은 계속 읽을 수 있습니다.</p></details>
+        <details><summary>GitHub 로그인 뒤 양식이 안 열린다</summary><p>GitHub App callback이 Worker origin의 <code>/oauth/callback</code>과 정확히 같은지, client secret이 Worker secret에 있는지 확인합니다. 브라우저 URL에 secret을 넣지 않습니다.</p></details>
+        <details><summary>의견 저장에 실패한다</summary><p>App 설치 대상이 <code>orange-taco/traceback-artifacts</code> 한 곳인지, 조직의 설치 ID와 private key가 Worker secret에 있는지 확인합니다. Worker 오류를 보고 GitHub 토큰 발급 실패와 파일 쓰기 실패를 구분합니다.</p></details>
+        <details><summary>Codex에서 의견 파일이 안 보인다</summary><p>게시된 환경에 <code>orange-taco/traceback-artifacts</code>가 연결되어 있는지 확인합니다. 의견 파일이 <code>main</code>에 올라간 뒤 새 Cloud 작업을 시작해 읽습니다.</p></details>
+      </div>
+    </section>
+
+    <section class="refs" aria-labelledby="refs-title">
+      <h2 id="refs-title">근거와 다시 열 위치</h2>
+      <p>처음 게시한 코드 링크는 <code>55287f3374e9752c4ac9b3171feb7e6c95cba137</code>, 단일 저장소 설정 링크는 <code>c1802be4fd12fb5840e5f776aa1ae4c759aa24aa</code>에 고정했습니다. 콘솔·Cloud 설정은 2026년 10월 8일 관찰값이므로 나중에 바뀔 수 있습니다.</p>
+      <ul>
+        <li><a href="https://github.com/orange-taco/traceback-artifacts/pull/1">문서·Worker 구현 PR</a> · CodeRabbit 검토 및 병합 상태</li>
+        <li><a href="https://github.com/orange-taco/traceback-artifacts/blob/55287f3374e9752c4ac9b3171feb7e6c95cba137/feedback-worker/README.md">Worker 재설정 README</a> · 명령과 secret 목록</li>
+        <li><a href="https://github.com/orange-taco/traceback-artifacts/blob/55287f3374e9752c4ac9b3171feb7e6c95cba137/feedback-worker/test/authorization.test.js">권한 테스트 원문</a> · 소유자·다른 사용자·Origin·CSRF·실행 API 부재</li>
+        <li><a href="https://orange-taco.github.io/traceback-artifacts/">공개 Pages 시작 주소</a> · 누구나 읽는 문서</li>
+        <li><a href="https://developers.cloudflare.com/workers/platform/pricing/">Cloudflare Workers 요금 안내</a> · 무료 요청 한도 확인</li>
+        <li><a href="https://docs.github.com/en/pages/quickstart">GitHub Pages 지원 플랜</a> · 공개 저장소의 Free 사용</li>
+        <li><a href="https://github.com/orange-taco/traceback-artifacts/blob/c1802be4fd12fb5840e5f776aa1ae4c759aa24aa/feedback/README.md">공개 의견 폴더 설명</a> · 같은 저장소의 파일 보관과 읽기 범위</li>
+        <li><a href="https://developers.openai.com/codex/environments/cloud-environments">Codex Cloud 환경 안내</a> · 저장소 연결, 재게시와 새 작업</li>
+        <li><a href="https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan">Codex와 ChatGPT 플랜</a> · Plus 포함 사용량과 한도</li>
+      </ul>
+    </section>
+  </main>
+  <script>
+    (function () {
+      const buttons = Array.from(document.querySelectorAll(".step-nav button"));
+      const steps = Array.from(document.querySelectorAll(".step"));
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          buttons.forEach(function (item) { item.setAttribute("aria-pressed", String(item === button)); });
+          steps.forEach(function (step) { step.classList.toggle("active", step.id === button.dataset.step); });
+          document.getElementById(button.dataset.step).scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+        });
+      });
+      const print = document.getElementById("print");
+      let originallyOpen = [];
+      window.addEventListener("beforeprint", function () {
+        originallyOpen = Array.from(document.querySelectorAll("details[open]"));
+        document.querySelectorAll("details").forEach(function (detail) { detail.open = true; });
+      });
+      window.addEventListener("afterprint", function () {
+        document.querySelectorAll("details").forEach(function (detail) { detail.open = originallyOpen.includes(detail); });
+      });
+      print.addEventListener("click", function () { window.print(); });
+    }());
+  </script>
+  <script src="feedback.js" defer></script>
+</body>
+</html>

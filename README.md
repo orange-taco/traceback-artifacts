@@ -3,6 +3,7 @@
 TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관리합니다.
 
 - 문서 시작: [`docs/artifact/index.html`](docs/artifact/index.html)
+- 문서 프로젝트 설정 기록: [`docs/artifact/artifact-feedback-operations.html`](docs/artifact/artifact-feedback-operations.html)
 - iPad 읽기 주소: [TRACEBACK 학습 목차](https://orange-taco.github.io/traceback-artifacts/)
 - 문서 작성 기준: [`.codex/skills/auth-flow-visualizer/SKILL.md`](.codex/skills/auth-flow-visualizer/SKILL.md)
 - 설명의 근거가 되는 백엔드 코드: [`orange-taco/traceback`](https://github.com/orange-taco/traceback)
@@ -31,7 +32,8 @@ Worker로 이동하며, Worker는 GitHub App을 통해 이 저장소의 `feedbac
 
 ## iPad 의견 저장
 
-구성 및 배포 절차는 [`feedback-worker/README.md`](feedback-worker/README.md)에
+설정 순서와 화면은 [운영 가이드](docs/artifact/artifact-feedback-operations.html),
+명령과 API는 [`feedback-worker/README.md`](feedback-worker/README.md)에
 있습니다. 공개 문서에서 **의견 남기기**를 누르면 작성 화면으로 이동합니다.
 문구 선택은 필요하지 않습니다. 위치를 자유롭게 적고, 문서 전체의 맥락에
 대한 의견도 남길 수 있습니다. 저장되는 JSON에는 문서 URL, 절 ID(있으면),
