@@ -1,11 +1,11 @@
-"""Build TRACEBACK infrastructure maps from reviewed source references."""
+"""Build four TRACEBACK infrastructure maps; access guide 02 is hand-authored."""
 
 from html import escape
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1] / "docs" / "artifact"
-BACKEND = "9a8794919142587789a7a7b9818ec62ec1fb75b5"
+BACKEND = "9e2108948c720497f65043b913cb55984a4243e1"
 CLIENT = "afd7664ce2e1b5d58f8f259b73b352878bdbf0e8"
 
 
@@ -224,7 +224,7 @@ def render(page: dict, index: int) -> str:
 {project_configuration(index)}
 {embedded_learning(index)}
 <section class="panel" aria-labelledby="status-title"><h2 id="status-title">현재 확인 범위</h2><p class="status">{escape(page["status"])}</p></section>
-<p class="source-note">코드 확인 기준: backend development {BACKEND[:12]} · client development {CLIENT[:12]}. 설정 근거는 해당 단계 바로 옆에 표시했습니다. AWS·Vercel 콘솔 관찰값에는 날짜를 붙였습니다.</p>
+<p class="source-note">코드 확인 기준: backend 배포 PR #12 <code>phase-0-development-deployment</code> {BACKEND[:12]} · client development {CLIENT[:12]}. 설정 근거는 해당 단계 바로 옆에 표시했습니다. AWS·Vercel 콘솔 관찰값에는 날짜를 붙였습니다.</p>
 <nav class="next" aria-label="앞뒤 흐름">{prev_link}{next_link}</nav></main><script src="feedback.js" defer></script></body></html>
 '''
 

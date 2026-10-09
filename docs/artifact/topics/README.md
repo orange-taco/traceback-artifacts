@@ -3,7 +3,9 @@
 기존 `docs/artifact/*.html`과 `images/*`는 공개 URL을 유지하기 위해 이동하지 않습니다.
 새 주제는 `topics/<subject>/<topic>/<slug>/index.html`로 추가하고, 그 문서만
 쓰는 이미지는 같은 디렉터리의 `images/`에 둡니다. 하나의 HTML로 완결되는
-시각 문서는 그 폴더의 `index.html`에 CSS·동작을 포함합니다.
+시각 문서는 그 폴더의 `index.html`에 CSS·동작을 포함합니다. 의견 버튼을
+사용할 때는 문서의 위치에서 `docs/artifact/feedback.js`까지 올바른 상대
+경로를 지정하고 `scripts/verify_site.py`로 확인합니다.
 
 새 문서를 목차에 넣을 때는 `docs/artifact/catalog.json`의 해당 subject/topic에
 항목을 추가하고 `python3 scripts/build_index.py`를 실행합니다. 기존 항목의
