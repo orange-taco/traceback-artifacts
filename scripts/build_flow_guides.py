@@ -1,4 +1,4 @@
-"""Build four TRACEBACK infrastructure maps; access guide 02 is hand-authored."""
+"""Build infrastructure maps 03–05; guides 01–02 are hand-authored."""
 
 from html import escape
 from pathlib import Path
@@ -231,7 +231,7 @@ def render(page: dict, index: int) -> str:
 
 if __name__ == "__main__":
     for index, page in enumerate(PAGES):
-        if index == 1:
-            # Access is authored as a two-tab in-context guide, not a generated map.
+        if index in (0, 1):
+            # System and access guides are authored in place for their detailed layouts.
             continue
         (ROOT / page["file"]).write_text(render(page, index), encoding="utf-8")
