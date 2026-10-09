@@ -46,5 +46,17 @@
 
   <p class="source-note">코드 확인: backend PR #12 <code>phase-0-development-deployment</code> <code>9e2108948c72</code>, client <code>development</code> <code>afd7664ce2e1</code>. 콘솔·접속 값에는 관찰 날짜를 붙였습니다. 현재 상태는 해당 서비스에서 다시 확인해야 합니다.</p>
   <nav class="bottom" aria-label="앞뒤 흐름"><a href="index.html">← 전체 구조</a><a href="flow-2-access.html">02 운영자의 EC2 접속 →</a></nav>
-</main><script src="feedback.js" defer></script></body>
+</main><script>
+  let closedBeforePrint = null;
+  window.addEventListener('beforeprint', () => {
+    if (closedBeforePrint !== null) return;
+    closedBeforePrint = [...document.querySelectorAll('details.setup, details.choice')].filter(detail => !detail.open);
+    closedBeforePrint.forEach(detail => { detail.open = true; });
+  });
+  window.addEventListener('afterprint', () => {
+    if (closedBeforePrint === null) return;
+    closedBeforePrint.forEach(detail => { detail.open = false; });
+    closedBeforePrint = null;
+  });
+</script><script src="feedback.js" defer></script></body>
 </html>
