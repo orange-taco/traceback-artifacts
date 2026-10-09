@@ -170,7 +170,7 @@
     }
   </style>
 </head>
-<body>
+<body><aside style="max-width:1100px;margin:12px auto;padding:12px 16px;border:1px solid #a7cbdc;border-radius:10px;background:#e8f3f8;color:#173042;font:600 14px/1.5 system-ui,sans-serif">개념·구현 심화 자료입니다. <a href="flow-2-access.html">TRACEBACK의 짧은 실제 흐름 먼저 보기 →</a></aside>
   <button type="button" class="pdf-export" onclick="window.print()" aria-label="전체 문서를 PDF로 저장">PDF로 저장</button>
   <script>
     (() => {
@@ -191,7 +191,7 @@
     <header class="hero">
       <p class="eyebrow">접속 설정을 하면서 원리 배우기</p>
       <h1>EC2에는 어떻게 접속할까?</h1>
-      <p>큰 그림이 먼저 필요하면 <a href="traceback-system-guide.html">TRACEBACK System Guide의 전체 흐름</a>을 보세요. 여기서는 네트워크 접속 방식과 AWS 권한을 분리한 뒤 SSH와 SSM을 비교하고, 실제 명령 및 현재 선택을 설명합니다.</p>
+      <p>우리 프로젝트가 무엇인지 먼저 보려면 <a href="flow-1-system.html">TRACEBACK 스토어의 전체 구성 그림</a>을 여세요. 이 심화 문서는 네트워크 접속 방식과 AWS 권한을 구분한 뒤 SSH와 SSM을 비교하고, 실제 명령 및 이전에 관찰한 상태를 설명합니다.</p>
       <p>여기서 접속하려는 대상은 <b>AWS에 있는 원격 EC2 컴퓨터</b>입니다. SSH는 내 Mac/PC가 그 EC2의 SSH 프로그램(보통 22번 포트)에 새 연결을 엽니다. SSM Session Manager는 내 Mac/PC와 EC2 안의 Agent가 AWS 세션 서비스를 통해 입력과 결과를 주고받습니다. 아래에서 먼저 “누가 누구에게” 연결하는지부터 설명합니다.</p>
       <div class="hero-flow" role="img" aria-label="원격 EC2 셸에 들어가는 두 경로: SSH는 내 컴퓨터에서 대상 EC2의 TCP 22로, SSM Session Manager는 사용자와 대상 EC2 Agent가 AWS 세션 서비스를 통해 통신"><span>SSH: 내 Mac/PC</span><b>→</b><span>원격 EC2 · TCP 22</span><b>│</b><span>SSM: 내 Mac/PC ↔ AWS 세션 서비스 ↔ 원격 EC2 Agent</span></div>
       <nav class="hero-nav" aria-label="문서 목차">

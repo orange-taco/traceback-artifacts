@@ -6,6 +6,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from build_index import load_catalog, render
+
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "docs" / "artifact"
 
@@ -33,8 +35,11 @@ def parse(page: Path) -> PageParser:
 
 
 def main() -> None:
-    pages = {page.resolve(): parse(page) for page in SITE.glob("*.html")}
+    pages = {page.resolve(): parse(page) for page in SITE.rglob("*.html")}
     failures: list[str] = []
+
+    if (SITE / "index.html").read_text(encoding="utf-8") != render(load_catalog()):
+        failures.append("index.html: stale catalog; run python3 scripts/build_index.py")
 
     for page, document in pages.items():
         for link in document.links:
@@ -43,13 +48,13 @@ def main() -> None:
                 continue
             target = (page.parent / unquote(url.path)).resolve() if url.path else page
             if not target.is_relative_to(SITE.resolve()) or not target.is_file():
-                failures.append(f"{page.name}: missing local target {link}")
+                failures.append(f"{page.relative_to(SITE)}: missing local target {link}")
                 continue
             fragment = unquote(url.fragment)
             if fragment and target.suffix == ".html":
                 target_document = pages.get(target)
                 if target_document is None or fragment not in target_document.anchors:
-                    failures.append(f"{page.name}: missing fragment {link}")
+                    failures.append(f"{page.relative_to(SITE)}: missing fragment {link}")
 
     if failures:
         raise SystemExit("\n".join(failures))
