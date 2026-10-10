@@ -20,7 +20,10 @@ TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관�
 `python3 scripts/build_index.py`로 단일 진입점 `index.html`을 만듭니다.
 새 강의·프로젝트 자료도 catalog에 subject/topic을 추가할 수 있습니다.
 새 파일의 경로 규칙은 [`topics/README.md`](docs/artifact/topics/README.md)에
-있습니다. 기존 공개 HTML·이미지는 URL을 유지합니다.
+있습니다. 새 아티팩트는 `topics/<주제>/<분야>/<문서>/index.html`에 두고,
+기존 공개 HTML·이미지는 URL을 유지합니다. 예를 들어 DBMS 저장 구조는
+[`topics/database-systems/storage/postgresql-innodb/`](docs/artifact/topics/database-systems/storage/postgresql-innodb/index.html)에
+놓습니다.
 
 TRACEBACK **인프라 구성 1–5**는 고객 요청, 운영자 접속,
 Client→Vercel과 Server→AWS의 배포, 주소, DNS를 실제 설정과 함께
@@ -81,8 +84,9 @@ HTML은 브라우저에서 `docs/artifact/index.html`로 열 수 있습니다. `
    Cloud 환경에 세 저장소를 연결하면 iPad에 clone을 둘 필요가 없습니다.
    두 코드 저장소의 기본 브랜치는 `main`이므로, 개발 중인 내용은
    `development` 또는 대상 PR 브랜치를 명시해 확인합니다.
-2. 문서 작성 스킬에 따라 HTML·이미지와 링크를 수정합니다. HTML 스타일은
-   `docs/artifact/styles/`에 두고, 각 문서에서 연결합니다. 목차 스타일을
+2. 문서 작성 스킬에 따라 HTML·이미지와 링크를 수정합니다. 기존 HTML 스타일은
+   `docs/artifact/styles/`에 두고, 각 문서에서 연결합니다. 하나의 HTML로
+   완결해야 하는 새 주제 문서는 CSS·동작을 그 파일에 포함합니다. 목차 스타일을
    바꿀 때는 `scripts/build_index.py`가 생성하는 HTML도 맞춰 둡니다.
 3. `python3 scripts/verify_site.py`로 상대 링크를 확인하고 좁은 화면과
    데스크톱 화면, 접기·펼치기 및 PDF 출력을 살펴봅니다.
