@@ -27,3 +27,14 @@ Before changing a guide:
 The index at `docs/artifact/index.html` is the single entry point. Keep the
 five AWS learning guides in their established reading order and preserve the
 skill's Required artifact standard.
+
+Before merging any artifact PR:
+
+1. Wait for the CodeRabbit review to finish. Inspect its review, comments, and
+   status check; `PENDING`, a rate-limit message, or no submitted review is not
+   a passing review. Address valid findings and wait for the follow-up review.
+2. Review the artifact content separately for accuracy against the named source
+   revisions and observed infrastructure state. CodeRabbit code review does not
+   replace this content review.
+3. Merge only after both reviews and the site checks are complete. If CodeRabbit
+   cannot finish, leave the PR open and report the blocker to the user.
