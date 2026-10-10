@@ -17,9 +17,15 @@ class PageParser(HTMLParser):
         super().__init__()
         self.links: list[str] = []
         self.anchors: set[str] = set()
+        self.inline_styles = 0
+        self.stylesheets = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
+        if tag == "style" or "style" in values:
+            self.inline_styles += 1
+        if tag == "link" and values.get("rel") == "stylesheet":
+            self.stylesheets += 1
         for name in ("href", "src"):
             if values.get(name):
                 self.links.append(values[name])
@@ -42,6 +48,10 @@ def main() -> None:
         failures.append("index.html: stale catalog; run python3 scripts/build_index.py")
 
     for page, document in pages.items():
+        if document.inline_styles:
+            failures.append(f"{page.relative_to(SITE)}: CSS must be in a separate stylesheet")
+        if not document.stylesheets:
+            failures.append(f"{page.relative_to(SITE)}: missing stylesheet link")
         for link in document.links:
             url = urlsplit(link)
             if url.scheme or url.netloc or link.startswith("//"):

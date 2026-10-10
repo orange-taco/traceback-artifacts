@@ -81,9 +81,16 @@ HTML은 브라우저에서 `docs/artifact/index.html`로 열 수 있습니다. `
    Cloud 환경에 세 저장소를 연결하면 iPad에 clone을 둘 필요가 없습니다.
    두 코드 저장소의 기본 브랜치는 `main`이므로, 개발 중인 내용은
    `development` 또는 대상 PR 브랜치를 명시해 확인합니다.
-2. 문서 작성 스킬에 따라 HTML·이미지와 링크를 수정합니다.
-3. `python3 scripts/verify_site.py`로 상대 링크를 확인합니다.
-4. 문서 저장소의 PR에서 변경을 검토한 뒤 `main`으로 병합해 게시합니다.
+2. 문서 작성 스킬에 따라 HTML·이미지와 링크를 수정합니다. HTML 스타일은
+   `docs/artifact/styles/`에 두고, 각 문서에서 연결합니다. 목차 스타일을
+   바꿀 때는 `scripts/build_index.py`가 생성하는 HTML도 맞춰 둡니다.
+3. `python3 scripts/verify_site.py`로 상대 링크를 확인하고 좁은 화면과
+   데스크톱 화면, 접기·펼치기 및 PDF 출력을 살펴봅니다.
+4. 문서 저장소의 PR에서는 문구보다 **내용의 정확성**을 먼저 검토합니다.
+   실제 설정과 일반 개념을 구별했는지, 그림의 화살표와 상태가 근거에
+   맞는지, 코드 revision·관찰 날짜·환경 경계가 드러나는지 확인합니다.
+   CodeRabbit 자동 코드 리뷰는 이 저장소의 `.coderabbit.yaml`에서 껐습니다.
+   PR 검토 후 `main`으로 병합해 게시합니다.
 
 GitHub Pages는 공개 사이트입니다. 문서에 넣을 AWS·GitHub 화면에는
 비밀값이나 개인 정보가 보이지 않는지 게시 전에 확인합니다.
