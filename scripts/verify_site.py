@@ -51,6 +51,8 @@ def main() -> None:
         failures.append("index.html: stale catalog; run python3 scripts/build_index.py")
 
     for page, document in pages.items():
+        if document.standalone and not document.inline_styles:
+            failures.append(f"{page.relative_to(SITE)}: standalone artifact needs inline CSS")
         if document.inline_styles and not document.standalone:
             failures.append(f"{page.relative_to(SITE)}: CSS must be in a separate stylesheet")
         if not document.stylesheets and not document.standalone:
