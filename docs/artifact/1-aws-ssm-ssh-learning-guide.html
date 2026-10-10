@@ -5,172 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="TRACEBACK 개발 EC2 접속을 따라 하며 SSH, SSM, 네트워크와 AWS 권한을 구분해 배우는 안내서">
   <title>1. TRACEBACK | EC2 접속과 SSH·SSM 이해하기</title>
-  <style>
-    :root {
-      color-scheme: light;
-      --ink: #17232d;
-      --muted: #536675;
-      --line: #d7e1e7;
-      --paper: #f4f7f8;
-      --white: #fff;
-      --blue: #176b87;
-      --blue-soft: #e7f4f8;
-      --green: #26735c;
-      --green-soft: #e9f5ef;
-      --amber: #8c5911;
-      --amber-soft: #fff3dc;
-      --red: #a63d3d;
-      --shadow: 0 12px 36px rgb(19 49 65 / 8%);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body { margin: 0; background: var(--paper); color: var(--ink); line-height: 1.65; }
-    a { color: var(--blue); text-underline-offset: .18em; }
-    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-    code { overflow-wrap: anywhere; }
-    .top { padding: 12px max(20px, calc((100vw - 1120px) / 2)); background: #102d3b; color: #d7edf4; font-size: .82rem; letter-spacing: .04em; }
-    main { width: min(1120px, calc(100% - 36px)); margin: 34px auto 80px; }
-    .hero { padding: clamp(26px, 6vw, 60px); border-radius: 24px; color: white; background: linear-gradient(125deg, #123c50, #176b87 68%, #37836f); box-shadow: var(--shadow); }
-    .eyebrow { margin: 0 0 12px; color: #b9e4ed; font-weight: 700; font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; }
-    h1 { max-width: 760px; margin: 0; font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1.12; letter-spacing: -.04em; }
-    .hero p { max-width: 760px; margin: 20px 0 0; color: #e4f2f5; font-size: 1.08rem; }
-    .hero-nav { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 24px; }
-    .hero-nav a { padding: 7px 12px; border: 1px solid #ffffff55; border-radius: 999px; color: white; text-decoration: none; font-size: .9rem; }
-    .hero-flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:22px; }
-    .hero-flow span { padding:9px 11px; border:1px solid #ffffff77; border-radius:9px; background:#ffffff18; color:#fff; font-size:.86rem; font-weight:700; }
-    .hero-flow b { color:#b9e4ed; }
-    .starter-terms { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:18px; }
-    .starter-terms div { padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:#fbfdfd; }
-    .starter-terms dt { font-weight:800; color:#123c50; }
-    .starter-terms dd { margin:2px 0 0; color:var(--muted); font-size:.92rem; }
-    .concept-map { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:14px; margin:18px 0; }
-    .boundary { padding:14px; border:2px solid #9bb7c2; border-radius:13px; background:#f6fafb; }
-    .boundary + .boundary { margin-top:10px; }
-    .boundary.vpc { border-color:#74a6bb; background:#eaf5f9; }
-    .boundary.subnet { border-color:#7ebba1; background:#eef9f2; }
-    .boundary.instance { border-color:#bca970; background:#fffaf0; }
-    .boundary strong { display:block; color:#123c50; }
-    .boundary small { display:block; color:var(--muted); margin:2px 0 10px; }
-    .boundary.instance small { margin-bottom:0; }
-    .map-note { padding:14px; border:1px solid var(--line); border-radius:12px; background:#fff; }
-    .map-note + .map-note { margin-top:10px; }
-    .map-note strong { display:block; color:#123c50; }
-    .map-note p { margin:4px 0 0; font-size:.91rem; }
-    .identity-map { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:17px 0; }
-    .identity-track { border:1px solid var(--line); border-radius:12px; padding:16px; background:#f8fbfc; }
-    .identity-track h3 { margin:0 0 12px; }
-    .identity-track ol { margin:0; padding-left:23px; }
-    .identity-track li { padding:4px 0; }
-    .identity-join { padding:13px 16px; border-radius:10px; background:var(--blue-soft); border:1px solid #b8dce7; }
-    section { margin-top: 25px; padding: clamp(20px, 4vw, 34px); border: 1px solid var(--line); border-radius: 18px; background: var(--white); box-shadow: var(--shadow); }
-    h2 { margin: 0 0 9px; font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.25; letter-spacing: -.025em; }
-    h3 { margin: 24px 0 8px; font-size: 1.12rem; }
-    p { margin: 8px 0 14px; }
-    .lead { color: var(--muted); max-width: 850px; }
-    .tag { display: inline-block; padding: 3px 9px; border-radius: 999px; background: var(--blue-soft); color: var(--blue); font-weight: 700; font-size: .77rem; }
-    .split, .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
-    .card { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #fcfdfd; }
-    .card h3 { margin: 0 0 8px; }
-    .card p:last-child { margin-bottom: 0; }
-    .network { background: var(--blue-soft); border-color: #b8dce7; }
-    .aws { background: var(--green-soft); border-color: #c8e3d5; }
-    .callout { margin: 18px 0 0; padding: 14px 17px; border-left: 4px solid var(--amber); border-radius: 8px; background: var(--amber-soft); }
-    .callout strong { color: #633e0b; }
-    .journey-lane { display: flex; align-items: stretch; gap: 8px; margin: 16px 0; }
-    .journey-node { flex: 1; min-width: 0; padding: 14px; border: 1px solid #b8dce7; border-radius: 11px; background: var(--blue-soft); }
-    .journey-node strong, .journey-node small { display: block; }
-    .journey-node small { margin-top: 5px; color: var(--muted); line-height: 1.4; }
-    .journey-arrow { align-self: center; color: var(--blue); font-weight: 900; font-size: 1.3rem; }
-    .journey-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 17px; }
-    .journey-options article { padding: 15px; border: 1px dashed #a9c3ce; border-radius: 11px; background: #fbfdfd; }
-    .journey-options article:last-child:nth-child(odd) { grid-column: 1 / -1; }
-    .journey-options b { display: block; margin-bottom: 7px; }
-    .journey-options p { margin: 0; font-size: .9rem; }
-    .reading-route { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
-    .reading-route a { padding: 6px 9px; border-radius: 7px; background: #edf2f4; text-decoration: none; font-size: .84rem; font-weight: 700; }
-    .handoff { margin: 0 0 13px; padding: 9px 12px; border-left: 3px solid var(--blue); background: #f3f8fa; color: var(--muted); font-size: .87rem; }
-    .source-label { display:block; margin:12px 0 5px; color:#123c50; font-size:.82rem; font-weight:800; }
-    details.learning { margin: 14px 0; padding: 13px 16px; border: 1px solid var(--line); border-radius: 12px; background: #f8fbfc; }
-    details.learning summary { cursor: pointer; font-weight: 800; color: #123c50; }
-    details.learning summary::marker { color: var(--blue); }
-    details.learning p:last-child { margin-bottom: 0; }
-    .diagram-wrap { overflow-x: auto; margin: 20px 0 4px; padding: 10px 0; }
-    .diagram { display: block; width: 100%; min-width: 700px; height: auto; }
-    .diagram text { font-family: inherit; fill: var(--ink); }
-    .diagram .small { font-size: 13px; fill: var(--muted); }
-    .diagram .label { font-size: 15px; font-weight: 700; }
-    .diagram .box { fill: white; stroke: #a9c3ce; stroke-width: 2; rx: 13; }
-    .diagram .awsbox { fill: #edf7f1; stroke: #8bbda4; }
-    .diagram .netbox { fill: #edf7fa; stroke: #83bacb; }
-    .diagram .arrow { stroke: #176b87; stroke-width: 3; fill: none; }
-    .diagram .return { stroke: #26735c; stroke-width: 3; stroke-dasharray: 7 6; fill: none; }
-    .caption { color: var(--muted); font-size: .9rem; }
-    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 17px 0; }
-    button { border: 1px solid #9bb7c2; border-radius: 9px; padding: 9px 13px; background: white; color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
-    button[aria-selected="true"] { border-color: var(--blue); background: var(--blue); color: white; }
-    button:focus-visible, a:focus-visible { outline: 3px solid #efa92b; outline-offset: 3px; }
-    [role="tabpanel"] { padding: 20px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfd; }
-    [hidden] { display: none !important; }
-    .step { display: grid; grid-template-columns: 46px 1fr; gap: 15px; padding: 18px 0; border-top: 1px solid var(--line); }
-    .step > div:last-child { min-width: 0; }
-    .step:first-of-type { border-top: 0; }
-    .num { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: var(--blue); color: white; font-weight: 800; }
-    .step h3 { margin: 2px 0 6px; }
-    .step p { margin: 5px 0 10px; }
-    pre { overflow: auto; margin: 12px 0; padding: 15px; border-radius: 10px; background: #132a36; color: #e6f2f5; line-height: 1.55; font-size: .91rem; }
-    pre code { white-space: pre; }
-    .prompt { padding: 11px 14px; border-radius: 9px; background: #edf2f4; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
-    .prompt b { color: var(--blue); }
-    .checklist { display: grid; gap: 9px; padding: 0; list-style: none; }
-    .checklist li { padding-left: 29px; position: relative; }
-    .checklist li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 900; }
-    .matrix { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    .matrix th, .matrix td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
-    .matrix th { color: var(--muted); font-size: .85rem; }
-    .matrix tr:last-child td { border-bottom: 0; }
-    .trouble { display: grid; grid-template-columns: minmax(130px, .7fr) 2fr; gap: 10px 20px; padding: 13px 0; border-top: 1px solid var(--line); }
-    .trouble strong { color: var(--red); }
-    footer { padding: 24px 8px; color: var(--muted); font-size: .88rem; }
-    @media (max-width: 700px) {
-      main { width: min(100% - 22px, 1120px); margin-top: 14px; }
-      .journey-lane { flex-direction: column; }
-      .journey-arrow { transform: rotate(90deg); }
-      .journey-options { grid-template-columns: 1fr; }
-      .split, .grid { grid-template-columns: 1fr; }
-      .trouble { grid-template-columns: 1fr; gap: 2px; }
-      .matrix { font-size: .9rem; }
-      .matrix th, .matrix td { padding: 9px 7px; }
-      .starter-terms { grid-template-columns:1fr; }
-      .concept-map, .identity-map { grid-template-columns:1fr; }
-    }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
-  </style>
-  <style>
-    .pdf-export { position:fixed; right:18px; bottom:18px; z-index:1000; border:1px solid #164d68; border-radius:999px; padding:10px 16px; background:#fff; color:#123c50; box-shadow:0 8px 24px #102a4333; font:700 14px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; cursor:pointer; }
-    .pdf-export:focus-visible { outline:3px solid #efa92b; outline-offset:3px; }
-    @media(max-width:700px){.pdf-export{position:static;display:block;width:max-content;margin:12px 12px 0 auto}}
-    @page { size:A4; margin:14mm; }
-    @media print {
-      .hub-return { display:none!important; }
-      html { scroll-behavior:auto; }
-      body { background:#fff!important; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
-      .pdf-export, main > nav, nav[role="tablist"], .sidebar, .hero-nav, .nav, .selector, .tabs, .step-controls, .next-tab, .flow-controls, .top { display:none!important; }
-      .hero, .masthead, .intro { background:#fff!important; color:#17212b!important; box-shadow:none!important; }
-      .hero p, .hero .eyebrow, .masthead p, .intro p { color:#33495c!important; }
-      .hero-flow span { background:#fff!important; color:#17212b!important; border-color:#9bb7c2!important; }
-      .hero-flow b { color:#17212b!important; }
-      [hidden], .panel[hidden], .flow[hidden], .option[hidden] { display:block!important; }
-      .shell, .diagram-wrap, .diagram-frame, .workflow-source, .flow, .canvas { overflow:visible!important; }
-      pre, .workflow-source { max-height:none!important; overflow:visible!important; white-space:pre-wrap!important; }
-      pre code, .workflow-source code, .workflow-line { width:auto!important; min-width:0!important; white-space:pre-wrap!important; overflow-wrap:anywhere!important; }
-      .workflow-block-body { grid-template-columns:1fr!important; }
-      svg, img, .diagram, .flow-diagram { max-width:100%!important; min-width:0!important; height:auto; }
-      h1, h2, h3, h4 { break-after:avoid; }
-    }
-  </style>
+
+
+  <link rel="stylesheet" href="styles/1-aws-ssm-ssh-learning-guide.css">
 </head>
-<body><aside style="max-width:1100px;margin:12px auto;padding:12px 16px;border:1px solid #a7cbdc;border-radius:10px;background:#e8f3f8;color:#173042;font:600 14px/1.5 system-ui,sans-serif">개념·구현 심화 자료입니다. <a href="flow-2-access.html">TRACEBACK의 짧은 실제 흐름 먼저 보기 →</a></aside>
+<body><aside class="extracted-inline-1">개념·구현 심화 자료입니다. <a href="flow-2-access.html">TRACEBACK의 짧은 실제 흐름 먼저 보기 →</a></aside>
   <button type="button" class="pdf-export" onclick="window.print()" aria-label="전체 문서를 PDF로 저장">PDF로 저장</button>
   <script>
     (() => {
@@ -187,7 +26,7 @@
   </script>
   <div class="top">TRACEBACK · AWS DEVELOPMENT · 학습 가이드</div>
   <main>
-    <a href="index.html" class="hub-return" style="display:inline-block;margin:8px 0 14px;padding:8px 12px;background:#fff;color:#176b91;border:1px solid #cbd8df;text-decoration:none">← 전체 학습 목차</a>
+    <a href="index.html" class="hub-return extracted-inline-2">← 전체 학습 목차</a>
     <header class="hero">
       <p class="eyebrow">접속 설정을 하면서 원리 배우기</p>
       <h1>EC2에는 어떻게 접속할까?</h1>
