@@ -29,6 +29,21 @@
       ]
     },
     {
+      "id": "database-systems",
+      "title": "데이터베이스 시스템",
+      "description": "특정 프로젝트 설정과 분리해 DBMS의 저장 파일과 내부 자료구조를 공식 문서 기준으로 탐색합니다.",
+      "topics": [
+        {
+          "id": "storage",
+          "title": "저장 구조",
+          "description": "논리 객체에서 OS 파일을 거쳐 실제 Row에 닿는 경로를 한 단계씩 살펴봅니다.",
+          "artifacts": [
+            {"title": "PostgreSQL · InnoDB 저장 구조", "description": "PGDATA·Relation·Page·Tuple과 .ibd·Clustered Index 비교", "href": "topics/database-systems/storage/postgresql-innodb/index.html"}
+          ]
+        }
+      ]
+    },
+    {
       "id": "artifact-operations",
       "title": "아티팩트 프로젝트 운영",
       "description": "이 공개 학습 사이트와 의견 저장, Codex Cloud 작업 연결의 설정 기록입니다.",

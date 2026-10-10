@@ -19,9 +19,12 @@ class PageParser(HTMLParser):
         self.anchors: set[str] = set()
         self.inline_styles = 0
         self.stylesheets = 0
+        self.standalone = False
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
+        if tag == "meta" and values.get("name") == "artifact-format":
+            self.standalone = values.get("content") == "standalone"
         if tag == "style" or "style" in values:
             self.inline_styles += 1
         if tag == "link" and values.get("rel") == "stylesheet":
@@ -48,9 +51,11 @@ def main() -> None:
         failures.append("index.html: stale catalog; run python3 scripts/build_index.py")
 
     for page, document in pages.items():
-        if document.inline_styles:
+        if document.standalone and not document.inline_styles:
+            failures.append(f"{page.relative_to(SITE)}: standalone artifact needs inline CSS")
+        if document.inline_styles and not document.standalone:
             failures.append(f"{page.relative_to(SITE)}: CSS must be in a separate stylesheet")
-        if not document.stylesheets:
+        if not document.stylesheets and not document.standalone:
             failures.append(f"{page.relative_to(SITE)}: missing stylesheet link")
         for link in document.links:
             url = urlsplit(link)
