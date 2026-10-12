@@ -36,7 +36,8 @@
         {
           "id": "storage",
           "title": "저장 구조",
-          "description": "논리 객체에서 OS 파일을 거쳐 실제 Row에 닿는 경로를 한 단계씩 살펴봅니다.",
+          "description": "세 층의 정의를 먼저 익힌 뒤, PostgreSQL과 InnoDB에서 실제 Row까지 따라갑니다.",
+          "layout": "reading-path",
           "artifacts": [
             {"title": "00 · 저장 구조를 읽는 세 층", "description": "논리 객체·OS 파일·Page/자료구조의 정의와 연결", "href": "topics/database-systems/storage/foundations/index.html"},
             {"title": "PostgreSQL · InnoDB 저장 구조", "description": "PGDATA·Relation·Page·Tuple과 .ibd·Clustered Index 비교", "href": "topics/database-systems/storage/postgresql-innodb/index.html"}

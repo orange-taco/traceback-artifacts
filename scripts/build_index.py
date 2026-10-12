@@ -51,6 +51,9 @@ def render(subjects: list[dict]) -> str:
     for subject in subjects:
         topics: list[str] = []
         for topic in subject["topics"]:
+            reading_path = topic.get("layout") == "reading-path"
+            cards_class = "cards reading-path" if reading_path else "cards"
+            cards_attrs = ' role="group" aria-label="추천 읽기 순서"' if reading_path else ""
             cards = "".join(
                 f'<a class="card" href="{escape(item["href"])}" '
                 f'data-search="{escape(" ".join([subject["title"], topic["title"], item["title"], item["description"]]))}">'
@@ -60,7 +63,8 @@ def render(subjects: list[dict]) -> str:
             topics.append(
                 f'<div class="topic" id="{escape(subject["id"])}-{escape(topic["id"])}">'
                 f'<div class="topic-head"><h3>{escape(topic["title"])}</h3><p>{escape(topic["description"])}</p></div>'
-                f'<div class="cards">{cards}</div></div>'
+                f'<div class="{cards_class}"{cards_attrs}>'
+                f'{cards}</div></div>'
             )
         sections.append(
             f'<section class="subject" id="{escape(subject["id"])}">'
@@ -79,7 +83,7 @@ def render(subjects: list[dict]) -> str:
 <footer class="foot">GitHub Pages의 공개 문서입니다. AWS·Vercel 상태는 각 문서의 확인 날짜를 기준으로 읽으세요.</footer>
 </main><script src="feedback.js" defer></script><script>
 const search=document.getElementById('artifact-search');const cards=[...document.querySelectorAll('.card')];
-search.addEventListener('input',()=>{{const q=search.value.trim().toLocaleLowerCase();for(const card of cards){{card.hidden=!!q&&!card.dataset.search.toLocaleLowerCase().includes(q)}}for(const topic of document.querySelectorAll('.topic')){{topic.hidden=![...topic.querySelectorAll('.card')].some(card=>!card.hidden)}}for(const subject of document.querySelectorAll('.subject')){{subject.hidden=![...subject.querySelectorAll('.topic')].some(topic=>!topic.hidden)}}document.getElementById('search-empty').hidden=cards.some(card=>!card.hidden)}});
+search.addEventListener('input',()=>{{const q=search.value.trim().toLocaleLowerCase();document.body.classList.toggle('is-searching',!!q);for(const card of cards){{card.hidden=!!q&&!card.dataset.search.toLocaleLowerCase().includes(q)}}for(const topic of document.querySelectorAll('.topic')){{topic.hidden=![...topic.querySelectorAll('.card')].some(card=>!card.hidden)}}for(const subject of document.querySelectorAll('.subject')){{subject.hidden=![...subject.querySelectorAll('.topic')].some(topic=>!topic.hidden)}}document.getElementById('search-empty').hidden=cards.some(card=>!card.hidden)}});
 </script></body></html>
 '''
 
