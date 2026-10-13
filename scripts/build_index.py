@@ -51,6 +51,9 @@ def render(subjects: list[dict]) -> str:
     for subject in subjects:
         topics: list[str] = []
         for topic in subject["topics"]:
+            reading_path = topic.get("layout") == "reading-path"
+            cards_class = "cards reading-path" if reading_path else "cards"
+            cards_attrs = ' role="group" aria-label="추천 읽기 순서"' if reading_path else ""
             cards = "".join(
                 f'<a class="card" href="{escape(item["href"])}" '
                 f'data-search="{escape(" ".join([subject["title"], topic["title"], item["title"], item["description"]]))}">'
@@ -60,7 +63,8 @@ def render(subjects: list[dict]) -> str:
             topics.append(
                 f'<div class="topic" id="{escape(subject["id"])}-{escape(topic["id"])}">'
                 f'<div class="topic-head"><h3>{escape(topic["title"])}</h3><p>{escape(topic["description"])}</p></div>'
-                f'<div class="cards">{cards}</div></div>'
+                f'<div class="{cards_class}"{cards_attrs}>'
+                f'{cards}</div></div>'
             )
         sections.append(
             f'<section class="subject" id="{escape(subject["id"])}">'
@@ -70,16 +74,16 @@ def render(subjects: list[dict]) -> str:
         )
     return f'''<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="TRACEBACK 인프라와 계정, 아티팩트 운영을 실제 설정 순서대로 읽는 학습 문서 목차">
+<meta name="description" content="TRACEBACK 인프라·계정과 데이터베이스 시스템의 저장·동시성, 아티팩트 운영을 학습하는 문서 목차">
 <title>학습 아티팩트 · TRACEBACK</title>
 <link rel="stylesheet" href="styles/index.css"></head><body><button class="pdf" type="button" onclick="window.print()">PDF로 저장</button><main>
-<header class="hero"><p class="eyebrow">LEARNING ARTIFACTS</p><h1>실제 구성을 따라 읽는 아티팩트</h1><p>지금은 TRACEBACK의 인프라와 계정, 이 문서 사이트의 운영 과정을 담았습니다. 각 문서는 설정과 선택 이유를 먼저 보여주고, 그 단계에서 필요한 용어와 코드를 같은 화면에서 설명합니다.</p></header>
+<header class="hero"><p class="eyebrow">LEARNING ARTIFACTS</p><h1>실제 구성을 따라 읽는 아티팩트</h1><p>TRACEBACK의 인프라와 계정 흐름, 데이터베이스의 저장 구조와 동시성, 이 문서 사이트의 운영 과정을 시각 자료로 살펴봅니다.</p></header>
 <nav class="jump" aria-label="주제 바로가기">{nav}</nav><label for="artifact-search">문서 찾기</label><input class="search" id="artifact-search" type="search" placeholder="주제, 설정, 용어 검색" autocomplete="off">
 <div id="catalog">{"".join(sections)}</div><p id="search-empty" hidden>일치하는 문서가 없습니다.</p>
 <footer class="foot">GitHub Pages의 공개 문서입니다. AWS·Vercel 상태는 각 문서의 확인 날짜를 기준으로 읽으세요.</footer>
 </main><script src="feedback.js" defer></script><script>
 const search=document.getElementById('artifact-search');const cards=[...document.querySelectorAll('.card')];
-search.addEventListener('input',()=>{{const q=search.value.trim().toLocaleLowerCase();for(const card of cards){{card.hidden=!!q&&!card.dataset.search.toLocaleLowerCase().includes(q)}}for(const topic of document.querySelectorAll('.topic')){{topic.hidden=![...topic.querySelectorAll('.card')].some(card=>!card.hidden)}}for(const subject of document.querySelectorAll('.subject')){{subject.hidden=![...subject.querySelectorAll('.topic')].some(topic=>!topic.hidden)}}document.getElementById('search-empty').hidden=cards.some(card=>!card.hidden)}});
+search.addEventListener('input',()=>{{const q=search.value.trim().toLocaleLowerCase();document.body.classList.toggle('is-searching',!!q);for(const card of cards){{card.hidden=!!q&&!card.dataset.search.toLocaleLowerCase().includes(q)}}for(const topic of document.querySelectorAll('.topic')){{topic.hidden=![...topic.querySelectorAll('.card')].some(card=>!card.hidden)}}for(const subject of document.querySelectorAll('.subject')){{subject.hidden=![...subject.querySelectorAll('.topic')].some(topic=>!topic.hidden)}}document.getElementById('search-empty').hidden=cards.some(card=>!card.hidden)}});
 </script></body></html>
 '''
 

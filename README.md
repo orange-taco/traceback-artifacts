@@ -21,9 +21,11 @@ TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관�
 새 강의·프로젝트 자료도 catalog에 subject/topic을 추가할 수 있습니다.
 새 파일의 경로 규칙은 [`topics/README.md`](docs/artifact/topics/README.md)에
 있습니다. 새 아티팩트는 `topics/<주제>/<분야>/<문서>/index.html`에 두고,
-기존 공개 HTML·이미지는 URL을 유지합니다. 예를 들어 DBMS 저장 구조는
-[`topics/database-systems/storage/postgresql-innodb/`](docs/artifact/topics/database-systems/storage/postgresql-innodb/index.html)에
-놓습니다.
+기존 공개 HTML·이미지는 URL을 유지합니다. DBMS 저장 구조는 먼저
+[`저장 구조를 읽는 세 층`](docs/artifact/topics/database-systems/storage/foundations/index.html)에서
+논리 객체·OS 파일·파일 내부 구조를 익히고, 기존
+[`PostgreSQL · InnoDB 탐색기`](docs/artifact/topics/database-systems/storage/postgresql-innodb/index.html)로
+이어집니다.
 
 TRACEBACK **인프라 구성 1–5**는 고객 요청, 운영자 접속,
 Client→Vercel과 Server→AWS의 배포, 주소, DNS를 실제 설정과 함께
