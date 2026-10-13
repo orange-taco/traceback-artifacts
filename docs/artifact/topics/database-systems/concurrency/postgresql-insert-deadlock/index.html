@@ -39,7 +39,7 @@
     @media(max-width:620px){.control-meta{justify-content:flex-start}.motion-toggle{min-height:42px}.step-actions .button{flex:1;padding-inline:8px}.controlbar{gap:9px}.locks{font-size:.78rem}.graph{grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:5px;padding:38px 12px;min-height:0}.graph-arrows,.edge-caption{display:none}.graph-node{width:min(100%,250px);min-height:62px;justify-self:center}.mobile-cycle{display:none;position:relative;z-index:2;justify-items:center;gap:3px;color:var(--amber);font-size:.74rem;font-weight:850;line-height:1.25;text-align:center}.graph.has-a .mobile-cycle{display:grid}.mobile-cycle .mobile-edge{display:none}.graph.has-a .mobile-edge.a{display:block}.graph.has-b .mobile-edge.b{display:block;color:#ffc3c7}.graph:not(.has-a) .graph-empty{display:block}}
     @media(prefers-reduced-motion:reduce){body.motion-enabled .graph .edge{animation:none!important}.explain-main.entering{animation:none}}
     @media print{.motion-toggle{display:none}}
-    @media print{ :root{color-scheme:light;--bg:#fff;--panel:#fff;--panel2:#fff;--panel3:#eef3f5;--line:#aebdc5;--ink:#172832;--muted:#4d606b;--cyan:#176c61;--blue:#285d8e;--amber:#8b5d16;--red:#a1272d;--green:#226d37}body{background:white;color:#172832;font-size:9pt}.shell{max-width:none}.top,.scope,.setup,.controlbar,.timeline,.answers,.concept,.sources,.explain{break-inside:avoid}.top{padding:8mm}.actions{display:none}.scope,.setup,.layout,.explain,.timeline,.answers,.concept{margin-left:8mm;margin-right:8mm}.layout{grid-template-columns:1fr 1.3fr 1fr;gap:5mm}.tx-card,.center-card,.explain,.timeline,.qa,.concept{background:#fff}.graph{background:#f5f8f9}.graph-node,.graph-node.b{background:#e7f4f1;color:#172832}.graph-node.b{background:#edf2f8}.graph-empty{display:none}.edge{opacity:1;stroke:#9b690d}.edge.second{stroke:#a1272d}.edge-label{opacity:1;fill:#664914}.locks th{background:#eef3f5;color:#293e49}.table-wrap{overflow:visible}.locks{min-width:0;font-size:6.8pt}.locks th,.locks td{padding:4px}.command,.sql,.explain-side{background:#f7f9fa;color:#172832}.callout{background:#faf5e8}.timeline-list{grid-template-columns:repeat(7,1fr)}a{color:#245b86;text-decoration:underline}}
+    @media print{ :root{color-scheme:light;--bg:#fff;--panel:#fff;--panel2:#fff;--panel3:#eef3f5;--line:#aebdc5;--ink:#172832;--muted:#4d606b;--cyan:#176c61;--blue:#285d8e;--amber:#8b5d16;--red:#a1272d;--green:#226d37}body{background:white;color:#172832;font-size:9pt}.shell{max-width:none}.top,.scope,.setup,.controlbar,.timeline,.answers,.concept,.sources,.explain{break-inside:avoid}.top{padding:8mm}.actions{display:none}.scope,.setup,.layout,.explain,.timeline,.answers,.concept{margin-left:8mm;margin-right:8mm}.layout{grid-template-columns:1fr 1.3fr 1fr;gap:5mm}.tx-card,.center-card,.explain,.timeline,.qa,.concept{background:#fff}.graph{background:#f5f8f9}.graph-node,.graph-node.b{background:#e7f4f1;color:#172832}.graph-node.b{background:#edf2f8}.graph-empty{display:none}.edge{stroke:#9b690d}.edge.second{stroke:#a1272d}.edge-label{opacity:1;fill:#664914}.locks th{background:#eef3f5;color:#293e49}.table-wrap{overflow:visible}.locks{min-width:0;font-size:6.8pt}.locks th,.locks td{padding:4px}.command,.sql,.explain-side{background:#f7f9fa;color:#172832}.callout{background:#faf5e8}.timeline-list{grid-template-columns:repeat(7,1fr)}a{color:#245b86;text-decoration:underline}}
   </style>
 </head>
 <body>
@@ -135,7 +135,7 @@ INSERT INTO test VALUES (21);</code></pre>
     if(isA && current>=2){cmds.push(['완료','INSERT INTO test VALUES (21);','done']);note=current>=5?'XID 100 · ROLLBACK됨':'XID 100 · 미커밋';}
     if(!isA && current>=1){cmds.push(['완료','INSERT INTO test VALUES (20);','done']);note=current>=7?'XID 200 · COMMIT됨':'XID 200 · 미커밋';}
     if(isA && current>=3){cmds.push([current===5||current>=6?'ROLLBACK':'WAITING','INSERT INTO test VALUES (20);',current===5||current>=6?'failed':'pending']);}
-    if(!isA && current>=4){cmds.push([current===5?'대기 해소 · 재개':current===6||current===7?'완료':'WAITING','INSERT INTO test VALUES (21);',current===5||current===6||current===7?'done':'pending']);}
+    if(!isA && current>=4){cmds.push([current===5?'대기 해소 · 재개':current>=6?'완료':'WAITING','INSERT INTO test VALUES (21);',current>=6?'done':'pending']);}
     if(current>=5 && isA){status='ROLLBACK';klass='rollback';}
     else if(current>=7 && !isA){status='COMMITTED';klass='committed';}
     else if((isA&&current>=3&&current<=4)||(!isA&&current===4)){status='WAITING';klass='waiting';}
@@ -150,6 +150,7 @@ INSERT INTO test VALUES (21);</code></pre>
     return locks;
   }
   function render(){
+    const focusedStep=$('step-dots').contains(document.activeElement)?document.activeElement.dataset.step:null;
     const s=steps[current];
     const rows=[...txCard('A'),...txCard('B')];
     $('lock-rows').innerHTML=lockRows(rows);
@@ -171,6 +172,7 @@ INSERT INTO test VALUES (21);</code></pre>
     const activeTimeline={1:1,2:3,3:4,4:5,5:6,6:7,7:8}[current];
     $('timeline-list').innerHTML=timeline.map((t,i)=>`<div class="time-item ${i===activeTimeline?'current':''}"><span class="num">${t[0]}</span>${t[1]}</div>`).join('');
     $('step-dots').innerHTML=steps.map((x,i)=>`<button class="step-dot" type="button" data-step="${i}" ${i===current?'aria-current="step"':''}>${i===0?'시작':i}</button>`).join('');
+    if(focusedStep!==null)$('step-dots').querySelector(`[data-step="${focusedStep}"]`)?.focus();
   }
   function stopAutoPlay(){if(autoplayTimer){clearTimeout(autoplayTimer);autoplayTimer=null;}document.body.classList.remove('motion-enabled');$('motion-toggle').setAttribute('aria-pressed','false');$('motion-toggle').setAttribute('aria-label','자동 애니메이션 재생 켜기');$('motion-toggle').textContent='▶ 자동 재생 OFF';}
   function autoAdvance(){if(current>=steps.length-1){stopAutoPlay();return;}current++;render();autoplayTimer=setTimeout(autoAdvance,3200);}
