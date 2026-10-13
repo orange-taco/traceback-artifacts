@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="artifact-format" content="standalone">
+  <meta name="description" content="PostgreSQL 유니크 인덱스 검사에서 Transaction ID ShareLock 대기가 교착 상태로 이어지는 과정을 단계별로 살펴봅니다.">
+  <title>INSERT 두 번이 만든 교착 상태 · PostgreSQL</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0a1118;--panel:#111d27;--panel2:#182633;--panel3:#203442;--line:#354b58;--ink:#edf4f6;--muted:#a7bac4;--cyan:#65d6c5;--blue:#8cc8ff;--amber:#f3c477;--red:#ff7f86;--green:#8cdda2;--focus:#ffe09c;font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);line-height:1.55}button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:3px}a{color:#a9d6ff}p,h1,h2,h3,h4,figure{margin:0}h1,h2,h3{line-height:1.2;text-wrap:balance}h1{font-size:clamp(1.45rem,3vw,2.3rem);letter-spacing:-.04em}h2{font-size:clamp(1.2rem,2.3vw,1.7rem)}h3{font-size:1rem}code,pre,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}code{font-size:.92em;color:#d7e8ef}.shell{max-width:1440px;margin:auto}.top{padding:20px clamp(15px,3vw,36px);border-bottom:1px solid var(--line);background:#0e1922;display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.intro{display:grid;gap:7px}.eyebrow{font-size:.7rem;font-weight:850;letter-spacing:.13em;color:var(--cyan)}.intro p{max-width:74ch;color:var(--muted);font-size:.9rem}.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}.button,.back-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--panel2);text-decoration:none;font-size:.82rem;font-weight:750;white-space:nowrap}.button:hover,.back-link:hover{border-color:var(--cyan)}.button.primary{background:#17413f;border-color:#2d8278}.button:disabled{opacity:.45;cursor:default}.scope{margin:14px clamp(15px,3vw,36px) 0;padding:10px 13px;border:1px solid #725b37;border-radius:8px;background:#292319;color:#ead8b7;font-size:.8rem}.scope b{color:#ffe2a9}.setup{margin:18px clamp(15px,3vw,36px);padding:15px 17px;background:var(--panel);border:1px solid var(--line);border-radius:12px;display:grid;grid-template-columns:minmax(190px,.75fr) minmax(0,1.7fr);gap:16px;align-items:center}.setup h2{font-size:1rem}.setup p{font-size:.82rem;color:var(--muted);margin-top:5px}.sql{margin:0;padding:12px 14px;border-radius:8px;background:#09131b;border:1px solid #263a46;overflow:auto;font-size:.79rem;line-height:1.5;color:#d8eaf0}.sql .comment{color:#7fa09f}.controlbar{margin:16px clamp(15px,3vw,36px);display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}.step-actions{display:flex;gap:8px}.progress-wrap{min-width:0}.progress-label{display:flex;justify-content:space-between;gap:12px;font-size:.77rem;color:var(--muted);margin-bottom:6px}.progress{height:7px;background:#1b2a34;border-radius:99px;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:99px;transition:width .35s ease}.steps-mini{display:flex;gap:5px;margin-top:8px;overflow:auto;padding:2px 0}.step-dot{flex:0 0 auto;border:1px solid var(--line);border-radius:99px;background:transparent;padding:4px 9px;font-size:.68rem;color:var(--muted)}.step-dot[aria-current="step"]{background:#18413f;border-color:#56bbae;color:#e9fffb}.layout{margin:0 clamp(15px,3vw,36px) 22px;display:grid;grid-template-columns:minmax(210px,1fr) minmax(370px,1.35fr) minmax(210px,1fr);gap:12px;align-items:stretch}.tx-card,.center-card,.explain{border:1px solid var(--line);border-radius:12px;background:var(--panel);min-width:0}.tx-card{padding:15px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,background .2s}.tx-card.waiting{border-color:#b18740;background:#29251c}.tx-card.deadlock{border-color:var(--red);background:#321f25}.tx-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.tx-title{display:flex;align-items:center;gap:9px}.tx-letter{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#18333b;color:var(--cyan);font-weight:900}.tx-card.b .tx-letter{background:#1d3047;color:var(--blue)}.xid{color:var(--muted);font-size:.75rem}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:4px 9px;background:#23323b;color:#c9d8de;font-size:.68rem;font-weight:850;letter-spacing:.04em;white-space:nowrap}.badge.running{background:#173b39;color:#a5eee2}.badge.waiting{background:#4a3819;color:#ffdc94}.badge.deadlock,.badge.rollback{background:#51252b;color:#ffc4c7}.badge.committed{background:#1c432d;color:#b4f0c2}.status-pip{width:7px;height:7px;border-radius:50%;background:currentColor}.tx-content{display:grid;gap:9px}.command{padding:9px 10px;background:#0a141c;border:1px solid #293b46;border-radius:7px;font-size:.78rem}.command.done{border-color:#315e4e}.command.pending{border-style:dashed;color:var(--muted)}.command.failed{border-color:#8c4c50;color:#ffb6bb}.command small{display:block;color:var(--muted);font-size:.68rem;margin-bottom:3px}.lock-chip{display:flex;gap:8px;align-items:flex-start;padding:9px 10px;border:1px solid #2d746d;border-radius:8px;background:#153532;font-size:.74rem}.lock-chip.request{border-color:#9b7435;background:#342a19}.lock-chip .lock-icon{color:var(--cyan);font-size:1rem}.lock-chip.request .lock-icon{color:var(--amber)}.tx-note{color:var(--muted);font-size:.75rem}.center-card{padding:15px;display:grid;align-content:start;gap:13px}.center-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.center-head p{font-size:.73rem;color:var(--muted)}.graph{position:relative;min-height:200px;border:1px solid #2d414d;border-radius:10px;background:radial-gradient(ellipse at 50% 48%,#1a2b36,#101a23 72%);overflow:hidden;display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:17px}.graph-node{z-index:1;align-self:center;min-height:88px;border:1px solid #408f82;border-radius:10px;background:#163735;padding:11px;display:grid;align-content:center;gap:4px;text-align:center}.graph-node.b{border-color:#557ba3;background:#1a2c40}.graph-node .node-label{font-size:.7rem;color:var(--muted)}.graph-node strong{font-size:.9rem}.graph-node small{font-size:.69rem;color:var(--muted)}.graph-arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.edge{fill:none;stroke:var(--amber);stroke-width:3;stroke-dasharray:7 5;opacity:0;transition:opacity .25s}.edge.second{stroke:var(--red)}.graph.has-a .edge.a{opacity:1}.graph.has-b .edge.b{opacity:1}.graph.is-cycle .edge{stroke-dasharray:none;stroke-width:4;filter:drop-shadow(0 0 5px #ff676b)}.edge-label{font:700 11px ui-sans-serif,system-ui;fill:#ffe0a3;opacity:0;transition:opacity .25s}.graph.has-a .edge-label.a,.graph.has-b .edge-label.b{opacity:1}.graph.is-cycle .edge-label{fill:#ffd2d4}.graph-empty{position:absolute;inset:auto 8px 8px;text-align:center;color:#81949e;font-size:.68rem}.lock-heading{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.lock-heading h3{font-size:.88rem}.lock-heading span{color:var(--muted);font-size:.67rem}.table-wrap{overflow:auto;border:1px solid #2c404b;border-radius:8px}.locks{width:100%;border-collapse:collapse;font-size:.7rem;min-width:510px}.locks th,.locks td{text-align:left;vertical-align:top;padding:8px;border-bottom:1px solid #293b46}.locks th{background:#182731;color:#aabcc5;font-size:.66rem}.locks tr:last-child td{border-bottom:0}.locks code{white-space:nowrap;font-size:.68rem}.grant{color:var(--green);font-weight:800}.wait{color:var(--amber);font-weight:800}.row-note{color:var(--muted);font-size:.66rem}.empty-locks{padding:12px!important;color:var(--muted);text-align:center!important}.table-note{color:var(--muted);font-size:.69rem}.callout{border-left:3px solid var(--amber);padding:10px 12px;background:#242319;border-radius:0 7px 7px 0;font-size:.75rem;color:#eadcbd}.callout strong{color:#ffe2a9}.explain{margin:0 clamp(15px,3vw,36px) 22px;padding:17px 19px;display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.8fr);gap:18px;align-items:start}.explain-main{display:grid;gap:7px}.explain-main .step-kicker{font-size:.68rem;font-weight:900;letter-spacing:.1em;color:var(--cyan)}.explain-main h2{font-size:1.15rem}.explain-main p{color:#cbd9df;font-size:.86rem;max-width:80ch}.explain-side{padding:11px 13px;border:1px solid #2a414b;border-radius:8px;background:#0e1921}.explain-side b{font-size:.72rem;color:var(--amber)}.explain-side p{margin-top:4px;color:var(--muted);font-size:.75rem}.timeline{margin:0 clamp(15px,3vw,36px) 25px;padding:15px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.timeline h2{font-size:.95rem;margin-bottom:11px}.timeline-list{display:grid;grid-template-columns:repeat(7,minmax(95px,1fr));gap:7px}.time-item{border:1px solid #2a3e49;border-radius:8px;padding:9px;background:#0e1921;color:var(--muted);font-size:.68rem;min-width:0}.time-item.current{border-color:var(--cyan);color:var(--ink);background:#153331}.time-item .num{display:block;font-size:.64rem;color:var(--cyan);font-weight:900;margin-bottom:4px}.timeline .tiny{margin-top:8px;color:var(--muted);font-size:.7rem}.answers{margin:0 clamp(15px,3vw,36px) 24px}.answers h2{font-size:1.2rem;margin:0 0 11px}.qa-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.qa{border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:12px 14px}.qa h3{font-size:.83rem;color:#dff4f1;margin-bottom:5px}.qa p{font-size:.77rem;color:var(--muted)}.concept{margin:0 clamp(15px,3vw,36px) 24px;border:1px solid #3b5860;border-radius:12px;padding:16px;background:#101f27}.concept h2{font-size:1rem;margin-bottom:8px}.concept-map{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:9px;align-items:center}.concept-node{padding:10px;border-radius:8px;text-align:center;background:#172b34;border:1px solid #385560;font-size:.74rem}.concept-node b{display:block;color:var(--cyan);margin-bottom:3px}.concept-arrow{color:var(--amber);font-size:.75rem;text-align:center}.concept>p{font-size:.75rem;color:var(--muted);margin-top:9px}.sources{padding:16px clamp(15px,3vw,36px) 30px;border-top:1px solid var(--line);color:var(--muted);font-size:.76rem}.sources summary{font-weight:800;color:var(--ink);cursor:pointer}.sources ul{display:grid;gap:6px;margin-top:10px;padding-left:20px}.sources p{margin-top:9px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:960px){.layout{grid-template-columns:1fr 1fr}.center-card{grid-column:1/-1;grid-row:2}.timeline-list{grid-template-columns:repeat(4,minmax(95px,1fr))}}
+    @media(max-width:620px){.top{display:grid}.actions{justify-content:flex-start}.setup{grid-template-columns:1fr}.controlbar{grid-template-columns:1fr;gap:10px}.step-actions{order:2}.layout{grid-template-columns:1fr}.center-card{grid-column:auto;grid-row:auto}.graph{min-height:185px}.explain{grid-template-columns:1fr}.timeline-list{grid-template-columns:repeat(2,minmax(0,1fr))}.qa-grid{grid-template-columns:1fr}.concept-map{grid-template-columns:1fr;gap:4px}.concept-arrow{transform:rotate(90deg);padding:3px}.locks{min-width:490px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+    @media print{.timeline-list{grid-template-columns:repeat(9,1fr)}.sources details:not([open])>*:not(summary){display:block!important}.sources details ul{display:grid!important}}
+    /* Readability and opt-in motion controls */
+    .control-meta{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+    .motion-toggle{border:1px solid #55717c;border-radius:9px;padding:9px 12px;background:#172b36;color:#e8f4f7;font-size:.78rem;font-weight:850;white-space:nowrap}
+    .motion-toggle[aria-pressed="true"]{background:#164840;border-color:#55bfae;color:#dffff8}
+    .motion-toggle:hover{border-color:var(--cyan)}
+    .step-actions .button{min-height:42px;padding-inline:14px}
+    .badge{font-size:.73rem;padding:5px 10px}
+    .xid,.tx-note,.command small,.graph-node .node-label,.graph-node small,.table-note,.row-note{font-size:.76rem}
+    .locks{font-size:.76rem}.locks th{font-size:.72rem}.locks code{font-size:.73rem}
+    .explain{padding:20px 22px}.explain-main p{font-size:.92rem;line-height:1.7}.explain-side p{font-size:.82rem;line-height:1.55}
+    .key-message{margin:0 clamp(15px,3vw,36px) 22px;padding:14px 17px;border:1px solid #397a72;border-radius:10px;background:#142c2d;font-size:.9rem;font-weight:800;line-height:1.6}.key-message strong{color:var(--cyan)}
+    .graph.is-cycle{border-color:#c74950;box-shadow:inset 0 0 0 1px #c7495040}
+    .graph.has-a .graph-empty{display:none}
+    .edge-caption{position:absolute;z-index:2;left:8px;right:8px;text-align:center;font-size:.74rem;font-weight:850;line-height:1.25;padding:3px 7px;border-radius:6px;background:#0d1820e8;opacity:0;transition:opacity .2s;pointer-events:none}
+    .edge-caption.a{top:7px;color:#ffe0a3}.edge-caption.b{bottom:7px;color:#ffc3c7}
+    .graph.has-a .edge-caption.a,.graph.has-b .edge-caption.b{opacity:1}
+    body.motion-enabled .graph.has-a .edge.a{animation:flow-dash 1s linear infinite}
+    body.motion-enabled .graph.is-cycle .edge.b{animation:flow-dash 1s linear infinite}
+    body.motion-enabled .graph.is-cycle .edge{filter:drop-shadow(0 0 4px #ff676b)}
+    .explain-main.entering{animation:step-enter .38s ease-out}
+    @keyframes flow-dash{to{stroke-dashoffset:-24}}
+    @keyframes step-enter{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+    .mobile-cycle{display:none}
+    @media(max-width:620px){.control-meta{justify-content:flex-start}.motion-toggle{min-height:42px}.step-actions .button{flex:1;padding-inline:8px}.controlbar{gap:9px}.locks{font-size:.78rem}.graph{grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:5px;padding:38px 12px;min-height:0}.graph-arrows,.edge-caption{display:none}.graph-node{width:min(100%,250px);min-height:62px;justify-self:center}.mobile-cycle{display:none;position:relative;z-index:2;justify-items:center;gap:3px;color:var(--amber);font-size:.74rem;font-weight:850;line-height:1.25;text-align:center}.graph.has-a .mobile-cycle{display:grid}.mobile-cycle .mobile-edge{display:none}.graph.has-a .mobile-edge.a{display:block}.graph.has-b .mobile-edge.b{display:block;color:#ffc3c7}.graph:not(.has-a) .graph-empty{display:block}}
+    @media(prefers-reduced-motion:reduce){body.motion-enabled .graph .edge{animation:none!important}.explain-main.entering{animation:none}}
+    @media print{.motion-toggle{display:none}}
+    @media print{ :root{color-scheme:light;--bg:#fff;--panel:#fff;--panel2:#fff;--panel3:#eef3f5;--line:#aebdc5;--ink:#172832;--muted:#4d606b;--cyan:#176c61;--blue:#285d8e;--amber:#8b5d16;--red:#a1272d;--green:#226d37}body{background:white;color:#172832;font-size:9pt}.shell{max-width:none}.top,.scope,.setup,.controlbar,.timeline,.answers,.concept,.sources,.explain{break-inside:avoid}.top{padding:8mm}.actions{display:none}.scope,.setup,.layout,.explain,.timeline,.answers,.concept{margin-left:8mm;margin-right:8mm}.layout{grid-template-columns:1fr 1.3fr 1fr;gap:5mm}.tx-card,.center-card,.explain,.timeline,.qa,.concept{background:#fff}.graph{background:#f5f8f9}.graph-node,.graph-node.b{background:#e7f4f1;color:#172832}.graph-node.b{background:#edf2f8}.graph-empty{display:none}.edge{opacity:1;stroke:#9b690d}.edge.second{stroke:#a1272d}.edge-label{opacity:1;fill:#664914}.locks th{background:#eef3f5;color:#293e49}.table-wrap{overflow:visible}.locks{min-width:0;font-size:6.8pt}.locks th,.locks td{padding:4px}.command,.sql,.explain-side{background:#f7f9fa;color:#172832}.callout{background:#faf5e8}.timeline-list{grid-template-columns:repeat(7,1fr)}a{color:#245b86;text-decoration:underline}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div class="intro"><div class="eyebrow">POSTGRESQL · 단계별 시각화</div><h1>두 트랜잭션은 왜 멈출까?</h1><p>B가 20을 넣고 A가 21을 넣은 뒤, 서로 상대가 넣은 값을 추가하려고 합니다. 단계 버튼이나 자동 재생으로 어디서 멈추는지 확인해 보세요.</p></div>
+    <div class="actions"><a class="back-link" href="../../../../index.html">← 전체 학습 목차</a><button class="button" type="button" onclick="window.print()">PDF 저장</button></div>
+  </header>
+  <div class="scope"><b>학습 모형 · PostgreSQL 18</b> — 그림 속 100과 200은 트랜잭션을 구분하는 예시 번호입니다. 실제 번호는 달라질 수 있습니다.</div>
+  <section class="setup" aria-labelledby="setup-title">
+    <div><h2 id="setup-title">실험 준비</h2><p>id는 중복될 수 없는 기본 키입니다. 오른쪽 SQL을 순서대로 실행한다고 가정합니다.</p></div>
+    <pre class="sql"><code>CREATE TABLE test (id INTEGER PRIMARY KEY);
+
+-- 세션 B
+BEGIN;
+INSERT INTO test VALUES (20);
+-- 세션 A
+BEGIN;
+INSERT INTO test VALUES (21);
+INSERT INTO test VALUES (20);
+-- 다시 세션 B
+INSERT INTO test VALUES (21);</code></pre>
+  </section>
+  <section class="controlbar" aria-label="단계 조작">
+    <div class="step-actions"><button class="button" id="prev" type="button" aria-label="이전 단계">← 이전</button><button class="button primary" id="next" type="button" aria-label="다음 단계">다음 단계 →</button><button class="button" id="reset" type="button">처음부터</button></div>
+    <div class="progress-wrap"><div class="progress-label"><span id="step-count">시작</span><span id="step-short">아직 INSERT 전</span></div><div class="progress" role="progressbar" aria-label="학습 진행" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"><span id="progress-fill" style="width:0%"></span></div><div class="steps-mini" id="step-dots" aria-label="단계 바로가기"></div></div>
+    <div class="control-meta"><button class="motion-toggle" id="motion-toggle" type="button" aria-pressed="false" aria-label="자동 애니메이션 재생 켜기">▶ 자동 재생 OFF</button><span class="badge running" id="engine-state"><i class="status-pip"></i> PostgreSQL 준비</span></div>
+  </section>
+  <main>
+    <section class="layout" aria-label="트랜잭션과 PostgreSQL 내부 상태">
+      <article class="tx-card" id="card-a" aria-label="트랜잭션 A 상태"></article>
+      <section class="center-card" aria-labelledby="internal-title">
+        <div class="center-head"><h2 id="internal-title">PostgreSQL 안에서는</h2><p>누가 누구를 기다리나?</p></div>
+        <div class="graph" id="graph" role="img" aria-label="아직 트랜잭션 대기가 없습니다.">
+          <svg class="graph-arrows" viewBox="0 0 600 200" preserveAspectRatio="none" aria-hidden="true">
+            <defs><marker id="arrowA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f3c477"/></marker><marker id="arrowB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ff7f86"/></marker></defs>
+            <path class="edge a" d="M170 78 C230 46 370 46 430 78" marker-end="url(#arrowA)"/><path class="edge b second" d="M430 122 C370 154 230 154 170 122" marker-end="url(#arrowB)"/>
+          </svg>
+          <div class="edge-caption a" aria-hidden="true">A → B · XID 200 ShareLock 대기</div><div class="edge-caption b" aria-hidden="true">B → A · XID 100 ShareLock 대기</div>
+          <div class="graph-node"><span class="node-label">트랜잭션 A</span><strong>XID 100</strong><small id="graph-a">아직 락 없음</small></div>
+          <div class="mobile-cycle" aria-hidden="true"><span class="mobile-edge a">↓ A가 B의 XID 200을 기다림 · ShareLock</span><span class="mobile-edge b">↑ B가 A의 XID 100을 기다림 · ShareLock</span></div>
+          <div class="graph-node b"><span class="node-label">트랜잭션 B</span><strong>XID 200</strong><small id="graph-b">아직 락 없음</small></div>
+          <div class="graph-empty" id="graph-empty">각 화살표는 “내가 상대 트랜잭션 종료를 기다림”을 뜻합니다.</div>
+        </div>
+        <div class="lock-heading"><h3>락 상태</h3><span><code>pg_locks</code>에서 보는 핵심 항목</span></div>
+        <div class="table-wrap"><table class="locks"><thead><tr><th>Transaction</th><th>Transaction ID</th><th>Lock Type</th><th>Lock Mode</th><th>Granted</th><th>Waiting For</th></tr></thead><tbody id="lock-rows"></tbody></table></div>
+        <p class="table-note">상대 트랜잭션 번호에 이미 ExclusiveLock이 있어서 ShareLock 요청이 기다립니다.</p>
+        <div class="callout"><strong>여기서 잠기는 대상:</strong> 값 20이나 21의 행이 아니라 상대 트랜잭션입니다. `SELECT ... FOR SHARE/UPDATE`로 행을 잠그는 예제와는 다릅니다.</div>
+      </section>
+      <article class="tx-card b" id="card-b" aria-label="트랜잭션 B 상태"></article>
+    </section>
+    <section class="explain" aria-live="polite" aria-atomic="true">
+      <div class="explain-main"><span class="step-kicker" id="ex-kicker">시작 상태</span><h2 id="ex-title">두 세션이 아직 시작되지 않았습니다</h2><p id="ex-text">다음 단계로 실행 순서를 따라가 보세요.</p></div>
+      <aside class="explain-side"><b>기억할 점</b><p id="ex-tip">화살표는 한 트랜잭션이 다른 트랜잭션의 종료를 기다린다는 뜻입니다.</p></aside>
+    </section>
+    <section class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">실행 순서</h2><div class="timeline-list" id="timeline-list"></div><p class="tiny">⑤와 ⑥에서 INSERT가 멈춥니다. ⑦에서 한쪽이 롤백된 뒤 B가 다시 진행합니다.</p></section>
+    <section class="key-message" aria-label="이 그림의 핵심"><strong>그림의 핵심</strong> · 키 20과 21이 서로 락을 건 게 아닙니다. 중복 여부를 확인하려고 상대 트랜잭션이 끝나길 기다리다가 두 방향의 대기가 생깁니다.</section>
+  </main>
+  <footer class="sources"><details><summary>정확성 근거와 범위</summary><ul>
+    <li><a href="https://www.postgresql.org/docs/18/index-unique-checks.html">PostgreSQL 18 공식 문서 · Index Uniqueness Checks</a> — 미커밋 삽입과 충돌 시 기다린 뒤 가시성을 다시 검사하는 이유.</li>
+    <li><a href="https://www.postgresql.org/docs/18/explicit-locking.html">PostgreSQL 18 공식 문서 · Explicit Locking</a> — 테이블/행 락의 범위, deadlock 감지와 victim 선택은 예측할 수 없다는 설명.</li>
+    <li><a href="https://www.postgresql.org/docs/18/view-pg-locks.html">PostgreSQL 18 공식 문서 · pg_locks</a> — locktype, mode, granted 및 transaction ID 락을 보는 시스템 뷰.</li>
+    <li><a href="https://github.com/postgres/postgres/blob/REL_18_STABLE/src/backend/access/nbtree/nbtinsert.c">PostgreSQL source · REL_18_STABLE · nbtinsert.c</a> — B-tree 유니크 검사가 다른 트랜잭션을 기다리고 다시 검사하는 경로.</li>
+    <li><a href="https://github.com/postgres/postgres/blob/REL_18_STABLE/src/backend/storage/lmgr/lmgr.c">PostgreSQL source · REL_18_STABLE · lmgr.c</a> — 실행 중인 XID에 `ExclusiveLock`을 놓고 상대 XID 대기에 `ShareLock`을 쓰는 경로.</li>
+  </ul><p>확인 기준일: 2026-10-13. PostgreSQL 18 문서를 기준으로 한 학습 시뮬레이션이며 실제 서버 연결이나 특정 TRACEBACK 환경의 상태를 표시하지 않습니다. `pg_locks`에는 위 핵심 transactionid 행 외에도 테이블의 `RowExclusiveLock` 등 다른 락이 함께 보일 수 있습니다. deadlock detector는 어느 트랜잭션을 중단할지 보장하지 않으므로, 여기서는 A를 선택하는 예시를 사용합니다.</p></details></footer>
+</div>
+<script>
+(() => {
+  const steps = [
+    {short:'시작', kicker:'시작', title:'B가 먼저, A가 다음에 실행합니다', text:'다음 단계를 누르며 두 세션이 넣는 값을 따라가 보세요.', tip:'자동 재생을 켜면 전체 흐름을 이어서 보여줍니다.'},
+    {short:'B: INSERT 20', kicker:'STEP 1', title:'B가 20을 넣습니다', text:'B는 아직 커밋하지 않습니다. B의 XID는 200입니다.', tip:'열린 트랜잭션은 끝날 때까지 락을 보유합니다.'},
+    {short:'A: INSERT 21', kicker:'STEP 2', title:'A가 21을 넣습니다', text:'A도 커밋하지 않은 상태로 둡니다. A의 XID는 100입니다.', tip:'A와 B가 서로 다른 값을 먼저 넣었습니다.'},
+    {short:'A: INSERT 20 대기', kicker:'STEP 3', title:'A는 B가 끝나기를 기다립니다', text:'20은 B가 넣었지만 아직 확정되지 않았습니다. A의 ShareLock 요청은 B의 ExclusiveLock 때문에 대기합니다.', tip:'처음에는 A에서 B로 가는 한 방향 대기입니다.'},
+    {short:'B: INSERT 21 대기', kicker:'STEP 4', title:'B도 A를 기다립니다', text:'21은 A가 넣은 값입니다. 이제 A와 B가 서로를 기다립니다.', tip:'화살표 두 개가 고리를 이루면 순환 대기입니다.'},
+    {short:'Deadlock 감지 · A 중단 예시', kicker:'STEP 5', title:'PostgreSQL이 한쪽을 중단합니다', text:'이 예시에서는 A를 롤백해 대기 고리를 풉니다. 실제 서버는 항상 A를 고르는 것은 아닙니다.', tip:'A의 락이 풀리자 B가 다시 진행할 수 있습니다.'},
+    {short:'B: INSERT 21 성공', kicker:'STEP 6', title:'B가 다시 시도해 21을 넣습니다', text:'A가 롤백되어 21이 비었습니다. B의 INSERT가 성공합니다.', tip:'INSERT 성공과 COMMIT은 다른 단계입니다.'},
+    {short:'B: COMMIT', kicker:'STEP 7', title:'B가 커밋합니다', text:'B의 작업이 확정됩니다. 최종 상태는 A 롤백, B 커밋입니다.', tip:'가운데 표는 트랜잭션 XID에 대한 락을 보여줍니다.'}
+  ];
+  const timeline = [
+    ['①','B · BEGIN'],['②','B · INSERT 20'],['③','A · BEGIN'],['④','A · INSERT 21'],['⑤','A · INSERT 20 → 대기'],['⑥','B · INSERT 21 → 대기'],['⑦','Deadlock 감지 · A 롤백'],['⑧','B · INSERT 21 성공'],['⑨','B · COMMIT']
+  ];
+  let current = 0;
+  let autoplayTimer = null;
+  const $ = id => document.getElementById(id);
+  function lockRows(rows){
+    if(!rows.length) return '<tr><td class="empty-locks" colspan="6">아직 표시할 transactionid lock이 없습니다.</td></tr>';
+    return rows.map(r=>`<tr><td>${r.tx}</td><td><code>${r.xid}</code></td><td><code>transactionid</code></td><td><code>${r.mode}</code></td><td class="${r.granted?'grant':'wait'}">${r.granted?'true · 보유':'false · 대기'}</td><td>${r.waiting||'—'}</td></tr>`).join('');
+  }
+  function txCard(which,s){
+    const isA=which==='A'; const xid=isA?'100':'200'; const card=$(isA?'card-a':'card-b');
+    let status='준비', klass=''; let cmds=[]; let locks=[]; let note='BEGIN 전';
+    if(current>=1 && (!isA || current>=2)){status='RUNNING';klass='running';}
+    if(isA && current>=2){cmds.push(['완료','INSERT INTO test VALUES (21);','done']);note=current>=5?'XID 100 · ROLLBACK됨':'XID 100 · 미커밋';}
+    if(!isA && current>=1){cmds.push(['완료','INSERT INTO test VALUES (20);','done']);note=current>=7?'XID 200 · COMMIT됨':'XID 200 · 미커밋';}
+    if(isA && current>=3){cmds.push([current===5||current>=6?'ROLLBACK':'WAITING','INSERT INTO test VALUES (20);',current===5||current>=6?'failed':'pending']);}
+    if(!isA && current>=4){cmds.push([current===5?'대기 해소 · 재개':current===6||current===7?'완료':'WAITING','INSERT INTO test VALUES (21);',current===5||current===6||current===7?'done':'pending']);}
+    if(current>=5 && isA){status='ROLLBACK';klass='rollback';}
+    else if(current>=7 && !isA){status='COMMITTED';klass='committed';}
+    else if((isA&&current>=3&&current<=4)||(!isA&&current===4)){status='WAITING';klass='waiting';}
+    if(current>=1&&!isA && current<7) locks.push({tx:'B',xid:'200',mode:'ExclusiveLock',granted:true});
+    if(current>=2&&isA&&current<5) locks.push({tx:'A',xid:'100',mode:'ExclusiveLock',granted:true});
+    if(current>=3&&current<5&&isA) locks.push({tx:'A',xid:'200',mode:'ShareLock',granted:false,waiting:'XID 200 · B 종료'});
+    if(current===4&&!isA) locks.push({tx:'B',xid:'100',mode:'ShareLock',granted:false,waiting:'XID 100 · A 종료'});
+    const badge=klass?`<span class="badge ${klass}"><i class="status-pip"></i>${status}</span>`:`<span class="badge">${status}</span>`;
+    card.className=`tx-card ${isA?'a':'b'} ${klass==='waiting'?'waiting':''} ${klass==='deadlock'?'deadlock':''}`;
+    const holdsOwnXid=(isA&&current>=2&&current<5)||(!isA&&current>=1&&current<7);
+    card.innerHTML=`<div class="tx-head"><div class="tx-title"><span class="tx-letter">${which}</span><div><h2>트랜잭션 ${which}</h2><div class="xid">Transaction ID: ${current>=(isA?2:1)?xid:'미배정'}</div></div></div>${badge}</div><div class="tx-content">${cmds.map(c=>`<div class="command ${c[2]}"><small>${c[0]}</small><code>${c[1]}</code></div>`).join('')||'<div class="command pending"><small>아직 실행 전</small><code>BEGIN;</code></div>'}</div>${holdsOwnXid?`<div class="lock-chip"><span class="lock-icon">🔒</span><span><b>보유</b><br><code>ExclusiveLock</code> → 자기 XID ${xid}</span></div>`:''}${(isA&&current>=3&&current<=4)||(!isA&&current===4)?`<div class="lock-chip request"><span class="lock-icon">↗</span><span><b>요청 · 미부여</b><br><code>ShareLock</code> → 상대 XID ${isA?'200':'100'}</span></div>`:''}<p class="tx-note">${note}</p>`;
+    return locks;
+  }
+  function render(){
+    const s=steps[current];
+    const rows=[...txCard('A'),...txCard('B')];
+    $('lock-rows').innerHTML=lockRows(rows);
+    $('ex-kicker').textContent=s.kicker;$('ex-title').textContent=s.title;$('ex-text').textContent=s.text;$('ex-tip').textContent=s.tip;
+    const explainMain=document.querySelector('.explain-main');
+    explainMain.classList.remove('entering');
+    if(document.body.classList.contains('motion-enabled')){void explainMain.offsetWidth;explainMain.classList.add('entering');}
+    $('step-count').textContent=current===0?'시작':`STEP ${current} / 7`;$('step-short').textContent=s.short;
+    $('progress-fill').style.width=`${current/7*100}%`;
+    document.querySelector('.progress').setAttribute('aria-valuenow',current);
+    $('prev').disabled=current===0;$('next').disabled=current===steps.length-1;
+    $('engine-state').innerHTML=current===5?'<i class="status-pip"></i> DEADLOCK DETECTED':current===6?'<i class="status-pip"></i> B INSERT 성공':current===7?'<i class="status-pip"></i> B COMMITTED':'<i class="status-pip"></i> PostgreSQL 상태';
+    $('engine-state').className=`badge ${current===5?'deadlock':current===7?'committed':'running'}`;
+    $('graph').className=`graph ${current===3||current===4?'has-a':''} ${current===4?'has-b is-cycle':''}`;
+    $('graph').setAttribute('aria-label',current===4?'A는 XID 200을 기다리고 B는 XID 100을 기다립니다. 순환 대기입니다.':current>=3&&current<4?'A가 XID 200을 기다립니다.':current===5?'A가 롤백되어 B가 재개할 수 있습니다.':'대기 관계가 없습니다.');
+    $('graph-a').textContent=current>=5?'ROLLBACK':current>=3?'XID 200 ShareLock 요청':current>=2?'XID 100 ExclusiveLock 보유':'아직 락 없음';
+    $('graph-b').textContent=current>=7?'COMMITTED':current===4?'XID 100 ShareLock 요청':current>=1?'XID 200 ExclusiveLock 보유':'아직 락 없음';
+    $('graph-empty').textContent=current===4?'순환 대기: A → B → A · deadlock':current>=5?'A의 락 해제 · B가 다시 진행':'화살표는 “내가 상대 트랜잭션 종료를 기다림”을 뜻합니다.';
+    const activeTimeline={1:1,2:3,3:4,4:5,5:6,6:7,7:8}[current];
+    $('timeline-list').innerHTML=timeline.map((t,i)=>`<div class="time-item ${i===activeTimeline?'current':''}"><span class="num">${t[0]}</span>${t[1]}</div>`).join('');
+    $('step-dots').innerHTML=steps.map((x,i)=>`<button class="step-dot" type="button" data-step="${i}" ${i===current?'aria-current="step"':''}>${i===0?'시작':i}</button>`).join('');
+  }
+  function stopAutoPlay(){if(autoplayTimer){clearTimeout(autoplayTimer);autoplayTimer=null;}document.body.classList.remove('motion-enabled');$('motion-toggle').setAttribute('aria-pressed','false');$('motion-toggle').setAttribute('aria-label','자동 애니메이션 재생 켜기');$('motion-toggle').textContent='▶ 자동 재생 OFF';}
+  function autoAdvance(){if(current>=steps.length-1){stopAutoPlay();return;}current++;render();autoplayTimer=setTimeout(autoAdvance,3200);}
+  function startAutoPlay(){if(current>=steps.length-1)current=0;document.body.classList.add('motion-enabled');$('motion-toggle').setAttribute('aria-pressed','true');$('motion-toggle').setAttribute('aria-label','자동 애니메이션 재생 끄기');$('motion-toggle').textContent='⏸ 자동 재생 ON';render();autoplayTimer=setTimeout(autoAdvance,3200);}
+  $('motion-toggle').addEventListener('click',()=>{if(autoplayTimer)stopAutoPlay();else startAutoPlay()});
+  $('prev').addEventListener('click',()=>{stopAutoPlay();current=Math.max(0,current-1);render()});
+  $('next').addEventListener('click',()=>{stopAutoPlay();current=Math.min(steps.length-1,current+1);render()});
+  $('reset').addEventListener('click',()=>{stopAutoPlay();current=0;render();$('next').focus()});
+  $('step-dots').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(b){stopAutoPlay();current=Number(b.dataset.step);render()}});
+  document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='ArrowRight'&&document.activeElement.tagName!=='BUTTON'){stopAutoPlay();current=Math.min(steps.length-1,current+1);render()}if(e.key==='ArrowLeft'&&document.activeElement.tagName!=='BUTTON'){stopAutoPlay();current=Math.max(0,current-1);render()}});
+  render();
+})();
+</script>
+</body>
+</html>

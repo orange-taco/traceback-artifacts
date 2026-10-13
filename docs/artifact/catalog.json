@@ -42,6 +42,14 @@
             {"title": "00 · 저장 구조를 읽는 세 층", "description": "논리 객체·OS 파일·Page/자료구조의 정의와 연결", "href": "topics/database-systems/storage/foundations/index.html"},
             {"title": "PostgreSQL · InnoDB 저장 구조", "description": "PGDATA·Relation·Page·Tuple과 .ibd·Clustered Index 비교", "href": "topics/database-systems/storage/postgresql-innodb/index.html"}
           ]
+        },
+        {
+          "id": "concurrency",
+          "title": "동시성·잠금",
+          "description": "PostgreSQL 트랜잭션이 기다리고 교착되는 과정을 단계별로 살펴봅니다.",
+          "artifacts": [
+            {"title": "PostgreSQL · INSERT 교착 상태", "description": "Transaction ID의 ShareLock/ExclusiveLock과 순환 대기", "href": "topics/database-systems/concurrency/postgresql-insert-deadlock/index.html"}
+          ]
         }
       ]
     },
