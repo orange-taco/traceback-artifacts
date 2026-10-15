@@ -46,10 +46,10 @@
         {
           "id": "concurrency",
           "title": "동시성·잠금",
-          "description": "Transaction ID 락과 대기 고리를 먼저 이해한 뒤, PostgreSQL INSERT 교착 상태를 단계별로 따라갑니다.",
+          "description": "PostgreSQL과 InnoDB의 INSERT 대기 대상을 비교한 뒤, PostgreSQL 교착 상태를 더 자세히 따라갑니다.",
           "layout": "reading-path",
           "artifacts": [
-            {"title": "00 · INSERT 교착 상태를 읽는 기본 그림", "description": "XID 락·중복 키 대기·순환 대기를 한눈에 이해", "href": "topics/database-systems/concurrency/foundations/index.html"},
+            {"title": "00 · INSERT 교착 상태를 읽는 기본 그림", "description": "PostgreSQL XID 락과 InnoDB 인덱스 레코드 락 비교", "href": "topics/database-systems/concurrency/foundations/index.html"},
             {"title": "PostgreSQL · INSERT 교착 상태", "description": "Transaction ID의 ShareLock/ExclusiveLock과 순환 대기", "href": "topics/database-systems/concurrency/postgresql-insert-deadlock/index.html"}
           ]
         }

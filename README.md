@@ -28,7 +28,7 @@ TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관�
 이어집니다.
 동시성·잠금도 먼저
 [`INSERT 교착 상태를 읽는 기본 그림`](docs/artifact/topics/database-systems/concurrency/foundations/index.html)에서
-트랜잭션 ID 락과 대기 고리를 구분한 뒤,
+PostgreSQL의 트랜잭션 ID 락과 InnoDB의 인덱스 레코드 락을 비교한 뒤,
 [`PostgreSQL · INSERT 교착 상태`](docs/artifact/topics/database-systems/concurrency/postgresql-insert-deadlock/index.html)의
 단계별 애니메이션으로 이어집니다.
 
