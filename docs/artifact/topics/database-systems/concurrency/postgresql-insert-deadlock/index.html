@@ -87,7 +87,7 @@ INSERT INTO test VALUES (21);</code></pre>
         <div class="lock-heading"><h3>락 상태</h3><span><code>pg_locks</code>에서 보는 핵심 항목</span></div>
         <div class="table-wrap"><table class="locks"><thead><tr><th>Transaction</th><th>Transaction ID</th><th>Lock Type</th><th>Lock Mode</th><th>Granted</th><th>Waiting For</th></tr></thead><tbody id="lock-rows"></tbody></table></div>
         <p class="table-note">상대 트랜잭션 번호에 이미 ExclusiveLock이 있어서 ShareLock 요청이 기다립니다.</p>
-        <div class="callout"><strong>여기서 잠기는 대상:</strong> 값 20이나 21의 행이 아니라 상대 트랜잭션입니다. `SELECT ... FOR SHARE/UPDATE`로 행을 잠그는 예제와는 다릅니다.</div>
+        <div class="callout"><strong>‘공유락을 요청한다’는 뜻:</strong> <code>INSERT</code>가 값 20·21의 행에 <code>FOR SHARE</code>를 거는 것이 아닙니다. 고유 키 충돌 때문에 상대의 결과를 기다리며, PostgreSQL 내부에서는 상대 <code>transactionid</code>에 대한 <strong>미부여 ShareLock 요청</strong>으로 이 대기가 보입니다. 행 잠금과 잠금 대상이 다릅니다.</div>
       </section>
       <article class="tx-card b" id="card-b" aria-label="트랜잭션 B 상태"></article>
     </section>
@@ -112,7 +112,7 @@ INSERT INTO test VALUES (21);</code></pre>
     {short:'시작', kicker:'시작', title:'B가 먼저, A가 다음에 실행합니다', text:'다음 단계를 누르며 두 세션이 넣는 값을 따라가 보세요.', tip:'자동 재생을 켜면 전체 흐름을 이어서 보여줍니다.'},
     {short:'B: INSERT 20', kicker:'STEP 1', title:'B가 20을 넣습니다', text:'B는 아직 커밋하지 않습니다. B의 XID는 200입니다.', tip:'열린 트랜잭션은 끝날 때까지 락을 보유합니다.'},
     {short:'A: INSERT 21', kicker:'STEP 2', title:'A가 21을 넣습니다', text:'A도 커밋하지 않은 상태로 둡니다. A의 XID는 100입니다.', tip:'A와 B가 서로 다른 값을 먼저 넣었습니다.'},
-    {short:'A: INSERT 20 대기', kicker:'STEP 3', title:'A는 B가 끝나기를 기다립니다', text:'20은 B가 넣었지만 아직 확정되지 않았습니다. A의 ShareLock 요청은 B의 ExclusiveLock 때문에 대기합니다.', tip:'처음에는 A에서 B로 가는 한 방향 대기입니다.'},
+    {short:'A: INSERT 20 대기', kicker:'STEP 3', title:'A는 B가 끝나기를 기다립니다', text:'20은 B가 넣었지만 아직 확정되지 않았습니다. 중복 여부를 결정하려면 B의 결과가 필요합니다. PostgreSQL 내부의 B transactionid ShareLock 요청은 B의 ExclusiveLock 때문에 미부여 상태로 대기합니다.', tip:'A가 20 행에 FOR SHARE를 건 것이 아닙니다. 처음에는 A → B 한 방향 대기입니다.'},
     {short:'B: INSERT 21 대기', kicker:'STEP 4', title:'B도 A를 기다립니다', text:'21은 A가 넣은 값입니다. 이제 A와 B가 서로를 기다립니다.', tip:'화살표 두 개가 고리를 이루면 순환 대기입니다.'},
     {short:'Deadlock 감지 · A 중단 예시', kicker:'STEP 5', title:'PostgreSQL이 한쪽을 중단합니다', text:'이 예시에서는 A를 롤백해 대기 고리를 풉니다. 실제 서버는 항상 A를 고르는 것은 아닙니다.', tip:'A의 락이 풀리자 B가 다시 진행할 수 있습니다.'},
     {short:'B: INSERT 21 성공', kicker:'STEP 6', title:'B가 다시 시도해 21을 넣습니다', text:'A가 롤백되어 21이 비었습니다. B의 INSERT가 성공합니다.', tip:'INSERT 성공과 COMMIT은 다른 단계입니다.'},
