@@ -40,6 +40,29 @@
     @media(prefers-reduced-motion:reduce){body.motion-enabled .graph .edge{animation:none!important}.explain-main.entering{animation:none}}
     @media print{.motion-toggle{display:none}}
     @media print{ :root{color-scheme:light;--bg:#fff;--panel:#fff;--panel2:#fff;--panel3:#eef3f5;--line:#aebdc5;--ink:#172832;--muted:#4d606b;--cyan:#176c61;--blue:#285d8e;--amber:#8b5d16;--red:#a1272d;--green:#226d37}body{background:white;color:#172832;font-size:9pt}.shell{max-width:none}.top,.scope,.setup,.controlbar,.timeline,.answers,.concept,.sources,.explain{break-inside:avoid}.top{padding:8mm}.actions{display:none}.scope,.setup,.layout,.explain,.timeline,.answers,.concept{margin-left:8mm;margin-right:8mm}.layout{grid-template-columns:1fr 1.3fr 1fr;gap:5mm}.tx-card,.center-card,.explain,.timeline,.qa,.concept{background:#fff}.graph{background:#f5f8f9}.graph-node,.graph-node.b{background:#e7f4f1;color:#172832}.graph-node.b{background:#edf2f8}.graph-empty{display:none}.edge{stroke:#9b690d}.edge.second{stroke:#a1272d}.edge-label{opacity:1;fill:#664914}.locks th{background:#eef3f5;color:#293e49}.table-wrap{overflow:visible}.locks{min-width:0;font-size:6.8pt}.locks th,.locks td{padding:4px}.command,.sql,.explain-side{background:#f7f9fa;color:#172832}.callout{background:#faf5e8}.timeline-list{grid-template-columns:repeat(7,1fr)}a{color:#245b86;text-decoration:underline}}
+    .print-report{display:none}
+    @page{size:A4;margin:15mm}
+    @media print{
+      :root{color-scheme:light}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .top{padding:0 0 6mm}.intro h1{font-size:22pt}.scope,.setup{margin:0 0 6mm}.setup{grid-template-columns:1fr 1.5fr;padding:9px 12px}
+      .controlbar,.layout,.explain,.timeline,.key-message{display:none!important}
+      .print-report{display:block;margin:0 0 8mm;color:#172832}
+      .print-report h2{font-size:14pt;margin:0 0 3mm}
+      .print-report>p{font-size:8.5pt;color:#40545e;margin:0 0 4mm}
+      .print-cycle{display:grid;grid-template-columns:1fr auto 1fr;gap:4mm;align-items:center;border:1px solid #9eb5b4;background:#f2f8f6;border-radius:8px;padding:4mm;margin-bottom:5mm;break-inside:avoid}
+      .print-cycle div{border:1px solid #85b5ae;background:#fff;border-radius:6px;padding:3mm;font-size:8.5pt}
+      .print-cycle div:last-child{border-color:#98abc2}
+      .print-cycle strong,.print-cycle span{display:block}.print-cycle span{font-size:7.5pt;color:#4e626b}
+      .print-cycle b{color:#a1272d;font-size:10pt;text-align:center}
+      .print-steps{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:0 0 5mm}
+      .print-step{border:1px solid #b6c6c7;border-left:3px solid #176c61;border-radius:5px;padding:2.5mm 3mm;break-inside:avoid}
+      .print-step:nth-child(3),.print-step:nth-child(4),.print-step:nth-child(5){border-left-color:#a1272d;background:#fff5f5}
+      .print-step small{display:block;color:#3f7068;font-weight:800}.print-step strong{display:block;font-size:8.5pt}.print-step p{font-size:7.8pt;color:#40545e;margin-top:1mm}
+      .print-locks{border-top:1px solid #b6c6c7;padding-top:4mm;break-inside:avoid}
+      .print-locks h3{font-size:10pt;margin-bottom:2mm}.print-locks table{width:100%;border-collapse:collapse;font-size:7.7pt}.print-locks th,.print-locks td{border:1px solid #b6c6c7;padding:2mm;text-align:left}.print-locks th{background:#edf3f3}
+      .print-locks p{font-size:7.8pt;color:#40545e;margin-top:2mm}
+      .sources{padding:4mm 0 0;font-size:7.5pt;break-inside:auto}
+    }
   </style>
 </head>
 <body>
@@ -98,6 +121,7 @@ INSERT INTO test VALUES (21);</code></pre>
     <section class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">실행 순서</h2><div class="timeline-list" id="timeline-list"></div><p class="tiny">⑤와 ⑥에서 INSERT가 멈춥니다. ⑦에서 한쪽이 롤백된 뒤 B가 다시 진행합니다.</p></section>
     <section class="key-message" aria-label="이 그림의 핵심"><strong>그림의 핵심</strong> · 키 20과 21이 서로 락을 건 게 아닙니다. 중복 여부를 확인하려고 상대 트랜잭션이 끝나길 기다리다가 두 방향의 대기가 생깁니다.</section>
   </main>
+  <section class="print-report" aria-labelledby="print-report-heading"><h2 id="print-report-heading">두 INSERT가 만든 대기 고리</h2><p>PostgreSQL 18 · 두 세션의 실행 순서와 데드락 감지 결과를 한 번에 읽는 인쇄용 그림</p><div class="print-cycle"><div><strong>A · XID 100</strong><span>21 INSERT 미커밋<br>20 INSERT → B의 종료 대기</span></div><b>서로 기다림<br>↔</b><div><strong>B · XID 200</strong><span>20 INSERT 미커밋<br>21 INSERT → A의 종료 대기</span></div></div><div class="print-steps" id="print-steps"></div><div class="print-locks"><h3>교착 순간의 핵심 transactionid 잠금</h3><table><thead><tr><th>트랜잭션</th><th>대상 XID</th><th>모드</th><th>부여</th></tr></thead><tbody><tr><td>A</td><td>100 · 자기 것</td><td>ExclusiveLock</td><td>예</td></tr><tr><td>B</td><td>200 · 자기 것</td><td>ExclusiveLock</td><td>예</td></tr><tr><td>A</td><td>200 · B의 것</td><td>ShareLock</td><td>아니요 · 대기</td></tr><tr><td>B</td><td>100 · A의 것</td><td>ShareLock</td><td>아니요 · 대기</td></tr></tbody></table><p>ShareLock은 20·21 행에 건 <code>FOR SHARE</code>가 아닙니다. 다른 트랜잭션의 종료를 기다리는 내부 잠금 요청입니다. 그림에서는 A가 중단되고 B가 INSERT를 끝낸 뒤 COMMIT합니다. 실제 중단 대상은 고정되지 않습니다.</p></div></section>
   <footer class="sources"><details><summary>정확성 근거와 범위</summary><ul>
     <li><a href="https://www.postgresql.org/docs/18/index-unique-checks.html">PostgreSQL 18 공식 문서 · Index Uniqueness Checks</a> — 미커밋 삽입과 충돌 시 기다린 뒤 가시성을 다시 검사하는 이유.</li>
     <li><a href="https://www.postgresql.org/docs/18/explicit-locking.html">PostgreSQL 18 공식 문서 · Explicit Locking</a> — 테이블/행 락의 범위, deadlock 감지와 victim 선택은 예측할 수 없다는 설명.</li>
@@ -121,6 +145,7 @@ INSERT INTO test VALUES (21);</code></pre>
   const timeline = [
     ['①','B · BEGIN'],['②','B · INSERT 20'],['③','A · BEGIN'],['④','A · INSERT 21'],['⑤','A · INSERT 20 → 대기'],['⑥','B · INSERT 21 → 대기'],['⑦','Deadlock 감지 · A 롤백'],['⑧','B · INSERT 21 성공'],['⑨','B · COMMIT']
   ];
+  document.getElementById('print-steps').innerHTML=steps.slice(1).map((s,i)=>`<article class="print-step"><small>${s.kicker}</small><strong>${s.short}</strong><p>${s.text}</p></article>`).join('');
   let current = 0;
   let autoplayTimer = null;
   const $ = id => document.getElementById(id);

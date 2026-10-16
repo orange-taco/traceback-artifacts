@@ -176,6 +176,29 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 @media print{body{background:#fff}.page{max-width:none;padding:0}.top-links,.picker,.controls,.notice,.next{display:none}.hero{padding:12px 0}.print-all{display:block}.print-all article{break-inside:avoid;margin:16px 0;padding:12px;border:1px solid var(--line)}.print-all ol{margin:7px 0;padding-left:20px;font-size:.8rem}.stage{display:none}.overview article,.model-cards article,.strategy article,.tech article,.placement article,.scale-grid article{break-inside:avoid}.details:not([open])>*:not(summary),.case-concepts details:not([open])>*:not(summary),.insert-clarity details:not([open])>*:not(summary),.study-extensions details:not([open])>*:not(summary){display:block!important}.sql-block{color:#17252b;background:#edf1ed}.sql-block .comment{color:#52646b}}
 @media print{.orm-sample pre,.method-compare pre,.gate-explain pre,.insert-clarity pre,.study-extensions pre{color:#17252b;background:#eef2ef;white-space:pre-wrap}.orm-sample,.method-compare,.insert-example,.gate-explain,.insert-clarity,.lock-primer{break-inside:avoid}.scale-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@page{size:A4;margin:15mm}
+@media print{
+ body{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:9pt}
+ .page{padding:0}.top{padding:0 0 5mm}.hero{padding:6mm 0}.hero h1{font-size:25pt}
+ .overview,.model-cards,.lock-flow-grid,.placement,.tech{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .lock-primer,.study-extensions,.scale{margin-top:6mm;padding:4mm}
+ .guide{margin-top:6mm;padding-top:4mm}.rule-strip{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .stage,.section-head,.picker,.controls,.notice{display:none!important}
+ .print-all{display:block;break-before:page}
+ .print-all>h2{font-size:16pt;margin:0 0 2mm}.print-intro{font-size:8.5pt;color:#52646b;margin:0 0 5mm}
+ .print-all>article{break-inside:auto!important;page-break-inside:auto;margin:0 0 7mm;padding:0 0 5mm;border:0;border-bottom:1px solid #b8c5c3}
+ .print-all h3{font-size:12pt;margin-bottom:2mm}.print-all>article>p{font-size:8.5pt;color:#52646b}
+ .print-flow{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:3mm 0;break-inside:avoid}
+ .print-flow>div{border:1px solid #b8c5c3;border-top:3px solid #087b74;border-radius:5px;padding:2.5mm 3mm;background:#f5faf7}
+ .print-flow>div:last-child{border-top-color:#b25d25;background:#fdf8f1}
+ .print-flow b{display:block;margin-bottom:1mm;font-size:8.5pt}.print-flow ol{margin:0;padding-left:4mm;font-size:7.7pt}
+ .print-flow li{margin:1mm 0;break-inside:avoid}.print-flow li small{display:block;color:#52646b;font-size:7pt}
+ .print-db{margin:2mm 0;padding:2mm 3mm;border-left:3px solid #bd4056;background:#fff1f1;font-size:7.8pt;break-inside:avoid}
+ .print-answer{padding:2.5mm 3mm;border-left:3px solid #247a51;background:#eef6ef;font-size:8pt;break-inside:avoid}
+ .print-all>article>h4{margin:3mm 0 1mm;font-size:8pt}.print-all>article>ul{margin:0;padding-left:5mm;font-size:7.5pt}
+ .print-all>article>ul li{margin:1mm 0}.print-all pre,.study-extensions pre{white-space:pre-wrap;overflow-wrap:anywhere}
+ .sources,.details{break-inside:auto}
+}
 </style>
 </head>
 <body>
@@ -399,7 +422,9 @@ stage.addEventListener('click',event=>{
  selectedChoice[item.id]=Number(button.dataset.choice);
  updateChoice(item);
 });
-document.getElementById('print-all').innerHTML='<h2>모든 예약 사례 · 인쇄용 실행 순서</h2>'+cases.map(c=>`<article><h3>${escapeText(c.title)} · ${escapeText(c.verdict)}</h3><p>${escapeText(c.summary)}</p><ol>${c.steps.map(s=>`<li><strong>${escapeText(s.who)}: ${escapeText(s.title)}</strong> — ${escapeText(s.why)}</li>`).join('')}</ol><h4>선택 가능한 주요 방법</h4><ul>${choices[c.id].map(option=>`<li><strong>${escapeText(option.title)} (${escapeText(option.mark)})</strong>: ${escapeText(option.body)} ${escapeText(option.cost)}</li>`).join('')}</ul>${c.id==='overwrite'?overwriteComparison:''}${c.id==='single'?djangoExample:''}${c.id==='reverse'?reverseConcepts:''}${c.id==='extra'?extraConcepts:''}</article>`).join('');
+const printLane=(item,who)=>`<div><b>예약 ${who}</b><ol>${item.steps.map((s,i)=>s.who===who?`<li><strong>${i+1}. ${escapeText(s.title)}</strong><small>${escapeText(s.why)}</small></li>`:'').join('')}</ol></div>`;
+document.getElementById('print-all').innerHTML='<h2>여섯 상황의 실행 순서와 판단</h2><p class="print-intro">화면에서 한 단계씩 보는 흐름을 PDF에서는 A와 B의 두 줄로 나란히 읽습니다. 번호가 실제 실행 순서입니다.</p>'+cases.map((c,i)=>`<article class="print-case"><h3>사례 ${String(i+1).padStart(2,'0')} · ${escapeText(c.title)}</h3><p>${escapeText(c.summary)}</p><div class="print-flow">${printLane(c,'A')}${printLane(c,'B')}</div><p class="print-answer"><strong>결과:</strong> ${escapeText(lessons[c.id].result)}<br><strong>기본 판단:</strong> ${escapeText(choices[c.id][0].title)} · ${escapeText(choices[c.id][0].body)}</p><h4>다른 선택지와 조건</h4><ul>${choices[c.id].map(option=>`<li><strong>${escapeText(option.title)} (${escapeText(option.mark)})</strong>: ${escapeText(option.body)} ${escapeText(option.cost)}</li>`).join('')}</ul>${c.id==='overwrite'?overwriteComparison:''}${c.id==='single'?djangoExample:''}${c.id==='reverse'?reverseConcepts:''}${c.id==='extra'?extraConcepts:''}</article>`).join('');
+cases.forEach((item,i)=>{const dbStep=item.steps.find(s=>s.who==='DB');if(dbStep)document.getElementById('print-all').querySelectorAll(':scope > article')[i].querySelector('.print-answer').insertAdjacentHTML('beforebegin',`<p class="print-db"><strong>DB 감지 · ${escapeText(dbStep.title)}:</strong> ${escapeText(dbStep.why)}</p>`)});
 document.getElementById('print-all').querySelectorAll(':scope > article')[cases.findIndex(c=>c.id==='insert')].insertAdjacentHTML('beforeend',insertClarity);
 document.getElementById('print-all').querySelectorAll(':scope > article')[cases.findIndex(c=>c.id==='ordered')].insertAdjacentHTML('beforeend',orderedConcepts);
 buildPicker();
