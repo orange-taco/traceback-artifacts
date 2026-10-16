@@ -87,6 +87,10 @@
 .gate-steps div:last-child{border-color:var(--b);background:#fdf7ef}
 .gate-steps b{display:block;margin-bottom:3px}
 .gate-steps code{font-size:.75rem}
+.gate-record{margin:10px 0;padding:9px 11px;background:#f3f6f4;border:1px solid var(--line);border-radius:5px;font-size:.78rem}
+.gate-record strong,.gate-record span{display:block}
+.gate-record span{color:#405851}
+.gate-explain pre{margin:9px 0 0;padding:11px 12px;background:#183039;color:#edf9f2;border-radius:6px;overflow:auto;font-size:.72rem;line-height:1.55}
 .orm-sample{margin-top:20px;padding:16px 18px;background:#fff;border:1px solid #b9cbbb;border-radius:7px}
 .orm-sample h5{font-size:.9rem;margin:0}
 .orm-sample p{font-size:.8rem;color:var(--sub);margin-top:6px}
@@ -132,7 +136,7 @@
 @media(max-width:430px){.picker button{min-height:76px;padding:10px}.picker button .pick-title{font-size:.82rem}.picker button .pick-result{font-size:.7rem}.overview .mini{gap:5px}.overview .mini span{white-space:normal;font-size:.72rem}.event strong{font-size:.78rem}.event small{font-size:.69rem}.lane-head{font-size:.74rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 @media print{body{background:#fff}.page{max-width:none;padding:0}.top-links,.picker,.controls,.notice,.next{display:none}.hero{padding:12px 0}.print-all{display:block}.print-all article{break-inside:avoid;margin:16px 0;padding:12px;border:1px solid var(--line)}.print-all ol{margin:7px 0;padding-left:20px;font-size:.8rem}.stage{display:none}.overview article,.strategy article,.tech article,.placement article,.scale-grid article{break-inside:avoid}.details:not([open])>*:not(summary),.case-concepts details:not([open])>*:not(summary){display:block!important}.sql-block{color:#17252b;background:#edf1ed}.sql-block .comment{color:#52646b}}
-@media print{.orm-sample pre,.method-compare pre{color:#17252b;background:#eef2ef;white-space:pre-wrap}.orm-sample,.method-compare,.insert-example{break-inside:avoid}.scale-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{.orm-sample pre,.method-compare pre,.gate-explain pre{color:#17252b;background:#eef2ef;white-space:pre-wrap}.orm-sample,.method-compare,.insert-example,.gate-explain{break-inside:avoid}.scale-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -225,7 +229,7 @@ const choices={
  ],
  reverse:[
   {title:'모든 좌석을 같은 순서로',mark:'추천 · 교착 감소',body:'좌석 ID를 정렬하고 모든 예약 경로에서 실제 잠금·UPDATE·INSERT 순서를 통일합니다.',cost:'다른 자원과 인덱스의 잠금이 남을 수 있으므로 데드락 전체 재시도는 계속 필요합니다.'},
-  {title:'공연별 게이트 행 잠금',mark:'대안 · 더 넓은 직렬화',body:'모든 예약 경로가 같은 공연의 게이트 행을 먼저 FOR UPDATE로 잠그고 나서 좌석에 접근합니다. 뒤따르는 요청은 게이트에서 기다립니다.',cost:'서로 다른 좌석도 같은 공연이면 대기합니다. 정렬된 잠금 순서와 DB의 소유권 규칙, 데드락 재시도는 계속 필요합니다.'}
+  {title:'공연 행 먼저 잠금',mark:'대안 · 더 넓은 직렬화',body:'모든 예약 경로가 같은 공연을 나타내는 행을 먼저 FOR UPDATE로 잠그고 나서 좌석에 접근합니다. 뒤따르는 요청은 그 공연 행에서 기다립니다.',cost:'서로 다른 좌석도 같은 공연이면 대기합니다. 정렬된 잠금 순서와 DB의 소유권 규칙, 데드락 재시도는 계속 필요합니다.'}
  ],
  ordered:[
   {title:'현재 순서 유지',mark:'추가 해결책 불필요',body:'이 두 좌석 예시에서는 잠금 순서가 같아 순환 대기가 없습니다. B는 대기 후 매진을 확인합니다.',cost:'다른 예약 코드도 같은 순서를 지켜야 합니다.'},
@@ -233,7 +237,7 @@ const choices={
  ],
  extra:[
   {title:'자원 종류까지 전역 순서',mark:'추천 · 교착 감소',body:'좌석 → 쿠폰 → 주문처럼 순서를 정하고 모든 코드 경로가 같은 순서로 잠급니다.',cost:'새 코드 경로가 추가될 때마다 순서를 지키는지 함께 점검해야 합니다.'},
-  {title:'공연별 게이트 행 잠금',mark:'대안 · 더 넓은 직렬화',body:'모든 예약 경로가 좌석·쿠폰을 건드리기 전에 같은 공연의 게이트 행을 FOR UPDATE로 잠급니다. B는 게이트에서 먼저 기다리므로 쿠폰을 선점하지 못합니다.',cost:'다른 좌석의 예약도 같은 공연이면 기다립니다. 좌석·쿠폰의 상태 검사와 DB 제약, 데드락 재시도는 계속 필요합니다.'}
+  {title:'공연 행 먼저 잠금',mark:'대안 · 더 넓은 직렬화',body:'모든 예약 경로가 좌석·쿠폰보다 먼저 같은 공연을 나타내는 행을 FOR UPDATE로 잠급니다. B는 공연 행에서 먼저 기다리므로 쿠폰을 선점하지 못합니다.',cost:'다른 좌석의 예약도 같은 공연이면 기다립니다. 좌석·쿠폰의 상태 검사와 DB 제약, 데드락 재시도는 계속 필요합니다.'}
  ],
  insert:[
   {title:'직접 INSERT + UNIQUE',mark:'추천 · 활성 예약 행',body:'DB가 (event_id, seat_id)의 유일성을 검사하게 하고 중복 키 오류를 매진으로 처리합니다. 선행 SELECT는 필수 조건이 아닙니다.',cost:'취소 이력을 함께 저장한다면 “활성 예약만 하나”인 스키마가 필요합니다.'},
@@ -281,7 +285,11 @@ with transaction.atomic():
     seat.reserved_by = user
     seat.save()</code></pre><span class="method-result">잠금 SELECT → 상태 검사 → UPDATE</span></article></div><p>둘 다 한 사람만 예약하게 합니다. 한 좌석의 단순한 상태 확인은 A가 간결하고, 여러 조건을 함께 검증할 때는 B가 유용합니다. Django 교육용 예시이며 TRACEBACK 코드 발췌가 아닙니다. <a href="https://docs.djangoproject.com/en/6.1/ref/models/querysets/#update">조건부 UPDATE</a> · <a href="https://docs.djangoproject.com/en/6.1/ref/models/querysets/#select-for-update">select_for_update()</a></p></div>`;
 const reverseConcepts=`<div class="case-concepts"><p><strong>공유 락은 어디에?</strong> <code>SELECT FOR SHARE</code>는 행에 거는 공유 잠금입니다. 이 사례에서 A는 S2 행의 공유 잠금을 얻은 게 아닙니다. PostgreSQL은 B의 종료를 기다리며 B의 <code>transactionid</code>에 <code>ShareLock</code>을 요청할 수 있고, <strong>아직 획득하지 못해</strong> 대기합니다. B도 반대로 기다리면 데드락입니다. 이는 PostgreSQL 내부 표현이며 InnoDB에 그대로 적용되지 않습니다.</p><div class="insert-example"><h5>왜 INSERT 순서도 살펴볼까?</h5><p>두 좌석을 함께 예약하고, <code>reservations</code>에 <strong>좌석별 예약 행</strong>을 넣는다고 해 봅시다. <code>(event_id, seat_id)</code>에는 UNIQUE가 있고 두 트랜잭션 모두 아직 COMMIT하지 않았습니다.</p><div class="insert-lanes"><div><b>예약 A</b><span>① S1 예약 행 INSERT · 키 선점</span><span>③ S2 INSERT 시도 → B를 기다림</span></div><div><b>예약 B</b><span>② S2 예약 행 INSERT · 키 선점</span><span>④ S1 INSERT 시도 → A를 기다림</span></div></div><p class="cycle-note"><strong>A → B → A: 데드락.</strong> 두 요청 모두 <strong>S1 → S2</strong> 순서로 예약 키를 INSERT하면 이 고리는 생기지 않습니다. 핵심은 모든 INSERT 문을 정렬하는 게 아니라, <strong>서로 충돌할 수 있는 좌석·예약 키를 같은 순서로 처리</strong>하는 것입니다. <a href="https://www.postgresql.org/docs/18/index-unique-checks.html">PostgreSQL 고유 키 검사</a></p><details><summary>외래 키 검사도 INSERT를 기다리게 할 수 있나요?</summary><p>네. <code>reservations.seat_id</code>가 <code>seats.id</code>를 참조할 때, INSERT는 참조할 좌석이 유지되는지 확인합니다. A가 S1을 <code>FOR UPDATE</code>로 잠그고 S2 예약을 INSERT하고, B가 S2를 잠그고 S1 예약을 INSERT하면 이 확인 과정에서 서로 기다릴 수 있습니다. 이 예시의 충돌은 <code>FOR UPDATE</code>와 외래 키 검사의 <code>FOR KEY SHARE</code> 사이에서 생깁니다. <code>status</code>만 바꾸는 일반 UPDATE는 보통 <code>FOR NO KEY UPDATE</code>여서 이 외래 키 검사와 충돌하지 않습니다.</p></details></div></div>`;
-const extraConcepts=`<div class="gate-explain"><h5>사례 05에서 ‘직렬화’는 무엇을 잠그나요?</h5><p><strong>직렬화는 같은 자원을 쓰는 작업을 차례로 진행시키는 목표</strong>입니다. 행 잠금은 그 목표를 이루는 방법 중 하나입니다. 사례 02의 조건부 UPDATE도 같은 S1의 변경을 순서대로 처리하지만, B가 먼저 잡은 쿠폰 C1까지 보호하지는 않습니다.</p><div class="gate-steps"><div><b>이 사례의 기본 방법 · 모두 S1 → 쿠폰 C1</b>A가 S1을 잠그면 B는 <strong>쿠폰을 잡기 전에 S1에서 대기</strong>합니다. A가 끝난 뒤 B가 좌석·쿠폰 상태를 다시 확인합니다. 같은 순서로 잠그면 이 고리가 끊깁니다.</div><div><b>더 넓은 대안 · 공연별 게이트 행 G</b>모든 예약 경로가 좌석·쿠폰보다 먼저 같은 공연의 G 행을 <code>SELECT ... FOR UPDATE</code>로 잠급니다. A가 G를 보유한 동안 B는 <strong>아무 좌석·쿠폰도 잡지 못하고 G에서 대기</strong>합니다.</div></div><p>G는 이 설명을 위해 별도로 둔 행입니다. 같은 공연의 다른 좌석 예약도 G에서 기다리므로 처리량이 줄 수 있습니다. <strong>자원 순서 통일과 게이트 잠금은 함께 쓸 수도 있습니다.</strong> 어느 방법이든 최신 상태 검사와 예약 모델에 맞는 DB 정합성 규칙은 계속 필요합니다.</p></div>`;
+const extraConcepts=`<div class="gate-explain"><h5>사례 05 · ‘공연 행을 먼저 잠근다’는 뜻</h5><p>사례 02의 조건부 UPDATE나 <code>SELECT FOR UPDATE</code>는 <strong>같은 좌석 S1</strong>에 대한 작업을 차례로 진행시킵니다. 하지만 B가 쿠폰 C1을 먼저 잠그는 사례 05의 고리까지 막으려면, 좌석과 쿠폰에 접근하는 순서도 맞춰야 합니다.</p><div class="gate-record"><strong>교육용 예시 · reservation_groups 테이블</strong><span>id 1 · 아이유 콘서트</span><span>id 2 · 콜드플레이 콘서트</span></div><div class="gate-steps"><div><b>기본 방법 · 두 요청 모두 좌석 S1 → 쿠폰 C1</b>A가 S1을 잠그면 B는 <strong>쿠폰을 잡기 전에 S1에서 대기</strong>합니다. A가 끝난 뒤 B가 최신 좌석·쿠폰 상태를 확인합니다.</div><div><b>더 넓은 방법 · 두 요청 모두 ‘아이유 콘서트’ 행부터</b>A가 공연 1번 행을 잠그고 좌석·쿠폰을 처리합니다. B는 <strong>좌석이나 쿠폰을 잡기 전에 공연 1번 행에서 대기</strong>합니다. A가 COMMIT하면 B가 그 행을 얻고 최신 상태를 확인합니다.</div></div><p>두 번째 방법의 Django 예시 · 실제 TRACEBACK 코드는 아닙니다:</p><pre><code>from django.db import transaction
+
+with transaction.atomic():
+    ReservationGroup.objects.select_for_update().get(id=1)
+    # 이 트랜잭션 안에서 좌석 확인과 쿠폰 처리</code></pre><p>공연 1번 행은 PostgreSQL의 특별한 락이 아니라 <strong>여러 요청이 공통으로 잠그기로 정한 일반 행</strong>입니다. 새 테이블 대신 이미 있는 공연 행을 써도 됩니다. 다만 같은 공연의 다른 좌석 예약도 기다리므로, 보통은 먼저 잠금 순서를 통일하고 필요한 경우 이 방법을 더합니다. <a href="https://docs.djangoproject.com/en/6.1/ref/models/querysets/#select-for-update">Django select_for_update() 문서</a></p></div>`;
 function escapeText(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function buildPicker(){
  const buttons=cases.map((item,i)=>{
