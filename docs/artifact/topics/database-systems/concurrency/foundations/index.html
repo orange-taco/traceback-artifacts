@@ -38,6 +38,47 @@
 .solution-grid div{border-left:2px solid #8fac9e;padding-left:11px}
 .solution-grid b{display:block;font-size:.78rem;color:#17382e;margin-bottom:4px}
 .solution-grid p{font-size:.85rem;color:#405851;line-height:1.5}
+.solution-panel{background:#f1f6f2}
+.solution-intro{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:15px;align-items:start}
+.solution-intro h4{font-size:.73rem;letter-spacing:0;text-transform:none;margin:0;color:#1e634d}
+.solution-intro strong{display:block;font-size:1.03rem;line-height:1.35;margin-top:3px}
+.solution-intro p{font-size:.83rem;color:#405851}
+.solution-heading{font-size:.82rem;font-weight:850;margin:20px 0 8px}
+.solution-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.solution-picker button{border:1px solid #a9c0b0;background:#fff;border-radius:6px;padding:11px 12px;text-align:left;min-width:0;color:var(--ink)}
+.solution-picker button[aria-pressed=true]{border:2px solid #1d7156;background:#e3f1e8;padding:10px 11px}
+.solution-picker button b{display:block;font-size:.82rem;line-height:1.25}
+.solution-picker button small{display:block;font-size:.68rem;color:#346f53;margin-top:3px}
+.choice-detail{margin-top:8px;padding:15px 17px;border-left:4px solid #227c58;background:#fff}
+.choice-detail strong{font-size:.87rem}
+.choice-detail p{font-size:.82rem;color:#405851;margin-top:5px}
+.choice-detail .tradeoff{color:#756344}
+.case-caution{font-size:.77rem;color:#556b60;margin-top:12px}
+.orm-sample{margin-top:20px;padding:16px 18px;background:#fff;border:1px solid #b9cbbb;border-radius:7px}
+.orm-sample h5{font-size:.9rem;margin:0}
+.orm-sample p{font-size:.8rem;color:var(--sub);margin-top:6px}
+.orm-sample pre{margin:12px 0;padding:14px;background:#183039;color:#edf9f2;border-radius:6px;overflow:auto;font-size:.77rem;line-height:1.65}
+.orm-sample .count-flow{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.orm-sample .count-flow span{padding:6px 9px;border:1px solid #abc4b3;border-radius:5px;background:#f3f9f4;font-size:.77rem;font-weight:800}
+.scale{margin-top:37px;border-top:1px solid var(--line);padding-top:26px}
+.scale h2{font-size:1.4rem}
+.scale>p{color:var(--sub);font-size:.86rem;margin-top:7px;max-width:78ch}
+.placement{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:19px 0}
+.placement article{border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:16px 18px}
+.placement h3{font-size:.93rem}
+.placement .nodes{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:12px 0;font-size:.72rem;font-weight:850}
+.placement .nodes span{padding:6px 9px;border:1px solid var(--line);border-radius:4px;background:#f3f7f4}
+.placement .nodes b{color:var(--a)}
+.placement p{font-size:.8rem;color:var(--sub)}
+.scale-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
+.scale-grid article{padding:15px;border-right:1px solid var(--line)}
+.scale-grid article:nth-child(2n){border-right:0}
+.scale-grid article:nth-child(-n+2){border-bottom:1px solid var(--line)}
+.scale-grid h3{font-size:.9rem}
+.scale-grid .answer{display:block;font-size:.72rem;font-weight:900;color:var(--a);margin:7px 0}
+.scale-grid p{font-size:.78rem;color:var(--sub)}
+.scale-note{border-left:3px solid var(--b);padding:9px 12px;background:#fff4e8;font-size:.82rem;margin-top:12px}
+.scale-sources{font-size:.75rem;color:var(--sub);margin-top:9px}
 .controls{margin-top:15px}
 .guide{margin-top:43px}
 .rule-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:20px;background:var(--panel);border:1px solid var(--line);border-radius:7px;overflow:hidden}
@@ -52,10 +93,12 @@
 .sql-details .sql-block{margin:12px 0 0}
 .sql-details p{margin-top:9px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-@media(max-width:760px){.hero{grid-template-columns:1fr;gap:15px;padding:25px 0}.overview{margin-bottom:30px}.picker{grid-template-columns:repeat(2,minmax(0,1fr))}.stage-body{grid-template-columns:1fr}.flow-pane,.state-pane{padding:17px}.solution-panel{padding:18px}.solution-grid{grid-template-columns:1fr;gap:12px}.rule-strip{grid-template-columns:1fr}.rule-strip article{border-right:0;border-bottom:1px solid var(--line)}.rule-strip article:last-child{border-bottom:0}}
+@media(max-width:760px){.hero{grid-template-columns:1fr;gap:15px;padding:25px 0}.overview{margin-bottom:30px}.picker{grid-template-columns:repeat(2,minmax(0,1fr))}.stage-body{grid-template-columns:1fr}.flow-pane,.state-pane{padding:17px}.solution-panel{padding:18px}.solution-intro{grid-template-columns:1fr;gap:5px}.solution-picker{grid-template-columns:repeat(2,minmax(0,1fr))}.solution-grid{grid-template-columns:1fr;gap:12px}.rule-strip{grid-template-columns:1fr}.rule-strip article{border-right:0;border-bottom:1px solid var(--line)}.rule-strip article:last-child{border-bottom:0}.scale-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.scale-grid article:nth-child(2){border-right:0}.scale-grid article:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+@media(max-width:560px){.placement{grid-template-columns:1fr}.solution-picker,.scale-grid{grid-template-columns:1fr}.scale-grid article{border-right:0;border-bottom:1px solid var(--line)}.scale-grid article:last-child{border-bottom:0}}
 @media(max-width:430px){.picker button{min-height:76px;padding:10px}.picker button .pick-title{font-size:.82rem}.picker button .pick-result{font-size:.7rem}.overview .mini{gap:5px}.overview .mini span{white-space:normal;font-size:.72rem}.event strong{font-size:.78rem}.event small{font-size:.69rem}.lane-head{font-size:.74rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
-@media print{body{background:#fff}.page{max-width:none;padding:0}.top-links,.picker,.controls,.notice,.next{display:none}.hero{padding:12px 0}.print-all{display:block}.print-all article{break-inside:avoid;margin:16px 0;padding:12px;border:1px solid var(--line)}.print-all ol{margin:7px 0;padding-left:20px;font-size:.8rem}.stage{display:none}.overview article,.strategy article,.tech article{break-inside:avoid}.details:not([open])>*:not(summary){display:block!important}.sql-block{color:#17252b;background:#edf1ed}.sql-block .comment{color:#52646b}}
+@media print{body{background:#fff}.page{max-width:none;padding:0}.top-links,.picker,.controls,.notice,.next{display:none}.hero{padding:12px 0}.print-all{display:block}.print-all article{break-inside:avoid;margin:16px 0;padding:12px;border:1px solid var(--line)}.print-all ol{margin:7px 0;padding-left:20px;font-size:.8rem}.stage{display:none}.overview article,.strategy article,.tech article,.placement article,.scale-grid article{break-inside:avoid}.details:not([open])>*:not(summary){display:block!important}.sql-block{color:#17252b;background:#edf1ed}.sql-block .comment{color:#52646b}}
+@media print{.orm-sample pre{color:#17252b;background:#eef2ef;white-space:pre-wrap}.orm-sample{break-inside:avoid}.scale-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -67,6 +110,22 @@
 <section class="guide" aria-labelledby="answer-heading"><h2 id="answer-heading">실무에서는 세 가지 질문을 순서대로</h2><p>행 락, UNIQUE, 정렬, 재시도는 같은 기능의 대안이 아닙니다. 서로 다른 실패를 막습니다.</p><div class="rule-strip"><article><span>1 · 정합성</span><h3>한 좌석의 주인은 한 명인가?</h3><p>좌석 상태 행이면 <strong>조건부 UPDATE</strong>와 변경 행 수를 확인합니다. 별도 활성 예약 행이면 <strong>UNIQUE</strong>를 DB에 둡니다. 이 규칙이 예약의 핵심입니다.</p></article><article><span>2 · 순서</span><h3>여러 자원을 같은 순서로 잡는가?</h3><p>좌석·쿠폰·예약 INSERT까지 실제 접근 순서를 통일합니다. 특히 여러 좌석은 <strong>정렬된 ID 순서로 하나씩</strong> 처리합니다.</p></article><article><span>3 · 복구</span><h3>실패를 어떻게 끝내는가?</h3><p>데드락은 <strong>전체 트랜잭션을 새로</strong> 재시도합니다. 이미 예약된 좌석은 매진으로 안내합니다. 타임아웃은 대기 시간의 상한입니다.</p></article></div></section>
 <section class="tech" aria-label="비관적 잠금과 낙관적 경쟁"><article><h2>비관적 잠금: 먼저 잡고 확인</h2><p><code>SELECT ... FOR UPDATE</code>로 기존 좌석 행을 잠근 뒤 최신 상태를 검사합니다. 다중 좌석·복잡한 검증에 유용하지만, <strong>잠금 순서와 상태 검사는 여전히 필요</strong>합니다.</p></article><article><h2>낙관적 경쟁: 조건으로 승자 결정</h2><p><code>UPDATE ... WHERE status='available'</code> 또는 버전 조건을 사용하고 변경 행 수를 봅니다. 한 좌석에서는 간결합니다. 여러 좌석은 <strong>한 트랜잭션에서 전부 성공하거나 전부 취소</strong>해야 합니다.</p></article></section>
 <details class="details sql-details"><summary>한 좌석의 조건부 UPDATE · 교육용 SQL 예시</summary><div class="sql-block"><span class="comment">-- 좌석 상태를 한 행에 저장하는 모델</span><br>BEGIN;<br>UPDATE seats<br>&nbsp;&nbsp; SET status = 'reserved', reserved_by = :user_id<br>&nbsp;WHERE event_id = :event_id AND seat_id = :seat_id<br>&nbsp;&nbsp;AND status = 'available';<br><span class="comment">-- 앱: 영향받은 행 1개 → COMMIT</span><br><span class="comment">-- 앱: 영향받은 행 0개 → ROLLBACK 및 매진 응답</span></div><p>이 모델은 좌석 행 자체가 현재 소유자를 표현합니다. 별도 활성 예약 행을 저장한다면 그 모델의 유일성 제약을 설계해야 합니다.</p></details>
+<section class="scale" aria-labelledby="scale-heading">
+ <h2 id="scale-heading">인덱스나 데이터 배치를 바꾸면 충돌도 사라질까?</h2>
+ <p>먼저 <strong>찾는 방법</strong>과 <strong>좌석의 소유권</strong>을 구분하세요. 같은 S1을 두 요청이 확정하려는 한, 더 빨리 찾는 인덱스가 승자를 정해 주지는 않습니다.</p>
+ <div class="placement">
+  <article><h3>파티셔닝 · 같은 DB 안에서 나눔</h3><div class="nodes"><span>DB 하나</span><b>→</b><span>S1 파티션</span><span>S2 파티션</span></div><p>행이 서로 다른 파티션에 있어도 두 좌석을 함께 잡는 트랜잭션은 역순으로 기다릴 수 있습니다.</p></article>
+  <article><h3>샤딩 · 독립된 DB/샤드로 배치</h3><div class="nodes"><span>샤드 A · S1</span><b>│</b><span>샤드 B · S2</span></div><p>독립적인 예약의 부하는 나뉩니다. 그러나 S1 요청 둘은 여전히 샤드 A에서 경쟁합니다.</p></article>
+ </div>
+ <div class="scale-grid">
+  <article><h3>일반 인덱스</h3><span class="answer">같은 S1 충돌: 그대로</span><p>찾는 범위와 속도를 바꿉니다. <code>id</code>가 PK라면 이미 인덱스가 있습니다. InnoDB에서는 적절한 검색 인덱스가 넓은 스캔·잠금 범위를 줄일 수 있습니다.</p></article>
+  <article><h3>PostgreSQL INCLUDE</h3><span class="answer">같은 S1 충돌: 그대로</span><p>추가 열은 읽기용 payload이며 검색 키나 잠금 회피 수단이 아닙니다. <code>UNIQUE (event_id, seat_id) INCLUDE (status)</code>도 유일성은 앞의 두 키에만 적용됩니다. 자주 바뀌는 <code>status</code>를 담으면 인덱스 갱신 비용도 늘 수 있습니다.</p></article>
+  <article><h3>파티셔닝</h3><span class="answer">같은 S1 충돌: 그대로</span><p>한 좌석은 정해진 파티션으로 갑니다. PostgreSQL의 파티션 테이블에서 UNIQUE/PK는 파티션 키를 포함해야 하는 제약도 있습니다.</p></article>
+  <article><h3>샤딩</h3><span class="answer">배치는 달라짐 · 충돌은 조건부</span><p>서로 독립된 좌석은 DB 부하가 분산됩니다. 같은 좌석은 같은 샤드에서 경쟁하고, 여러 샤드를 한 번에 예약하면 분산 트랜잭션·원자성이 새 문제입니다.</p></article>
+ </div>
+ <p class="scale-note"><strong>핵심:</strong> 샤딩의 차이는 인덱스가 빨라져서가 아니라 데이터와 요청을 별도 DB/샤드로 배치하기 때문입니다. 샤딩도 이중 예약을 막는 조건부 변경·유일성 규칙을 대신하지 않습니다.</p>
+ <p class="scale-sources">근거: <a href="https://www.postgresql.org/docs/18/indexes-index-only-scans.html">PostgreSQL INCLUDE</a> · <a href="https://www.postgresql.org/docs/18/ddl-partitioning.html">PostgreSQL 파티셔닝</a> · <a href="https://dev.mysql.com/doc/refman/8.4/en/innodb-locks-set.html">InnoDB 검색·잠금 범위</a>. 샤딩 설명은 분리된 DB에 좌석을 배치한 가정에서의 설계 추론입니다.</p>
+</section>
 <details class="details"><summary>PostgreSQL과 InnoDB에서 어디가 다른가?</summary><p>위 <strong>기존 좌석 행 UPDATE</strong> 사례는 두 엔진 모두 충돌하는 변경을 기다릴 수 있고, 반대 순서로 여러 행을 변경하면 교착이 가능합니다. 다만 잠금 구현과 오류 뒤 처리에는 차이가 있습니다.</p><ul><li><strong>PostgreSQL:</strong> 기본 READ COMMITTED에서 대기 후 UPDATE의 WHERE 조건을 새 행 버전에 다시 평가합니다. UNIQUE INSERT 충돌에서는 미완료 트랜잭션의 결과를 기다리며, 자세한 <em>transactionid ShareLock</em> 사례는 다음 페이지에 있습니다.</li><li><strong>MySQL InnoDB:</strong> 잠금 읽기와 UPDATE는 인덱스 레코드 잠금에 관여합니다. 인덱스·검색 조건·격리 수준에 따라 잠금 범위가 커질 수 있습니다. UNIQUE INSERT의 대기 대상을 PostgreSQL의 XID ShareLock과 같은 것으로 설명하면 안 됩니다.</li><li><strong>오류 처리:</strong> InnoDB의 데드락은 전체 트랜잭션을 롤백하지만, 기본 lock wait timeout은 실패한 문장만 롤백합니다. 애플리케이션에서 트랜잭션을 명시적으로 정리하고 재시도 정책을 정해야 합니다.</li></ul></details>
 <details class="details"><summary>놓치기 쉬운 경계</summary><ul><li><strong>한 좌석이어도</strong> 같은 트랜잭션에서 쿠폰·주문 등 다른 자원을 역순으로 잠그면 데드락이 가능합니다. “한 좌석은 절대 데드락이 없다”는 뜻이 아닙니다.</li><li><strong>SELECT 후 INSERT</strong>는 읽은 시점의 빈자리만 말합니다. 예약 테이블에 유일성 제약이 없으면 두 예약 행이 모두 들어갈 수 있습니다.</li><li><strong>무조건 UPDATE</strong>는 앞선 예약자를 나중 예약자가 덮어쓸 수 있습니다. 행 잠금이 있더라도 최신 상태를 확인하지 않으면 업무 규칙은 지켜지지 않습니다.</li><li><strong>취소·재판매:</strong> 예약 이력을 같은 테이블에 남기면 모든 행에 단순 UNIQUE를 걸 수 없습니다. “활성 예약만 하나”라는 규칙에 맞는 스키마나 별도 현재 소유 행이 필요합니다.</li><li><strong>MVCC</strong>는 일반 조회와 쓰기의 간섭을 줄여 주지만, 같은 좌석의 소유권 결정이나 여러 행의 잠금 순환을 없애지는 않습니다. <code>SKIP LOCKED</code>는 정확히 지정한 좌석을 건너뛸 수 있어 이 흐름의 기본 해결책이 아닙니다.</li></ul></details>
 <details class="details"><summary>실서비스에서는 요청 재시도와 결제도 분리해서 생각</summary><ul><li><strong>중복 요청:</strong> 사용자의 재클릭이나 네트워크 재시도로 같은 예약 요청이 다시 올 수 있습니다. 요청별 멱등 키를 두면 같은 요청을 한 번의 결과로 묶을 수 있습니다. 좌석의 DB 유일성 규칙도 별도로 유지해야 합니다.</li><li><strong>결제 대기:</strong> 결제 서비스의 응답을 기다리는 동안 좌석 행 잠금을 오래 보유하지 않도록 예약 보류 기간·만료·확정 흐름을 설계합니다. 만료 처리와 재판매가 가능한 스키마인지 함께 확인합니다.</li><li><strong>타임아웃:</strong> 요청을 빨리 실패시키는 운영 장치입니다. 실패한 문장과 트랜잭션의 처리 범위는 DB마다 다르므로, 앱에서 명시적으로 정리한 뒤 재시도 여부를 판단합니다.</li></ul></details>
@@ -120,6 +179,33 @@ const lessons={
  extra:{result:'좌석은 하나지만 좌석 ↔ 쿠폰 고리 발생',cause:'A는 좌석부터, B는 쿠폰부터 잠가 서로의 다음 자원을 기다립니다.',fix:'좌석·쿠폰·주문처럼 자원 종류가 달라도 전 경로의 순서를 정하고, 데드락 재시도를 준비합니다.',caution:'외부 결제 API를 DB 트랜잭션 안에서 기다리면 잠금을 오래 잡습니다. 예약 보류·결제·확정의 수명 주기를 별도로 설계합니다.'},
  insert:{result:'같은 활성 예약 키는 하나만 남음',cause:'두 번의 일반 SELECT는 각각 “비어 있음”을 볼 수 있지만 미래의 INSERT를 막지 않습니다.',fix:'활성 예약 행에 DB 유일성 제약을 두고, INSERT 충돌을 매진으로 처리합니다. 이 모델에서는 UNIQUE가 원자적 확정 수단이기도 합니다.',caution:'취소 이력을 같은 테이블에 남기면 단순 UNIQUE가 재예약까지 막을 수 있어 활성 행만 유일하도록 스키마를 설계해야 합니다.'}
 };
+const choices={
+ overwrite:[
+  {title:'조건부 UPDATE',mark:'추천 · 한 좌석',body:'status="available"인 행만 UPDATE하고, 매칭된 행이 1개일 때만 예약 성공으로 응답합니다.',cost:'현재 소유자를 좌석 행에 저장하는 모델에 잘 맞습니다.'},
+  {title:'FOR UPDATE 뒤 재확인',mark:'대안 · 복잡한 검증',body:'트랜잭션에서 좌석 행을 잠근 다음 최신 status를 다시 읽고, 비어 있을 때만 변경합니다.',cost:'잠금을 오래 보유하면 대기 시간이 늘어납니다. 재확인을 빼면 덮어쓰기 오류가 남습니다.'},
+  {title:'version 조건 비교',mark:'대안 · 낙관적 경쟁',body:'읽었던 version이 그대로일 때만 UPDATE하고 성공 행 수를 확인합니다.',cost:'충돌 시 새 상태를 읽어 사용자에게 실패를 알리거나 제한적으로 다시 시도해야 합니다.'}
+ ],
+ single:[
+  {title:'현재 방식 유지',mark:'추가 해결책 불필요',body:'조건부 UPDATE와 0/1 결과 확인으로 이 단일 좌석 모델의 소유권 결정이 끝납니다.',cost:'이미 다른 사람이 예약한 경우 0은 정상적인 매진 결과입니다.'},
+  {title:'FOR UPDATE 사용',mark:'필요할 때만',body:'같은 트랜잭션 안에서 복잡한 검증이 필요하면 행을 잠근 뒤 최신 status를 다시 확인합니다.',cost:'단순한 한 좌석 확정에는 더 많은 잠금 대기와 코드가 생길 수 있습니다.'}
+ ],
+ reverse:[
+  {title:'모든 좌석을 같은 순서로',mark:'추천 · 교착 감소',body:'좌석 ID를 정렬하고 모든 예약 경로에서 실제 잠금·UPDATE·INSERT 순서를 통일합니다.',cost:'다른 자원과 인덱스의 잠금이 남을 수 있으므로 데드락 전체 재시도는 계속 필요합니다.'},
+  {title:'이벤트별 직렬 처리',mark:'대안 · 높은 경쟁',body:'한 공연의 예약을 하나의 게이트나 작업 대기열로 통과시켜 겹치는 트랜잭션을 줄입니다.',cost:'처리량과 대기 시간이 희생되고, DB의 소유권 제약과 오류 복구는 계속 필요합니다.'}
+ ],
+ ordered:[
+  {title:'현재 순서 유지',mark:'추가 해결책 불필요',body:'이 두 좌석 예시에서는 잠금 순서가 같아 순환 대기가 없습니다. B는 대기 후 매진을 확인합니다.',cost:'다른 예약 코드도 같은 순서를 지켜야 합니다.'},
+  {title:'대기 시간 제한',mark:'운영 선택',body:'사용자 요청이 지나치게 오래 대기하지 않게 잠금 대기 상한을 둘 수 있습니다.',cost:'타임아웃은 교착 방지나 매진 판정의 대안이 아닙니다.'}
+ ],
+ extra:[
+  {title:'자원 종류까지 전역 순서',mark:'추천 · 교착 감소',body:'좌석 → 쿠폰 → 주문처럼 순서를 정하고 모든 코드 경로가 같은 순서로 잠급니다.',cost:'새 코드 경로가 추가될 때마다 순서를 지키는지 함께 점검해야 합니다.'},
+  {title:'예약 흐름 직렬화',mark:'대안 · 높은 경쟁',body:'서로 같은 자원을 쓰는 예약을 한 번에 하나씩 처리하는 게이트를 둡니다.',cost:'병렬성이 줄며, 외부 결제 호출을 DB 잠금 안에 오래 두면 안 됩니다.'}
+ ],
+ insert:[
+  {title:'직접 INSERT + UNIQUE',mark:'추천 · 활성 예약 행',body:'DB가 (event_id, seat_id)의 유일성을 검사하게 하고 중복 키 오류를 매진으로 처리합니다. 선행 SELECT는 필수 조건이 아닙니다.',cost:'취소 이력을 함께 저장한다면 “활성 예약만 하나”인 스키마가 필요합니다.'},
+  {title:'좌석 행 잠금 뒤 INSERT',mark:'대안 · 추가 검증',body:'이미 존재하는 좌석 행을 잠근 뒤 상태를 확인하고 예약 행을 INSERT합니다.',cost:'모든 쓰기 경로가 같은 규칙을 따라야 하며, DB의 UNIQUE도 최종 불변식으로 유지합니다.'}
+ ]
+};
 const pickLabels={
  overwrite:['한 좌석 · 덮어쓰기','나중 사람이 좌석을 차지'],
  single:['한 좌석 · 올바른 확정','한 사람만 성공'],
@@ -129,7 +215,20 @@ const pickLabels={
  insert:['예약 행 INSERT','중복 예약 방어']
 };
 let active=0,step=cases[0].steps.length-1,timer=null;
+const selectedChoice=Object.fromEntries(cases.map(item=>[item.id,0]));
 const picker=document.getElementById('picker'),stage=document.getElementById('stage');
+const djangoExample=`<div class="orm-sample"><h5>사례 2를 Django ORM으로 쓰면</h5><p><code>filter()</code>의 두 조건을 만족하는 좌석만 한 번의 <code>UPDATE</code>로 바꿉니다. 먼저 Python에서 조회하고 나중에 저장하는 코드가 아닙니다.</p><pre><code>from django.core.exceptions import ValidationError
+
+updated_count = Seat.objects.filter(
+    id=1,
+    status="available",
+).update(
+    status="reserved",
+    reserved_by=user,
+)
+
+if updated_count == 0:
+    raise ValidationError("이미 예약된 좌석입니다.")</code></pre><div class="count-flow"><span>1 → 이 조건에 맞는 좌석을 선점</span><span>0 → 조건에 맞는 좌석 없음</span></div><p><strong>정확히는 “변경된 값의 수”가 아니라 매칭된 행 수</strong>입니다. <code>id=1</code>이 존재한다고 보장할 때 0은 이미 예약된 상태입니다. 좌석이 아예 없는 경우도 가능하면 따로 구분해야 합니다.</p><p><a href="https://docs.djangoproject.com/en/6.1/ref/models/querysets/#update">Django QuerySet.update() 공식 문서</a> · 교육용 예시이며 TRACEBACK 코드 발췌가 아닙니다.</p></div>`;
 function escapeText(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function buildPicker(){
  const buttons=cases.map((item,i)=>{
@@ -148,17 +247,34 @@ function buildPicker(){
 }
 function stop(){if(timer){clearInterval(timer);timer=null}const p=document.getElementById('play');p.setAttribute('aria-pressed','false');p.textContent='자동 재생: 꺼짐'}
 function select(i){stop();active=i;step=cases[i].steps.length-1;render()}
-function render(){const item=cases[active],now=item.steps[step],lesson=lessons[item.id];picker.querySelectorAll('button').forEach((button,i)=>button.setAttribute('aria-pressed',String(i===active)));
+function updateChoice(item){
+ const option=choices[item.id][selectedChoice[item.id]];
+ stage.querySelectorAll('[data-choice]').forEach((button,i)=>button.setAttribute('aria-pressed',String(i===selectedChoice[item.id])));
+ stage.querySelector('#choice-title').textContent=option.title;
+ stage.querySelector('#choice-body').textContent=option.body;
+ stage.querySelector('#choice-cost').textContent=option.cost;
+}
+function render(){const focusedChoice=stage.contains(document.activeElement)?document.activeElement.closest('[data-choice]')?.dataset.choice:null;const item=cases[active],now=item.steps[step],lesson=lessons[item.id];picker.querySelectorAll('button').forEach((button,i)=>button.setAttribute('aria-pressed',String(i===active)));
  const rows=item.steps.map((s,i)=>{const cell=`<div class="event ${s.who==='B'?'b':''} ${s.tone||''}"><strong>${escapeText(s.title)}</strong><small>${escapeText(s.detail)}</small></div>`;return `<div class="flow-row ${i===step?'current':''} ${i>step?'future':''}" aria-hidden="${i>step}">${s.who==='A'?cell:'<div class="event empty" aria-hidden="true"></div>'}<div class="number"><span>${i+1}</span></div>${s.who==='B'?cell:s.who==='DB'?`<div class="event error"><strong>DB가 교착 감지</strong><small>한쪽 롤백</small></div>`:'<div class="event empty" aria-hidden="true"></div>'}</div>`}).join('');
  const seats=item.seats.map(name=>{const owner=(now.seats||{})[name],label=owner==='A'?'A 보유':owner==='B'?'B 보유':'비어 있음';return `<div class="seat ${owner?owner.toLowerCase():''}">${escapeText(name)}<small>${label}</small></div>`}).join('');
  const deps=now.deps?.length?now.deps.map(d=>`<span class="${now.deps.length>1?'cycle':''}">${escapeText(d)}</span>`).join(''):'<span class="none">현재 대기 화살표 없음</span>';
- stage.innerHTML=`<div class="stage-header"><div><small>CASE ${String(active+1).padStart(2,'0')} / ${cases.length}</small><h3>${escapeText(item.title)}</h3><p>${escapeText(item.summary)}</p></div><span class="verdict ${item.safe?'safe':''}">${escapeText(item.verdict)}</span></div><div class="stage-body"><div class="flow-pane"><div class="lane-head"><span class="a">예약 A</span><span>순서</span><span class="b">예약 B</span></div><div class="flow-grid">${rows}</div><div class="dependency" aria-label="현재 대기 관계">${deps}</div></div><div class="state-pane"><div><h4>현재 좌석 / 자원</h4><div class="seat-map">${seats}</div></div><div><h4>트랜잭션 상태</h4><div class="status-list"><div class="status-line"><b>예약 A</b><span>${escapeText(now.a)}</span></div><div class="status-line"><b>예약 B</b><span>${escapeText(now.b)}</span></div></div></div><div class="step-explain"><strong>${step+1}단계 · 왜?</strong><p>${escapeText(now.why)}</p></div></div></div><div class="solution-panel"><h4>이 사례의 결론 · ${escapeText(lesson.result)}</h4><div class="solution-grid"><div><b>왜 생겼나</b><p>${escapeText(lesson.cause)}</p></div><div><b>권장 처리</b><p>${escapeText(lesson.fix)}</p></div><div><b>주의할 점</b><p>${escapeText(lesson.caution)}</p></div></div></div>`;
+ const choiceMarkup=choices[item.id].map((option,i)=>`<button type="button" data-choice="${i}" aria-pressed="false"><b>${escapeText(option.title)}</b><small>${escapeText(option.mark)}</small></button>`).join('');
+ stage.innerHTML=`<div class="stage-header"><div><small>CASE ${String(active+1).padStart(2,'0')} / ${cases.length}</small><h3>${escapeText(item.title)}</h3><p>${escapeText(item.summary)}</p></div><span class="verdict ${item.safe?'safe':''}">${escapeText(item.verdict)}</span></div><div class="stage-body"><div class="flow-pane"><div class="lane-head"><span class="a">예약 A</span><span>순서</span><span class="b">예약 B</span></div><div class="flow-grid">${rows}</div><div class="dependency" aria-label="현재 대기 관계">${deps}</div></div><div class="state-pane"><div><h4>현재 좌석 / 자원</h4><div class="seat-map">${seats}</div></div><div><h4>트랜잭션 상태</h4><div class="status-list"><div class="status-line"><b>예약 A</b><span>${escapeText(now.a)}</span></div><div class="status-line"><b>예약 B</b><span>${escapeText(now.b)}</span></div></div></div><div class="step-explain"><strong>${step+1}단계 · 왜?</strong><p>${escapeText(now.why)}</p></div></div></div><div class="solution-panel"><div class="solution-intro"><div><h4>이 사례의 판단</h4><strong>${escapeText(lesson.result)}</strong></div><p>${escapeText(lesson.cause)}</p></div><p class="solution-heading">주요 방법 하나를 골라 비교해 보세요</p><div class="solution-picker" role="group" aria-label="이 사례의 처리 방법">${choiceMarkup}</div><div class="choice-detail" aria-live="polite"><strong id="choice-title"></strong><p id="choice-body"></p><p id="choice-cost" class="tradeoff"></p></div><p class="case-caution"><strong>함께 지킬 것:</strong> ${escapeText(lesson.caution)}</p>${item.id==="single"?djangoExample:""}</div>`;
+ updateChoice(item);
+ if(focusedChoice!==null)stage.querySelector(`[data-choice="${focusedChoice}"]`)?.focus();
  document.getElementById('step-count').textContent=`${step+1} / ${item.steps.length} 단계`;
  document.getElementById('step-announcement').textContent=`${item.title}. ${step+1}단계. ${now.who}: ${now.title}. ${now.why} 예약 A: ${now.a}. 예약 B: ${now.b}.`;
  document.getElementById('prev').disabled=step===0;
  document.getElementById('next').disabled=step===item.steps.length-1;}
 picker.addEventListener('click',e=>{const b=e.target.closest('[data-case]');if(b)select(Number(b.dataset.case))});document.getElementById('prev').addEventListener('click',()=>{stop();step=Math.max(0,step-1);render()});document.getElementById('next').addEventListener('click',()=>{stop();step=Math.min(cases[active].steps.length-1,step+1);render()});document.getElementById('reset').addEventListener('click',()=>{stop();step=0;render()});document.getElementById('play').addEventListener('click',()=>{if(timer){stop();return}if(step===cases[active].steps.length-1)step=0;render();const p=document.getElementById('play');p.setAttribute('aria-pressed','true');p.textContent='자동 재생: 켜짐';timer=setInterval(()=>{if(step>=cases[active].steps.length-1){stop();return}step++;render()},1700)});
-document.getElementById('print-all').innerHTML='<h2>모든 예약 사례 · 인쇄용 실행 순서</h2>'+cases.map(c=>`<article><h3>${escapeText(c.title)} · ${escapeText(c.verdict)}</h3><p>${escapeText(c.summary)}</p><ol>${c.steps.map(s=>`<li><strong>${escapeText(s.who)}: ${escapeText(s.title)}</strong> — ${escapeText(s.why)}</li>`).join('')}</ol><p><strong>권장 처리:</strong> ${escapeText(lessons[c.id].fix)}</p><p><strong>주의:</strong> ${escapeText(lessons[c.id].caution)}</p></article>`).join('');
+stage.addEventListener('click',event=>{
+ const button=event.target.closest('[data-choice]');
+ if(!button)return;
+ const item=cases[active];
+ selectedChoice[item.id]=Number(button.dataset.choice);
+ updateChoice(item);
+});
+document.getElementById('print-all').innerHTML='<h2>모든 예약 사례 · 인쇄용 실행 순서</h2>'+cases.map(c=>`<article><h3>${escapeText(c.title)} · ${escapeText(c.verdict)}</h3><p>${escapeText(c.summary)}</p><ol>${c.steps.map(s=>`<li><strong>${escapeText(s.who)}: ${escapeText(s.title)}</strong> — ${escapeText(s.why)}</li>`).join('')}</ol><h4>선택 가능한 주요 방법</h4><ul>${choices[c.id].map(option=>`<li><strong>${escapeText(option.title)} (${escapeText(option.mark)})</strong>: ${escapeText(option.body)} ${escapeText(option.cost)}</li>`).join('')}</ul>${c.id==='single'?djangoExample:''}</article>`).join('');
 buildPicker();
 render();
 </script>
