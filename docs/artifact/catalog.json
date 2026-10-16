@@ -46,10 +46,10 @@
         {
           "id": "concurrency",
           "title": "동시성·잠금",
-          "description": "PostgreSQL과 InnoDB의 INSERT 대기 대상을 비교한 뒤, PostgreSQL 교착 상태를 더 자세히 따라갑니다.",
+          "description": "좌석 예약으로 대기·데드락·중복 예약을 구분한 뒤, PostgreSQL의 INSERT 교착 상태를 더 자세히 따라갑니다.",
           "layout": "reading-path",
           "artifacts": [
-            {"title": "00 · INSERT 교착 상태를 읽는 기본 그림", "description": "PostgreSQL XID 락과 InnoDB 인덱스 레코드 락 비교", "href": "topics/database-systems/concurrency/foundations/index.html"},
+            {"title": "00 · 좌석 예약으로 읽는 동시성", "description": "한 좌석 대기·덮어쓰기, 여러 좌석 교착, 잠금 순서와 예약 확정", "href": "topics/database-systems/concurrency/foundations/index.html"},
             {"title": "PostgreSQL · INSERT 교착 상태", "description": "Transaction ID의 ShareLock/ExclusiveLock과 순환 대기", "href": "topics/database-systems/concurrency/postgresql-insert-deadlock/index.html"}
           ]
         }
