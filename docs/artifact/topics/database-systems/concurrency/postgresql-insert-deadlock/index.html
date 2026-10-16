@@ -40,13 +40,36 @@
     @media(prefers-reduced-motion:reduce){body.motion-enabled .graph .edge{animation:none!important}.explain-main.entering{animation:none}}
     @media print{.motion-toggle{display:none}}
     @media print{ :root{color-scheme:light;--bg:#fff;--panel:#fff;--panel2:#fff;--panel3:#eef3f5;--line:#aebdc5;--ink:#172832;--muted:#4d606b;--cyan:#176c61;--blue:#285d8e;--amber:#8b5d16;--red:#a1272d;--green:#226d37}body{background:white;color:#172832;font-size:9pt}.shell{max-width:none}.top,.scope,.setup,.controlbar,.timeline,.answers,.concept,.sources,.explain{break-inside:avoid}.top{padding:8mm}.actions{display:none}.scope,.setup,.layout,.explain,.timeline,.answers,.concept{margin-left:8mm;margin-right:8mm}.layout{grid-template-columns:1fr 1.3fr 1fr;gap:5mm}.tx-card,.center-card,.explain,.timeline,.qa,.concept{background:#fff}.graph{background:#f5f8f9}.graph-node,.graph-node.b{background:#e7f4f1;color:#172832}.graph-node.b{background:#edf2f8}.graph-empty{display:none}.edge{stroke:#9b690d}.edge.second{stroke:#a1272d}.edge-label{opacity:1;fill:#664914}.locks th{background:#eef3f5;color:#293e49}.table-wrap{overflow:visible}.locks{min-width:0;font-size:6.8pt}.locks th,.locks td{padding:4px}.command,.sql,.explain-side{background:#f7f9fa;color:#172832}.callout{background:#faf5e8}.timeline-list{grid-template-columns:repeat(7,1fr)}a{color:#245b86;text-decoration:underline}}
+    .print-report{display:none}
+    @page{size:A4;margin:15mm}
+    @media print{
+      :root{color-scheme:light}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .top{padding:0 0 6mm}.intro h1{font-size:22pt}.scope,.setup{margin:0 0 6mm}.setup{grid-template-columns:1fr 1.5fr;padding:9px 12px}
+      .controlbar,.layout,.explain,.timeline,.key-message{display:none!important}
+      .print-report{display:block;margin:0 0 8mm;color:#172832}
+      .print-report h2{font-size:14pt;margin:0 0 3mm}
+      .print-report>p{font-size:8.5pt;color:#40545e;margin:0 0 4mm}
+      .print-cycle{display:grid;grid-template-columns:1fr auto 1fr;gap:4mm;align-items:center;border:1px solid #9eb5b4;background:#f2f8f6;border-radius:8px;padding:4mm;margin-bottom:5mm;break-inside:avoid}
+      .print-cycle div{border:1px solid #85b5ae;background:#fff;border-radius:6px;padding:3mm;font-size:8.5pt}
+      .print-cycle div:last-child{border-color:#98abc2}
+      .print-cycle strong,.print-cycle span{display:block}.print-cycle span{font-size:7.5pt;color:#4e626b}
+      .print-cycle b{color:#a1272d;font-size:10pt;text-align:center}
+      .print-steps{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:0 0 5mm}
+      .print-step{border:1px solid #b6c6c7;border-left:3px solid #176c61;border-radius:5px;padding:2.5mm 3mm;break-inside:avoid}
+      .print-step:nth-child(3),.print-step:nth-child(4),.print-step:nth-child(5){border-left-color:#a1272d;background:#fff5f5}
+      .print-step small{display:block;color:#3f7068;font-weight:800}.print-step strong{display:block;font-size:8.5pt}.print-step p{font-size:7.8pt;color:#40545e;margin-top:1mm}
+      .print-locks{border-top:1px solid #b6c6c7;padding-top:4mm;break-inside:avoid}
+      .print-locks h3{font-size:10pt;margin-bottom:2mm}.print-locks table{width:100%;border-collapse:collapse;font-size:7.7pt}.print-locks th,.print-locks td{border:1px solid #b6c6c7;padding:2mm;text-align:left}.print-locks th{background:#edf3f3}
+      .print-locks p{font-size:7.8pt;color:#40545e;margin-top:2mm}
+      .sources{padding:4mm 0 0;font-size:7.5pt;break-inside:auto}
+    }
   </style>
 </head>
 <body>
 <div class="shell">
   <header class="top">
-    <div class="intro"><div class="eyebrow">POSTGRESQL · 단계별 시각화</div><h1>두 트랜잭션은 왜 멈출까?</h1><p>B가 20을 넣고 A가 21을 넣은 뒤, 서로 상대가 넣은 값을 추가하려고 합니다. 단계 버튼이나 자동 재생으로 어디서 멈추는지 확인해 보세요.</p></div>
-    <div class="actions"><a class="back-link" href="../../../../index.html">← 전체 학습 목차</a><button class="button" type="button" onclick="window.print()">PDF 저장</button></div>
+    <div class="intro"><div class="eyebrow">01 · 완성본 / POSTGRESQL · 단계별 시각화</div><h1>두 트랜잭션은 왜 멈출까?</h1><p>B가 20을 넣고 A가 21을 넣은 뒤, 서로 상대가 넣은 값을 추가하려고 합니다. 단계 버튼이나 자동 재생으로 어디서 멈추는지 확인해 보세요.</p></div>
+    <div class="actions"><a class="back-link" href="../foundations/index.html">← 00 · 기본 그림</a><a class="back-link" href="../../../../index.html#database-systems-concurrency">전체 학습 목차</a><button class="button" type="button" onclick="window.print()">PDF 저장</button></div>
   </header>
   <div class="scope"><b>학습 모형 · PostgreSQL 18</b> — 그림 속 100과 200은 트랜잭션을 구분하는 예시 번호입니다. 실제 번호는 달라질 수 있습니다.</div>
   <section class="setup" aria-labelledby="setup-title">
@@ -87,7 +110,7 @@ INSERT INTO test VALUES (21);</code></pre>
         <div class="lock-heading"><h3>락 상태</h3><span><code>pg_locks</code>에서 보는 핵심 항목</span></div>
         <div class="table-wrap"><table class="locks"><thead><tr><th>Transaction</th><th>Transaction ID</th><th>Lock Type</th><th>Lock Mode</th><th>Granted</th><th>Waiting For</th></tr></thead><tbody id="lock-rows"></tbody></table></div>
         <p class="table-note">상대 트랜잭션 번호에 이미 ExclusiveLock이 있어서 ShareLock 요청이 기다립니다.</p>
-        <div class="callout"><strong>여기서 잠기는 대상:</strong> 값 20이나 21의 행이 아니라 상대 트랜잭션입니다. `SELECT ... FOR SHARE/UPDATE`로 행을 잠그는 예제와는 다릅니다.</div>
+        <div class="callout"><strong>‘공유락을 요청한다’는 뜻:</strong> <code>INSERT</code>가 값 20·21의 행에 <code>FOR SHARE</code>를 거는 것이 아닙니다. 고유 키 충돌 때문에 상대의 결과를 기다리며, PostgreSQL 내부에서는 상대 <code>transactionid</code>에 대한 <strong>미부여 ShareLock 요청</strong>으로 이 대기가 보입니다. 행 잠금과 잠금 대상이 다릅니다.</div>
       </section>
       <article class="tx-card b" id="card-b" aria-label="트랜잭션 B 상태"></article>
     </section>
@@ -98,6 +121,7 @@ INSERT INTO test VALUES (21);</code></pre>
     <section class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">실행 순서</h2><div class="timeline-list" id="timeline-list"></div><p class="tiny">⑤와 ⑥에서 INSERT가 멈춥니다. ⑦에서 한쪽이 롤백된 뒤 B가 다시 진행합니다.</p></section>
     <section class="key-message" aria-label="이 그림의 핵심"><strong>그림의 핵심</strong> · 키 20과 21이 서로 락을 건 게 아닙니다. 중복 여부를 확인하려고 상대 트랜잭션이 끝나길 기다리다가 두 방향의 대기가 생깁니다.</section>
   </main>
+  <section class="print-report" aria-labelledby="print-report-heading"><h2 id="print-report-heading">두 INSERT가 만든 대기 고리</h2><p>PostgreSQL 18 · 두 세션의 실행 순서와 데드락 감지 결과를 한 번에 읽는 인쇄용 그림</p><div class="print-cycle"><div><strong>A · XID 100</strong><span>21 INSERT 미커밋<br>20 INSERT → B의 종료 대기</span></div><b>서로 기다림<br>↔</b><div><strong>B · XID 200</strong><span>20 INSERT 미커밋<br>21 INSERT → A의 종료 대기</span></div></div><div class="print-steps" id="print-steps"></div><div class="print-locks"><h3>교착 순간의 핵심 transactionid 잠금</h3><table><thead><tr><th>트랜잭션</th><th>대상 XID</th><th>모드</th><th>부여</th></tr></thead><tbody><tr><td>A</td><td>100 · 자기 것</td><td>ExclusiveLock</td><td>예</td></tr><tr><td>B</td><td>200 · 자기 것</td><td>ExclusiveLock</td><td>예</td></tr><tr><td>A</td><td>200 · B의 것</td><td>ShareLock</td><td>아니요 · 대기</td></tr><tr><td>B</td><td>100 · A의 것</td><td>ShareLock</td><td>아니요 · 대기</td></tr></tbody></table><p>ShareLock은 20·21 행에 건 <code>FOR SHARE</code>가 아닙니다. 다른 트랜잭션의 종료를 기다리는 내부 잠금 요청입니다. 그림에서는 A가 중단되고 B가 INSERT를 끝낸 뒤 COMMIT합니다. 실제 중단 대상은 고정되지 않습니다.</p></div></section>
   <footer class="sources"><details><summary>정확성 근거와 범위</summary><ul>
     <li><a href="https://www.postgresql.org/docs/18/index-unique-checks.html">PostgreSQL 18 공식 문서 · Index Uniqueness Checks</a> — 미커밋 삽입과 충돌 시 기다린 뒤 가시성을 다시 검사하는 이유.</li>
     <li><a href="https://www.postgresql.org/docs/18/explicit-locking.html">PostgreSQL 18 공식 문서 · Explicit Locking</a> — 테이블/행 락의 범위, deadlock 감지와 victim 선택은 예측할 수 없다는 설명.</li>
@@ -112,7 +136,7 @@ INSERT INTO test VALUES (21);</code></pre>
     {short:'시작', kicker:'시작', title:'B가 먼저, A가 다음에 실행합니다', text:'다음 단계를 누르며 두 세션이 넣는 값을 따라가 보세요.', tip:'자동 재생을 켜면 전체 흐름을 이어서 보여줍니다.'},
     {short:'B: INSERT 20', kicker:'STEP 1', title:'B가 20을 넣습니다', text:'B는 아직 커밋하지 않습니다. B의 XID는 200입니다.', tip:'열린 트랜잭션은 끝날 때까지 락을 보유합니다.'},
     {short:'A: INSERT 21', kicker:'STEP 2', title:'A가 21을 넣습니다', text:'A도 커밋하지 않은 상태로 둡니다. A의 XID는 100입니다.', tip:'A와 B가 서로 다른 값을 먼저 넣었습니다.'},
-    {short:'A: INSERT 20 대기', kicker:'STEP 3', title:'A는 B가 끝나기를 기다립니다', text:'20은 B가 넣었지만 아직 확정되지 않았습니다. A의 ShareLock 요청은 B의 ExclusiveLock 때문에 대기합니다.', tip:'처음에는 A에서 B로 가는 한 방향 대기입니다.'},
+    {short:'A: INSERT 20 대기', kicker:'STEP 3', title:'A는 B가 끝나기를 기다립니다', text:'20은 B가 넣었지만 아직 확정되지 않았습니다. 중복 여부를 결정하려면 B의 결과가 필요합니다. PostgreSQL 내부의 B transactionid ShareLock 요청은 B의 ExclusiveLock 때문에 미부여 상태로 대기합니다.', tip:'A가 20 행에 FOR SHARE를 건 것이 아닙니다. 처음에는 A → B 한 방향 대기입니다.'},
     {short:'B: INSERT 21 대기', kicker:'STEP 4', title:'B도 A를 기다립니다', text:'21은 A가 넣은 값입니다. 이제 A와 B가 서로를 기다립니다.', tip:'화살표 두 개가 고리를 이루면 순환 대기입니다.'},
     {short:'Deadlock 감지 · A 중단 예시', kicker:'STEP 5', title:'PostgreSQL이 한쪽을 중단합니다', text:'이 예시에서는 A를 롤백해 대기 고리를 풉니다. 실제 서버는 항상 A를 고르는 것은 아닙니다.', tip:'A의 락이 풀리자 B가 다시 진행할 수 있습니다.'},
     {short:'B: INSERT 21 성공', kicker:'STEP 6', title:'B가 다시 시도해 21을 넣습니다', text:'A가 롤백되어 21이 비었습니다. B의 INSERT가 성공합니다.', tip:'INSERT 성공과 COMMIT은 다른 단계입니다.'},
@@ -121,6 +145,7 @@ INSERT INTO test VALUES (21);</code></pre>
   const timeline = [
     ['①','B · BEGIN'],['②','B · INSERT 20'],['③','A · BEGIN'],['④','A · INSERT 21'],['⑤','A · INSERT 20 → 대기'],['⑥','B · INSERT 21 → 대기'],['⑦','Deadlock 감지 · A 롤백'],['⑧','B · INSERT 21 성공'],['⑨','B · COMMIT']
   ];
+  document.getElementById('print-steps').innerHTML=steps.slice(1).map((s,i)=>`<article class="print-step"><small>${s.kicker}</small><strong>${s.short}</strong><p>${s.text}</p></article>`).join('');
   let current = 0;
   let autoplayTimer = null;
   const $ = id => document.getElementById(id);

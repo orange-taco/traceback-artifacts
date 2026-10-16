@@ -26,6 +26,12 @@ TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관�
 논리 객체·OS 파일·파일 내부 구조를 익히고, 기존
 [`PostgreSQL · InnoDB 탐색기`](docs/artifact/topics/database-systems/storage/postgresql-innodb/index.html)로
 이어집니다.
+동시성·잠금도 먼저
+[`좌석 예약으로 읽는 동시성`](docs/artifact/topics/database-systems/concurrency/foundations/index.html)에서
+한 좌석의 대기·덮어쓰기와 여러 좌석의 교착, 처리 방법 및
+인덱스·파티셔닝·샤딩의 영향을 살핀 뒤,
+[`PostgreSQL · INSERT 교착 상태`](docs/artifact/topics/database-systems/concurrency/postgresql-insert-deadlock/index.html)의
+단계별 애니메이션으로 이어집니다.
 
 TRACEBACK **인프라 구성 1–5**는 고객 요청, 운영자 접속,
 Client→Vercel과 Server→AWS의 배포, 주소, DNS를 실제 설정과 함께
