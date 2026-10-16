@@ -63,9 +63,15 @@
 .insert-example h5,.method-compare h5{font-size:.89rem;margin:0 0 7px}
 .insert-example>p,.method-compare>p{font-size:.8rem;color:#405851}
 .insert-lanes,.method-lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:11px 0}
-.insert-lanes div,.method-lanes div{border:1px solid var(--line);border-radius:6px;background:#f8faf8;padding:10px 12px;min-width:0}
+.insert-lanes div,.method-lanes article{border:1px solid var(--line);border-radius:6px;background:#f8faf8;padding:10px 12px;min-width:0}
 .insert-lanes b,.method-lanes b{display:block;font-size:.79rem;margin-bottom:5px}
 .insert-lanes span,.method-lanes span{display:block;font-size:.78rem;line-height:1.55}
+.method-lanes article:first-child{border-top:3px solid var(--a)}
+.method-lanes article:last-child{border-top:3px solid var(--b)}
+.method-lanes h6{font-size:.86rem;margin:0 0 7px}
+.method-lanes .method-label{font-size:.7rem;font-weight:900;color:#315f50;margin-bottom:4px}
+.method-lanes article:last-child .method-label{color:#89501c}
+.method-lanes .method-result{margin-top:9px;font-weight:750}
 .insert-example .cycle-note{border-left:3px solid var(--bad);padding:7px 10px;background:#fff1f1}
 .case-concepts details{padding:2px 0 0;font-size:.79rem;color:#405851}
 .case-concepts summary{cursor:pointer;font-weight:800}
@@ -249,7 +255,14 @@ updated_count = Seat.objects.filter(
 
 if updated_count == 0:
     raise ValidationError("이미 예약된 좌석입니다.")</code></pre><div class="count-flow"><span>A: available 매칭 → 1</span><span>B: A 종료 대기 → reserved 확인 → 0</span></div><p>B의 UPDATE는 A가 끝나기를 기다린 뒤 <code>status="available"</code> 조건을 만족하는 행이 없어서 0을 받습니다. <strong>이 값은 바뀐 값의 개수가 아니라 매칭된 행 수</strong>입니다. <code>id=1</code>이 존재한다고 보장할 때 0을 이미 예약됨으로 해석할 수 있고, 좌석이 아예 없는 경우도 가능하면 따로 구분해야 합니다.</p><p><a href="https://docs.djangoproject.com/en/6.1/ref/models/querysets/#update">Django QuerySet.update() 공식 문서</a> · 교육용 예시이며 TRACEBACK 코드 발췌가 아닙니다.</p></div>`;
-const overwriteComparison=`<div class="method-compare"><h5>사례 01과 02는 어떻게 이어질까?</h5><p>사례 01의 덮어쓰기 오류를 고치는 두 방법입니다. <strong>사례 02는 첫 번째 방법을 실행한 결과</strong>예요. 둘 다 잠금 뒤의 최신 상태를 기준으로 한 사람만 예약하게 합니다.</p><div class="method-lanes"><div><b>기본 · 조건부 UPDATE (사례 02)</b><span>DB가 <code>WHERE status='available'</code>을 검사하며 UPDATE합니다.</span><span>변경된 행 1개 → 성공 · 0개 → 매진</span><span>단순한 한 좌석 예약에 적합합니다.</span></div><div><b>대안 · FOR UPDATE + 상태 확인</b><span>먼저 행을 잠금 → 앱에서 최신 상태 확인 → 비어 있을 때만 UPDATE</span><span>쿠폰·잔액처럼 여러 조건을 함께 검증할 때 유용합니다.</span></div></div><p>두 번째 방법의 Django 예시 · 교육용 코드:</p><pre><code>from django.db import transaction
+const overwriteComparison=`<div class="method-compare"><h5>사례 01의 덮어쓰기를 어떻게 막을까?</h5><p><strong>사례 01은 실패 장면</strong>입니다. 아래 두 방법은 같은 문제를 해결합니다. <strong>사례 02는 방법 A를 적용한 장면</strong>입니다.</p><div class="method-lanes"><article><div class="method-label">방법 A · 사례 02에서 실행</div><h6>조건부 UPDATE</h6><span>DB의 <code>WHERE</code>가 빈 좌석인지 확인하면서 변경합니다.</span><pre><code>from django.core.exceptions import ValidationError
+
+updated_count = Seat.objects.filter(
+    id=1, status="available"
+).update(status="reserved", reserved_by=user)
+
+if updated_count == 0:
+    raise ValidationError("이미 예약된 좌석입니다.")</code></pre><span class="method-result">UPDATE 1문장 · 1행 성공 / 0행 매진</span></article><article><div class="method-label">방법 B · 사례 01의 다른 해결책</div><h6>FOR UPDATE + 상태 확인</h6><span>좌석 행을 먼저 잠근 뒤, 앱의 <code>if</code>가 빈 좌석인지 확인합니다.</span><pre><code>from django.db import transaction
 from django.core.exceptions import ValidationError
 
 with transaction.atomic():
@@ -258,7 +271,7 @@ with transaction.atomic():
         raise ValidationError("이미 예약된 좌석입니다.")
     seat.status = "reserved"
     seat.reserved_by = user
-    seat.save()</code></pre><p><a href="https://docs.djangoproject.com/en/6.1/ref/models/querysets/#select-for-update">Django select_for_update() 문서</a> · TRACEBACK 코드 발췌가 아닙니다.</p></div>`;
+    seat.save()</code></pre><span class="method-result">잠금 SELECT → 상태 검사 → UPDATE</span></article></div><p>둘 다 한 사람만 예약하게 합니다. 한 좌석의 단순한 상태 확인은 A가 간결하고, 여러 조건을 함께 검증할 때는 B가 유용합니다. Django 교육용 예시이며 TRACEBACK 코드 발췌가 아닙니다. <a href="https://docs.djangoproject.com/en/6.1/ref/models/querysets/#update">조건부 UPDATE</a> · <a href="https://docs.djangoproject.com/en/6.1/ref/models/querysets/#select-for-update">select_for_update()</a></p></div>`;
 const reverseConcepts=`<div class="case-concepts"><p><strong>공유 락은 어디에?</strong> <code>SELECT FOR SHARE</code>는 행에 거는 공유 잠금입니다. 이 사례에서 A는 S2 행의 공유 잠금을 얻은 게 아닙니다. PostgreSQL은 B의 종료를 기다리며 B의 <code>transactionid</code>에 <code>ShareLock</code>을 요청할 수 있고, <strong>아직 획득하지 못해</strong> 대기합니다. B도 반대로 기다리면 데드락입니다. 이는 PostgreSQL 내부 표현이며 InnoDB에 그대로 적용되지 않습니다.</p><div class="insert-example"><h5>왜 INSERT 순서도 살펴볼까?</h5><p>두 좌석을 함께 예약하고, <code>reservations</code>에 <strong>좌석별 예약 행</strong>을 넣는다고 해 봅시다. <code>(event_id, seat_id)</code>에는 UNIQUE가 있고 두 트랜잭션 모두 아직 COMMIT하지 않았습니다.</p><div class="insert-lanes"><div><b>예약 A</b><span>① S1 예약 행 INSERT · 키 선점</span><span>③ S2 INSERT 시도 → B를 기다림</span></div><div><b>예약 B</b><span>② S2 예약 행 INSERT · 키 선점</span><span>④ S1 INSERT 시도 → A를 기다림</span></div></div><p class="cycle-note"><strong>A → B → A: 데드락.</strong> 두 요청 모두 <strong>S1 → S2</strong> 순서로 예약 키를 INSERT하면 이 고리는 생기지 않습니다. 핵심은 모든 INSERT 문을 정렬하는 게 아니라, <strong>서로 충돌할 수 있는 좌석·예약 키를 같은 순서로 처리</strong>하는 것입니다. <a href="https://www.postgresql.org/docs/18/index-unique-checks.html">PostgreSQL 고유 키 검사</a></p><details><summary>외래 키 검사도 INSERT를 기다리게 할 수 있나요?</summary><p>네. <code>reservations.seat_id</code>가 <code>seats.id</code>를 참조할 때, INSERT는 참조할 좌석이 유지되는지 확인합니다. A가 S1을 <code>FOR UPDATE</code>로 잠그고 S2 예약을 INSERT하고, B가 S2를 잠그고 S1 예약을 INSERT하면 이 확인 과정에서 서로 기다릴 수 있습니다. 이 예시의 충돌은 <code>FOR UPDATE</code>와 외래 키 검사의 <code>FOR KEY SHARE</code> 사이에서 생깁니다. <code>status</code>만 바꾸는 일반 UPDATE는 보통 <code>FOR NO KEY UPDATE</code>여서 이 외래 키 검사와 충돌하지 않습니다.</p></details></div></div>`;
 function escapeText(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function buildPicker(){
