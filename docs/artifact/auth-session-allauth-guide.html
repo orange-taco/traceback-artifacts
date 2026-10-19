@@ -21,7 +21,16 @@
     <section id="transport"><p class="eyebrow">DECISION 1 · 상태 전달</p><h2>브라우저 세션 vs API 토큰</h2><div class="grid">
       <article class="card chosen"><span class="badge chosen">TRACEBACK 선택</span><h3>서버 측 세션 + HttpOnly 쿠키</h3><p>브라우저는 세션 ID를 쿠키로 보냅니다. 서버가 DB의 세션을 조회하므로 로그아웃·세션 종료를 서버에서 제어하기 쉽습니다. 브라우저 요청에는 CSRF 방어가 필요하고, 여러 서버에서 실행하면 공유 세션 저장소가 필요합니다.</p><p><b>선택 이유:</b> 고객 프런트와 API 경로를 같은 Vercel origin으로 보이게 하고, Django DB 세션과 CSRF를 그대로 활용합니다.</p></article>
       <article class="card"><span class="badge">대안</span><h3>Access token · JWT 또는 불투명 토큰</h3><p>클라이언트가 토큰을 API에 제시합니다. 모바일 앱·서로 다른 도메인의 API·서비스 간 호출에 맞출 수 있습니다. 브라우저 저장 위치, 만료·갱신·탈취·철회 정책을 별도로 설계해야 합니다. JWT는 토큰 형식이지 인증 시스템 전체가 아닙니다.</p><p><b>선택 조건:</b> 독립 모바일 클라이언트나 다수 API가 실제로 필요한 경우 다시 비교합니다.</p></article>
-    </div><details><summary>쿠키를 쓰면 CSRF는 왜 필요하고, HttpOnly는 무엇인가요?</summary><p>브라우저는 같은 사이트 요청에 쿠키를 자동으로 붙입니다. CSRF는 사용자가 의도하지 않은 다른 사이트의 변경 요청을 막는 검증입니다. HttpOnly는 자바스크립트가 세션 쿠키 값을 직접 읽지 못하게 합니다. TRACEBACK의 변경 요청은 <code>X-CSRFToken</code>을 보내고, 배포 환경은 HTTPS와 secure cookie를 사용합니다. <a href="https://docs.djangoproject.com/en/6.1/topics/http/sessions/">Django 세션 문서</a> · <a href="https://docs.djangoproject.com/en/6.1/ref/csrf/">Django CSRF 문서</a></p></details>
+    </div><details><summary>쿠키 인증에서는 CSRF가 어떻게 생기고 막히나요?</summary>
+      <p>CSRF는 JWT나 세션 ID를 훔치는 공격이 아닙니다. 공격자가 로그인된 사용자의 <b>브라우저에 요청을 시키는 공격</b>이라 쿠키 값이나 JWT 서명을 알 필요가 없습니다.</p>
+      <div class="csrf-flow" role="group" aria-label="CSRF 공격의 네 단계">
+        <span><b>① bank.com</b> 로그인·인증 쿠키 저장</span><i aria-hidden="true">→</i><span><b>② evil.com</b> 방문·송금 요청 유도</span><i aria-hidden="true">→</i><span><b>③ 브라우저</b> 쿠키 정책이 허용하면 자동 첨부</span><i aria-hidden="true">→</i><span><b>④ bank.com</b> 방어가 없으면 송금 처리</span>
+      </div>
+      <p class="csrf-state"><b>로그인 중:</b> 유효한 인증 쿠키가 붙을 수 있습니다. <b>로그아웃 후:</b> 쿠키가 삭제되거나 세션이 무효화됐다면 그 쿠키로 인증된 요청은 처리되지 않습니다.</p>
+      <p><b>저장 방식이 기준입니다.</b> Session ID나 JWT를 쿠키에 넣으면 브라우저가 자동으로 보낼 수 있어 CSRF를 고려해야 합니다. JWT를 <code>localStorage</code>에 두고 요청 헤더에 직접 붙이는 방식은 일반적인 쿠키 기반 CSRF와 다르지만, JavaScript가 토큰을 읽을 수 있어 XSS 위험이 있습니다.</p>
+      <p><b>방어:</b> SameSite로 다른 사이트에서 시작한 요청의 쿠키 전송을 제한하고, CSRF 토큰이나 요청의 Origin을 서버에서 검증합니다. HttpOnly는 JavaScript의 쿠키 직접 읽기를 막을 뿐 CSRF 방어는 아닙니다. 가짜 로그인 화면에서 비밀번호를 받아내는 <b>피싱</b>과도 다릅니다.</p>
+      <p><b>TRACEBACK:</b> JSON 변경 요청은 <code>X-CSRFToken</code> 헤더를, Kakao 로그인 폼은 <code>csrfmiddlewaretoken</code> 필드를 보냅니다. 배포 환경에는 HTTPS와 secure cookie가 필요합니다. <a href="https://github.com/orange-taco/traceback-client/blob/afd7664ce2e1b5d58f8f259b73b352878bdbf0e8/app/lib/auth-api.ts#L63-L72">Kakao 폼 63–72행</a> · <a href="https://github.com/orange-taco/traceback-client/blob/afd7664ce2e1b5d58f8f259b73b352878bdbf0e8/app/lib/auth-api.ts#L94-L102">JSON 요청 94–102행</a> · <a href="https://docs.djangoproject.com/en/6.1/ref/csrf/">Django CSRF</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html">OWASP CSRF</a></p>
+    </details>
 
     <div class="auth-risk" id="token-theft"><p class="eyebrow">04 · 탈취와 무효화</p><h3>JWT를 훔쳐 갔다면 언제 멈출까?</h3>
       <p><b>원인.</b> JWT와 세션 ID 모두 탈취되면 인증 도용에 쓰일 수 있습니다. 서버 상태를 조회하지 않는 JWT는 서명과 만료가 유효하면 탈취된 토큰도 통과하므로, 서버가 즉시 무효화하기 어렵습니다.</p>
