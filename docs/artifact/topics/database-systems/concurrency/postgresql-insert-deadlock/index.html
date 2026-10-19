@@ -24,6 +24,18 @@
     .locks{font-size:.76rem}.locks th{font-size:.72rem}.locks code{font-size:.73rem}
     .explain{padding:20px 22px}.explain-main p{font-size:.92rem;line-height:1.7}.explain-side p{font-size:.82rem;line-height:1.55}
     .key-message{margin:0 clamp(15px,3vw,36px) 22px;padding:14px 17px;border:1px solid #397a72;border-radius:10px;background:#142c2d;font-size:.9rem;font-weight:800;line-height:1.6}.key-message strong{color:var(--cyan)}
+    .two-phase{margin:0 clamp(15px,3vw,36px) 24px;padding:15px 17px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+    .two-phase summary{cursor:pointer;font-weight:800;color:var(--ink)}
+    .two-phase>p{margin-top:10px;color:var(--muted);font-size:.83rem}
+    .two-phase>p b{color:var(--ink)}
+    .two-phase-flow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:9px;margin-top:12px}
+    .two-phase-flow span{padding:10px 12px;border:1px solid #385560;border-radius:8px;background:#172b34;font-size:.8rem}
+    .two-phase-flow span b{display:block;color:var(--cyan)}
+    .two-phase-flow i{color:var(--amber);font-style:normal;font-weight:800;text-align:center;font-size:.77rem}
+    .two-phase-example{display:grid;gap:4px;margin-top:10px;font-size:.78rem}
+    .two-phase-example .valid{color:var(--green)}.two-phase-example .invalid{color:var(--red)}
+    @media(max-width:620px){.two-phase-flow{grid-template-columns:1fr}.two-phase-flow i{padding:2px}.two-phase-flow i::before{content:'↓ '}}
+    @media print{.two-phase{margin:0 0 5mm;background:#fff;break-inside:avoid}.two-phase:not([open])>*:not(summary){display:block!important}.two-phase-flow{display:grid!important}.two-phase-flow span{background:#f1f5f6}.two-phase-example{display:grid!important}}
     .graph.is-cycle{border-color:#c74950;box-shadow:inset 0 0 0 1px #c7495040}
     .graph.has-a .graph-empty{display:none}
     .edge-caption{position:absolute;z-index:2;left:8px;right:8px;text-align:center;font-size:.74rem;font-weight:850;line-height:1.25;padding:3px 7px;border-radius:6px;background:#0d1820e8;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -120,12 +132,21 @@ INSERT INTO test VALUES (21);</code></pre>
     </section>
     <section class="timeline" aria-labelledby="timeline-title"><h2 id="timeline-title">실행 순서</h2><div class="timeline-list" id="timeline-list"></div><p class="tiny">⑤와 ⑥에서 INSERT가 멈춥니다. ⑦에서 한쪽이 롤백된 뒤 B가 다시 진행합니다.</p></section>
     <section class="key-message" aria-label="이 그림의 핵심"><strong>그림의 핵심</strong> · 키 20과 21이 서로 락을 건 게 아닙니다. 중복 여부를 확인하려고 상대 트랜잭션이 끝나길 기다리다가 두 방향의 대기가 생깁니다.</section>
+    <details class="two-phase"><summary>질문 · 2단계 잠금(2PL)은 잠금을 풀고 다시 잠글 수 없다는 규칙인가요?</summary>
+      <p><b>맞아요.</b> 2PL은 한 트랜잭션 안에서 잠금을 얻고 푸는 순서에 관한 규칙입니다. <b>첫 잠금을 해제한 뒤에는 새 잠금을 얻지 않습니다.</b></p>
+      <div class="two-phase-flow" aria-label="2단계 잠금의 확장 단계와 축소 단계"><span><b>① 확장 단계 · Growing</b>잠금 획득 가능 · 해제 불가</span><i aria-hidden="true">첫 해제 →</i><span><b>② 축소 단계 · Shrinking</b>잠금 해제 가능 · 새 잠금 획득 불가</span></div>
+      <div class="two-phase-example"><span class="valid">✓ 잠금 1 획득 → 잠금 2 획득 → 잠금 1 해제 → 잠금 2 해제</span><span class="invalid">✕ 잠금 1 획득 → 잠금 1 해제 → 잠금 2 획득 · 2PL 위반</span></div>
+      <p>충돌하는 작업에 이 규칙을 적용하면 <b>충돌 직렬 가능성</b>을 보장할 수 있지만, <b>데드락은 여전히 가능</b>합니다. <b>Strict 2PL</b>은 배타 락을 COMMIT 또는 ROLLBACK까지 유지합니다.</p>
+      <p>여기서는 <b>일반적인 잠금 규칙</b>을 설명합니다. PostgreSQL은 MVCC도 사용하므로 모든 트랜잭션을 2PL 하나로 설명할 수 없습니다. 일반 SELECT는 행의 공유 락 없이 이전에 커밋된 버전을 읽을 수 있습니다.</p>
+    </details>
   </main>
   <section class="print-report" aria-labelledby="print-report-heading"><h2 id="print-report-heading">두 INSERT가 만든 대기 고리</h2><p>PostgreSQL 18 · 두 세션의 실행 순서와 데드락 감지 결과를 한 번에 읽는 인쇄용 그림</p><div class="print-cycle"><div><strong>A · XID 100</strong><span>21 INSERT 미커밋<br>20 INSERT → B의 종료 대기</span></div><b>서로 기다림<br>↔</b><div><strong>B · XID 200</strong><span>20 INSERT 미커밋<br>21 INSERT → A의 종료 대기</span></div></div><div class="print-steps" id="print-steps"></div><div class="print-locks"><h3>교착 순간의 핵심 transactionid 잠금</h3><table><thead><tr><th>트랜잭션</th><th>대상 XID</th><th>모드</th><th>부여</th></tr></thead><tbody><tr><td>A</td><td>100 · 자기 것</td><td>ExclusiveLock</td><td>예</td></tr><tr><td>B</td><td>200 · 자기 것</td><td>ExclusiveLock</td><td>예</td></tr><tr><td>A</td><td>200 · B의 것</td><td>ShareLock</td><td>아니요 · 대기</td></tr><tr><td>B</td><td>100 · A의 것</td><td>ShareLock</td><td>아니요 · 대기</td></tr></tbody></table><p>ShareLock은 20·21 행에 건 <code>FOR SHARE</code>가 아닙니다. 다른 트랜잭션의 종료를 기다리는 내부 잠금 요청입니다. 그림에서는 A가 중단되고 B가 INSERT를 끝낸 뒤 COMMIT합니다. 실제 중단 대상은 고정되지 않습니다.</p></div></section>
   <footer class="sources"><details><summary>정확성 근거와 범위</summary><ul>
     <li><a href="https://www.postgresql.org/docs/18/index-unique-checks.html">PostgreSQL 18 공식 문서 · Index Uniqueness Checks</a> — 미커밋 삽입과 충돌 시 기다린 뒤 가시성을 다시 검사하는 이유.</li>
     <li><a href="https://www.postgresql.org/docs/18/explicit-locking.html">PostgreSQL 18 공식 문서 · Explicit Locking</a> — 테이블/행 락의 범위, deadlock 감지와 victim 선택은 예측할 수 없다는 설명.</li>
     <li><a href="https://www.postgresql.org/docs/18/view-pg-locks.html">PostgreSQL 18 공식 문서 · pg_locks</a> — locktype, mode, granted 및 transaction ID 락을 보는 시스템 뷰.</li>
+    <li><a href="https://pages.cs.wisc.edu/~yxy/cs764-f20/slides/L6.pdf">University of Wisconsin · 2PL 강의 자료</a> — 확장·축소 단계와 Strict 2PL의 일반 규칙.</li>
+    <li><a href="https://www.postgresql.org/docs/18/mvcc-intro.html">PostgreSQL 18 공식 문서 · MVCC</a> — PostgreSQL의 버전 기반 읽기와 잠금의 관계.</li>
     <li><a href="https://github.com/postgres/postgres/blob/REL_18_STABLE/src/backend/access/nbtree/nbtinsert.c">PostgreSQL source · REL_18_STABLE · nbtinsert.c</a> — B-tree 유니크 검사가 다른 트랜잭션을 기다리고 다시 검사하는 경로.</li>
     <li><a href="https://github.com/postgres/postgres/blob/REL_18_STABLE/src/backend/storage/lmgr/lmgr.c">PostgreSQL source · REL_18_STABLE · lmgr.c</a> — 실행 중인 XID에 `ExclusiveLock`을 놓고 상대 XID 대기에 `ShareLock`을 쓰는 경로.</li>
   </ul><p>확인 기준일: 2026-10-13. PostgreSQL 18 문서를 기준으로 한 학습 시뮬레이션이며 실제 서버 연결이나 특정 TRACEBACK 환경의 상태를 표시하지 않습니다. `pg_locks`에는 위 핵심 transactionid 행 외에도 테이블의 `RowExclusiveLock` 등 다른 락이 함께 보일 수 있습니다. deadlock detector는 어느 트랜잭션을 중단할지 보장하지 않으므로, 여기서는 A를 선택하는 예시를 사용합니다.</p></details></footer>
