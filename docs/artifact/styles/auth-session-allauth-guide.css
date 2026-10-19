@@ -13,3 +13,26 @@
 
 .extracted-inline-1 {max-width:1100px;margin:12px auto;padding:12px 16px;border:1px solid #a7cbdc;border-radius:10px;background:#e8f3f8;color:#173042;font:600 14px/1.5 system-ui,sans-serif}
 .extracted-inline-2 {margin-top:13px}
+
+.auth-risk,.redis-compare,.auth-summary{margin-top:20px;padding:20px;background:var(--card);border:1px solid var(--line);border-radius:13px}
+.auth-risk h3,.redis-compare h3,.auth-summary h3{margin-bottom:10px;font-size:1.16rem}
+.auth-risk>.eyebrow{margin-bottom:4px}
+.auth-risk>p{margin-bottom:14px}
+.remedy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.remedy-grid>div{padding:13px 15px;background:var(--soft);border-radius:9px;min-width:0}
+.remedy-grid strong,.remedy-grid span{display:block}
+.remedy-grid strong{color:var(--ink);margin-bottom:4px}
+.remedy-grid span{color:var(--muted);font-size:.92rem}
+.auth-risk .risk-limit{margin:14px 0 0;padding:10px 13px;background:var(--sand);border-left:3px solid var(--amber);border-radius:6px;color:var(--ink)}
+.auth-risk .source{margin:12px 0 0}
+.redis-flow{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(140px,1fr) auto minmax(160px,1.3fr) auto minmax(100px,.7fr);align-items:center;gap:8px;margin-top:10px}
+.redis-flow strong,.redis-flow span{min-width:0;padding:10px 12px;border-radius:8px;background:var(--soft);color:var(--ink);font-size:.9rem}
+.redis-flow strong{background:var(--mint);color:var(--green)}
+.redis-flow b{color:var(--blue);text-align:center}
+.auth-summary .table-scroll{overflow-x:auto}
+.auth-summary table{border-collapse:collapse;width:100%;min-width:510px;text-align:left}
+.auth-summary th,.auth-summary td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+.auth-summary thead th{background:var(--soft)}
+.auth-summary tbody th{white-space:nowrap;color:var(--blue)}
+@media(max-width:720px){.auth-risk,.redis-compare,.auth-summary{padding:16px}.remedy-grid{grid-template-columns:1fr}.redis-flow{grid-template-columns:1fr;gap:5px}.redis-flow b{transform:rotate(90deg);line-height:1}.auth-summary table{font-size:.88rem}}
+@media print{.auth-risk,.redis-compare,.auth-summary,.remedy-grid>div,.redis-flow{break-inside:avoid}.auth-summary .table-scroll{overflow:visible}}

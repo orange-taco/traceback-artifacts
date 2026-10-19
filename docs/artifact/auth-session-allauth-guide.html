@@ -21,7 +21,38 @@
     <section id="transport"><p class="eyebrow">DECISION 1 · 상태 전달</p><h2>브라우저 세션 vs API 토큰</h2><div class="grid">
       <article class="card chosen"><span class="badge chosen">TRACEBACK 선택</span><h3>서버 측 세션 + HttpOnly 쿠키</h3><p>브라우저는 세션 ID를 쿠키로 보냅니다. 서버가 DB의 세션을 조회하므로 로그아웃·세션 종료를 서버에서 제어하기 쉽습니다. 브라우저 요청에는 CSRF 방어가 필요하고, 여러 서버에서 실행하면 공유 세션 저장소가 필요합니다.</p><p><b>선택 이유:</b> 고객 프런트와 API 경로를 같은 Vercel origin으로 보이게 하고, Django DB 세션과 CSRF를 그대로 활용합니다.</p></article>
       <article class="card"><span class="badge">대안</span><h3>Access token · JWT 또는 불투명 토큰</h3><p>클라이언트가 토큰을 API에 제시합니다. 모바일 앱·서로 다른 도메인의 API·서비스 간 호출에 맞출 수 있습니다. 브라우저 저장 위치, 만료·갱신·탈취·철회 정책을 별도로 설계해야 합니다. JWT는 토큰 형식이지 인증 시스템 전체가 아닙니다.</p><p><b>선택 조건:</b> 독립 모바일 클라이언트나 다수 API가 실제로 필요한 경우 다시 비교합니다.</p></article>
-    </div><details><summary>쿠키를 쓰면 CSRF는 왜 필요하고, HttpOnly는 무엇인가요?</summary><p>브라우저는 같은 사이트 요청에 쿠키를 자동으로 붙입니다. CSRF는 사용자가 의도하지 않은 다른 사이트의 변경 요청을 막는 검증입니다. HttpOnly는 자바스크립트가 세션 쿠키 값을 직접 읽지 못하게 합니다. TRACEBACK의 변경 요청은 <code>X-CSRFToken</code>을 보내고, 배포 환경은 HTTPS와 secure cookie를 사용합니다. <a href="https://docs.djangoproject.com/en/6.1/topics/http/sessions/">Django 세션 문서</a> · <a href="https://docs.djangoproject.com/en/6.1/ref/csrf/">Django CSRF 문서</a></p></details></section>
+    </div><details><summary>쿠키를 쓰면 CSRF는 왜 필요하고, HttpOnly는 무엇인가요?</summary><p>브라우저는 같은 사이트 요청에 쿠키를 자동으로 붙입니다. CSRF는 사용자가 의도하지 않은 다른 사이트의 변경 요청을 막는 검증입니다. HttpOnly는 자바스크립트가 세션 쿠키 값을 직접 읽지 못하게 합니다. TRACEBACK의 변경 요청은 <code>X-CSRFToken</code>을 보내고, 배포 환경은 HTTPS와 secure cookie를 사용합니다. <a href="https://docs.djangoproject.com/en/6.1/topics/http/sessions/">Django 세션 문서</a> · <a href="https://docs.djangoproject.com/en/6.1/ref/csrf/">Django CSRF 문서</a></p></details>
+
+    <div class="auth-risk" id="token-theft"><p class="eyebrow">04 · 탈취와 무효화</p><h3>JWT를 훔쳐 갔다면 언제 멈출까?</h3>
+      <p><b>원인.</b> JWT와 세션 ID 모두 탈취되면 인증 도용에 쓰일 수 있습니다. 서버 상태를 조회하지 않는 JWT는 서명과 만료가 유효하면 탈취된 토큰도 통과하므로, 서버가 즉시 무효화하기 어렵습니다.</p>
+      <div class="remedy-grid" aria-label="JWT 탈취 위험을 줄이는 네 가지 방법">
+        <div><strong>① 짧은 Access Token 만료</strong><span>탈취된 토큰을 쓸 수 있는 시간을 줄입니다. 이미 탈취된 토큰을 즉시 끊지는 못합니다.</span></div>
+        <div><strong>② Refresh Token 교체</strong><span>갱신할 때마다 새 Refresh Token을 발급하고 이전 것은 무효화합니다. 서버가 토큰 계열을 기록하고, 이전 토큰의 재사용을 감지하면 계열 전체를 폐기합니다.</span></div>
+        <div><strong>③ Redis 차단 목록</strong><span>강제 로그아웃·탈취 의심 시 JWT의 <code>jti</code> 등을 등록합니다. 매 요청에서 서명·만료를 확인한 뒤 차단 여부를 조회하고, TTL은 남은 유효기간에 맞춥니다.</span></div>
+        <div><strong>④ 브라우저 저장 보호</strong><span>쿠키를 쓴다면 HttpOnly·Secure·SameSite를 적용합니다. HttpOnly는 JavaScript의 쿠키 직접 읽기를 막지만 XSS 전체를 막지는 못하며, 쿠키 인증에는 CSRF 방어도 필요합니다.</span></div>
+      </div>
+      <p class="risk-limit"><b>남는 한계.</b> Refresh Token 교체만으로 이미 발급된 Access Token은 막지 못합니다. 즉시 차단하려면 인증 요청마다 Redis를 조회해야 하므로 JWT의 무상태 처리 이점이 줄어듭니다.</p>
+      <p class="source">일반 설계 선택지 · TRACEBACK의 현재 JWT 구현 설명이 아닙니다. <a href="https://www.rfc-editor.org/rfc/rfc9700.html#section-4.14.2">OAuth 2.0 보안 권고 · Refresh Token 교체</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_Cheat_Sheet.html">OWASP JWT 안내</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies">MDN 쿠키 보안 안내</a></p>
+    </div>
+
+    <div class="auth-risk" id="session-resources"><p class="eyebrow">05 · 저장소와 조회 비용</p><h3>세션을 서버에서 관리하는 부담은 어떻게 줄일까?</h3>
+      <p><b>원인.</b> 세션 방식은 서버가 세션 ID에 연결된 인증 상태를 저장하고 요청 때 조회합니다. 서버가 여러 대라면 같은 세션 저장소를 볼 수 있어야 합니다.</p>
+      <div class="remedy-grid" aria-label="세션 저장과 조회 부담을 줄이는 네 가지 방법">
+        <div><strong>① Redis 세션 저장소</strong><span>DB 대신 Redis에서 세션을 조회하면 구성과 부하에 따라 조회 지연을 줄일 수 있습니다.</span></div>
+        <div><strong>② 서버 간 저장소 공유</strong><span>서버 A와 B가 같은 Redis를 사용하면 어느 서버가 요청을 받아도 같은 세션을 찾습니다.</span></div>
+        <div><strong>③ TTL로 자동 만료</strong><span>세션 유효기간과 Redis TTL을 맞춰 만료된 데이터를 자동 삭제합니다.</span></div>
+        <div><strong>④ 최소 정보만 저장</strong><span>세션에는 <code>user_id</code> 등 인증에 필요한 정보만 두고, 불필요한 프로필 데이터는 저장하지 않습니다.</span></div>
+      </div>
+      <p class="risk-limit"><b>남는 한계.</b> Redis도 메모리·네트워크·운영 비용이 듭니다. 세션 인증은 매 요청의 저장소 조회가 필요하므로 저장소의 가용성도 관리해야 합니다.</p>
+      <p class="source">일반 설계 선택지 · TRACEBACK의 세션 인증 설정은 <a href="https://github.com/orange-taco/traceback/blob/2a8e0f1261a2c17fb72fadd786fbc3cb4d7d8a3a/config/settings/base.py#L126-L130">development 브랜치의 확인한 리비전, base.py 126–130행</a>을 참고하세요. Redis 세션 저장소는 현재 구현 설명이 아닙니다. <a href="https://docs.djangoproject.com/en/6.1/topics/http/sessions/">Django 세션 문서</a> · <a href="https://redis.io/docs/latest/commands/expire/">Redis TTL 문서</a></p>
+    </div>
+
+    <div class="redis-compare"><h3>Redis를 쓰더라도 저장하는 대상이 다릅니다</h3>
+      <div class="redis-flow"><strong>JWT · 차단 목록</strong><span>JWT 서명·만료 확인</span><b aria-hidden="true">→</b><span>Redis에서 차단된 <code>jti</code> 확인</span><b aria-hidden="true">→</b><span>있으면 거부</span></div>
+      <div class="redis-flow"><strong>Session · 세션 저장소</strong><span>쿠키의 세션 ID 수신</span><b aria-hidden="true">→</b><span>Redis에서 인증 세션 조회</span><b aria-hidden="true">→</b><span>없으면 거부</span></div>
+    </div>
+    <div class="auth-summary"><h3>어떤 문제에 어떤 보완이 맞을까?</h3><div class="table-scroll"><table><thead><tr><th scope="col">방식</th><th scope="col">주요 문제</th><th scope="col">대표적인 보완</th></tr></thead><tbody><tr><th scope="row">JWT</th><td>탈취 후 즉시 무효화 어려움</td><td>짧은 만료 · Refresh Token 교체 · Redis 차단 목록</td></tr><tr><th scope="row">Session</th><td>서버 저장·조회 비용</td><td>Redis · TTL · 최소 정보 저장</td></tr><tr><th scope="row">Session</th><td>여러 서버 간 세션 공유</td><td>공용 Redis 세션 저장소</td></tr></tbody></table></div></div>
+    </section>
 
     <section id="implementation"><p class="eyebrow">DECISION 2 · 계정 흐름 구현</p><h2>가입·이메일·소셜 인증은 누가 구현할까?</h2><div class="grid">
       <article class="card"><h3>Django 기본 auth + 직접 API 작성</h3><p>모델·세션 기반은 단순하게 시작할 수 있습니다. 대신 이메일 확인, 비밀번호 재설정, 소셜 연결·해제, 재전송 제한과 오류 흐름을 직접 구현·유지해야 합니다.</p></article>
