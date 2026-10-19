@@ -45,7 +45,12 @@
     </details>
 
     <div class="auth-risk" id="token-theft"><p class="eyebrow">보안 · 탈취와 무효화</p><h3>JWT를 훔쳐 갔다면 언제 멈출까?</h3>
-      <p><b>원인.</b> JWT와 세션 ID 모두 탈취되면 인증 도용에 쓰일 수 있습니다. 서버 상태를 조회하지 않는 JWT는 서명과 만료가 유효하면 탈취된 토큰도 통과하므로, 서버가 즉시 무효화하기 어렵습니다.</p>
+      <p><b>원인.</b> 서버는 제시된 인증 정보의 유효성을 확인합니다. 정상 JWT나 세션 ID를 탈취당하면 자격 증명 검사만으로는 원래 사용자와 탈취자를 구별할 수 없습니다.</p>
+      <div class="credential-flows" aria-label="JWT 서명 검증과 탈취된 인증 정보의 확인 과정">
+        <div class="credential-flow"><strong>JWT 서명 검증 <small>HS256 예시</small></strong><span>인코딩된 <code>Header.Payload</code>와 비밀키로 HMAC-SHA256 계산</span><b aria-hidden="true">→</b><span>JWT의 <code>Signature</code>와 비교</span><b aria-hidden="true">→</b><span>일치하면 <code>exp</code> 확인</span></div>
+        <div class="credential-flow"><strong>JWT 탈취</strong><span>정상 JWT 제시</span><b aria-hidden="true">→</b><span>서명·만료 유효</span><b aria-hidden="true">→</b><span>인증 통과</span></div>
+        <div class="credential-flow"><strong>세션 ID 탈취</strong><span>정상 세션 ID 제시</span><b aria-hidden="true">→</b><span>서버 저장소(DB·Redis 등)에 유효한 세션 존재</span><b aria-hidden="true">→</b><span>인증 통과</span></div>
+      </div>
       <div class="remedy-grid" aria-label="JWT 탈취 위험을 줄이는 네 가지 방법">
         <div><strong>① 짧은 Access Token 만료</strong><span>탈취된 토큰을 쓸 수 있는 시간을 줄입니다. 이미 탈취된 토큰을 즉시 끊지는 못합니다.</span></div>
         <div><strong>② Refresh Token 교체</strong><span>갱신할 때마다 새 Refresh Token을 발급하고 이전 것은 무효화합니다. 서버가 토큰 계열을 기록하고, 이전 토큰의 재사용을 감지하면 계열 전체를 폐기합니다.</span></div>
@@ -53,7 +58,7 @@
         <div><strong>④ 브라우저 저장 보호</strong><span>쿠키를 쓴다면 HttpOnly·Secure·SameSite를 적용합니다. HttpOnly는 JavaScript의 쿠키 직접 읽기를 막지만 XSS 전체를 막지는 못하며, 쿠키 인증에는 CSRF 방어도 필요합니다.</span></div>
       </div>
       <p class="risk-limit"><b>남는 한계.</b> Refresh Token 교체만으로 이미 발급된 Access Token은 막지 못합니다. 즉시 차단하려면 인증 요청마다 Redis를 조회해야 하므로 JWT의 무상태 처리 이점이 줄어듭니다.</p>
-      <p class="source">일반 설계 선택지 · TRACEBACK의 현재 JWT 구현 설명이 아닙니다. <a href="https://www.rfc-editor.org/rfc/rfc9700.html#section-4.14.2">OAuth 2.0 보안 권고 · Refresh Token 교체</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_Cheat_Sheet.html">OWASP JWT 안내</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies">MDN 쿠키 보안 안내</a></p>
+      <p class="source">일반 설계 선택지 · TRACEBACK의 현재 JWT 구현 설명이 아닙니다. <a href="https://www.rfc-editor.org/rfc/rfc7518.html#section-3.2">HS256 서명 검증</a> · <a href="https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.4">JWT 만료 확인</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">OWASP 세션 탈취 안내</a> · <a href="https://www.rfc-editor.org/rfc/rfc9700.html#section-4.14.2">OAuth 2.0 보안 권고 · Refresh Token 교체</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_Cheat_Sheet.html">OWASP JWT 안내</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies">MDN 쿠키 보안 안내</a></p>
     </div>
 
     <div class="auth-risk" id="session-resources"><p class="eyebrow">운영 · 저장소와 조회 비용</p><h3>세션을 서버에서 관리하는 부담은 어떻게 줄일까?</h3>
