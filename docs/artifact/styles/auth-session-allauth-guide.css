@@ -55,6 +55,11 @@
 .auth-risk h3,.redis-compare h3,.auth-summary h3{margin-bottom:10px;font-size:1.16rem}
 .auth-risk>.eyebrow{margin-bottom:4px}
 .auth-risk>p{margin-bottom:14px}
+.risk-group+.risk-group{border-top:1px solid var(--line);margin-top:16px;padding-top:16px}
+.risk-group h4{margin:0 0 9px;font-size:.98rem;color:var(--ink)}
+.risk-group>p:not(.risk-limit):not(.risk-prevention){margin:0 0 12px;color:var(--muted)}
+.risk-group .risk-prevention{margin:0;padding:9px 12px;border-left:3px solid var(--blue);background:var(--soft);border-radius:6px;font-size:.88rem}
+.risk-group .risk-prevention b{color:var(--ink)}
 .credential-flows{display:grid;gap:7px;margin:0 0 16px}
 .credential-flow{display:grid;grid-template-columns:minmax(115px,.9fr) minmax(160px,1.6fr) auto minmax(130px,1.2fr) auto minmax(95px,.9fr);align-items:center;gap:7px;padding:8px 10px;background:var(--soft);border-radius:9px;font-size:.88rem}
 .credential-flow strong{color:var(--ink)}
@@ -66,6 +71,7 @@
 .remedy-grid strong,.remedy-grid span{display:block}
 .remedy-grid strong{color:var(--ink);margin-bottom:4px}
 .remedy-grid span{color:var(--muted);font-size:.92rem}
+.jwt-remedies>div:last-child{grid-column:1/-1}
 .auth-risk .risk-limit{margin:14px 0 0;padding:10px 13px;background:var(--sand);border-left:3px solid var(--amber);border-radius:6px;color:var(--ink)}
 .auth-risk .source{margin:12px 0 0}
 .redis-flow{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(140px,1fr) auto minmax(160px,1.3fr) auto minmax(100px,.7fr);align-items:center;gap:8px;margin-top:10px}
@@ -78,4 +84,4 @@
 .auth-summary thead th{background:var(--soft)}
 .auth-summary tbody th{white-space:nowrap;color:var(--blue)}
 @media(max-width:720px){.auth-risk,.redis-compare,.auth-summary{padding:16px}.credential-flow{grid-template-columns:1fr;gap:4px}.credential-flow b{transform:rotate(90deg);line-height:1}.remedy-grid{grid-template-columns:1fr}.redis-flow{grid-template-columns:1fr;gap:5px}.redis-flow b{transform:rotate(90deg);line-height:1}.auth-summary table{font-size:.88rem}}
-@media print{.auth-risk,.redis-compare,.auth-summary,.credential-flow,.remedy-grid>div,.redis-flow{break-inside:avoid}.auth-summary .table-scroll{overflow:visible}}
+@media print{.risk-group,.redis-compare,.auth-summary,.credential-flow,.remedy-grid>div,.redis-flow{break-inside:avoid}.auth-summary .table-scroll{overflow:visible}}
