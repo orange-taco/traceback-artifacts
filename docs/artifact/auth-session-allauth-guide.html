@@ -21,26 +21,111 @@
     <section id="transport"><p class="eyebrow">DECISION 1 · 상태 전달</p><h2>브라우저 세션 vs API 토큰</h2><div class="grid">
       <article class="card chosen"><span class="badge chosen">TRACEBACK 선택</span><h3>서버 측 세션 + HttpOnly 쿠키</h3><p>브라우저는 세션 ID를 쿠키로 보냅니다. 서버가 DB의 세션을 조회하므로 로그아웃·세션 종료를 서버에서 제어하기 쉽습니다. 브라우저 요청에는 CSRF 방어가 필요하고, 여러 서버에서 실행하면 공유 세션 저장소가 필요합니다.</p><p><b>선택 이유:</b> 고객 프런트와 API 경로를 같은 Vercel origin으로 보이게 하고, Django DB 세션과 CSRF를 그대로 활용합니다.</p></article>
       <article class="card"><span class="badge">대안</span><h3>Access token · JWT 또는 불투명 토큰</h3><p>클라이언트가 토큰을 API에 제시합니다. 모바일 앱·서로 다른 도메인의 API·서비스 간 호출에 맞출 수 있습니다. 브라우저 저장 위치, 만료·갱신·탈취·철회 정책을 별도로 설계해야 합니다. JWT는 토큰 형식이지 인증 시스템 전체가 아닙니다.</p><p><b>선택 조건:</b> 독립 모바일 클라이언트나 다수 API가 실제로 필요한 경우 다시 비교합니다.</p></article>
-    </div><details><summary>쿠키를 쓰면 CSRF는 왜 필요하고, HttpOnly는 무엇인가요?</summary><p>브라우저는 같은 사이트 요청에 쿠키를 자동으로 붙입니다. CSRF는 사용자가 의도하지 않은 다른 사이트의 변경 요청을 막는 검증입니다. HttpOnly는 자바스크립트가 세션 쿠키 값을 직접 읽지 못하게 합니다. TRACEBACK의 변경 요청은 <code>X-CSRFToken</code>을 보내고, 배포 환경은 HTTPS와 secure cookie를 사용합니다. <a href="https://docs.djangoproject.com/en/6.1/topics/http/sessions/">Django 세션 문서</a> · <a href="https://docs.djangoproject.com/en/6.1/ref/csrf/">Django CSRF 문서</a></p></details></section>
+    </div><details><summary>쿠키 인증에서는 CSRF가 어떻게 생기고 막히나요?</summary>
+      <p>CSRF는 JWT나 세션 ID를 훔치는 공격이 아닙니다. 공격자가 로그인된 사용자의 <b>브라우저에 요청을 시키는 공격</b>이라 쿠키 값이나 JWT 서명을 알 필요가 없습니다.</p>
+      <div class="csrf-flow" role="group" aria-label="CSRF 공격의 네 단계">
+        <span><b>① bank.com</b> 로그인·인증 쿠키 저장</span><i aria-hidden="true">→</i><span><b>② evil.com</b> 방문·송금 요청 유도</span><i aria-hidden="true">→</i><span><b>③ 브라우저</b> 쿠키 정책이 허용하면 자동 첨부</span><i aria-hidden="true">→</i><span><b>④ bank.com</b> 방어가 없으면 송금 처리</span>
+      </div>
+      <p class="csrf-state"><b>로그인 중:</b> 유효한 인증 쿠키가 붙을 수 있습니다. <b>로그아웃 후:</b> 쿠키가 삭제되거나 세션이 무효화됐다면 그 쿠키로 인증된 요청은 처리되지 않습니다.</p>
+      <p><b>저장 방식이 기준입니다.</b> Session ID나 JWT를 쿠키에 넣으면 브라우저가 자동으로 보낼 수 있어 CSRF를 고려해야 합니다. JWT를 <code>localStorage</code>에 두고 요청 헤더에 직접 붙이는 방식은 일반적인 쿠키 기반 CSRF와 다르지만, JavaScript가 토큰을 읽을 수 있어 XSS 위험이 있습니다.</p>
+      <p><b>방어:</b> SameSite로 다른 사이트에서 시작한 요청의 쿠키 전송을 제한하고, CSRF 토큰이나 요청의 Origin을 서버에서 검증합니다. HttpOnly는 JavaScript의 쿠키 직접 읽기를 막을 뿐 CSRF 방어는 아닙니다. 가짜 로그인 화면에서 비밀번호를 받아내는 <b>피싱</b>과도 다릅니다.</p>
+      <p><b>TRACEBACK:</b> JSON 변경 요청은 <code>X-CSRFToken</code> 헤더를, Kakao 로그인 폼은 <code>csrfmiddlewaretoken</code> 필드를 보냅니다. 배포 환경에는 HTTPS와 secure cookie가 필요합니다. <a href="https://github.com/orange-taco/traceback-client/blob/afd7664ce2e1b5d58f8f259b73b352878bdbf0e8/app/lib/auth-api.ts#L63-L72">Kakao 폼 63–72행</a> · <a href="https://github.com/orange-taco/traceback-client/blob/afd7664ce2e1b5d58f8f259b73b352878bdbf0e8/app/lib/auth-api.ts#L94-L102">JSON 요청 94–102행</a> · <a href="https://docs.djangoproject.com/en/6.1/ref/csrf/">Django CSRF</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html">OWASP CSRF</a></p>
+    </details>
 
-    <section id="implementation"><p class="eyebrow">DECISION 2 · 계정 흐름 구현</p><h2>가입·이메일·소셜 인증은 누가 구현할까?</h2><div class="grid">
-      <article class="card"><h3>Django 기본 auth + 직접 API 작성</h3><p>모델·세션 기반은 단순하게 시작할 수 있습니다. 대신 이메일 확인, 비밀번호 재설정, 소셜 연결·해제, 재전송 제한과 오류 흐름을 직접 구현·유지해야 합니다.</p></article>
-      <article class="card chosen"><span class="badge chosen">TRACEBACK 선택</span><h3>django-allauth</h3><p>가입, 이메일 확인, 비밀번호 관리, 소셜 계정 흐름을 한 라이브러리에서 다룹니다. 커스텀 User와 Django 세션을 함께 사용할 수 있습니다. 설정과 라이브러리 흐름을 이해해야 하고, Kakao 검증·삭제 정책은 프로젝트 코드로 추가했습니다.</p></article>
-      <article class="card"><h3>외부 관리형 인증 · Cognito/Auth0 등</h3><p>계정 운영과 일부 인증 기능을 서비스에 위임할 수 있습니다. 반면 외부 사용자 저장소·가격·콜백·앱 데이터 연결 정책이 추가됩니다. TRACEBACK의 초기 한 서버·한 웹 클라이언트에는 필요성이 확인되지 않았습니다.</p></article>
-      <article class="card"><h3>dj-rest-auth 같은 DRF API 패키지</h3><p>REST 로그인·비밀번호 endpoint를 빠르게 구성할 수 있습니다. 소셜 로그인·가입에는 allauth를 함께 쓰는 구성도 있어 두 도구가 항상 양자택일은 아닙니다. TRACEBACK은 allauth 자체의 Headless API가 이미 필요한 흐름을 제공해 API 래퍼를 추가하지 않았습니다. <a href="https://github.com/iMerica/dj-rest-auth">패키지 설명</a></p></article>
-    </div></section>
+    <details class="lifecycle-details"><summary>세션 ID와 JWT는 언제 발급되고 바뀌나요?</summary>
+      <p>둘 다 영구 인증 정보가 아닙니다. 일반 요청에는 이미 받은 값을 재사용하고, 만료 뒤에는 다시 인증하거나 새 값을 받아야 합니다.</p>
+      <div class="lifecycle-row"><strong>Session ID <span class="badge chosen">TRACEBACK 방식</span></strong><div class="lifecycle-flow" role="group" aria-label="세션 ID의 생명주기">
+        <span><b>로그인·발급</b>새 세션 ID</span><i aria-hidden="true">→</i><span><b>유지</b>API 요청·새로고침에 같은 ID 사용</span><i aria-hidden="true">→</i><span><b>만료·연장</b>서버 유효기간 적용, 설정에 따라 활동 시 연장</span><i aria-hidden="true">→</i><span><b>로그아웃</b>서버 세션 무효화, 재로그인 시 새 ID</span>
+      </div></div>
+      <div class="lifecycle-row"><strong>JWT Access Token <span class="badge">일반 대안</span></strong><div class="lifecycle-flow" role="group" aria-label="JWT Access Token의 생명주기">
+        <span><b>로그인·발급</b>Access Token 발급</span><i aria-hidden="true">→</i><span><b>유지</b>유효한 기존 토큰을 API 요청에 사용</span><i aria-hidden="true">→</i><span><b>만료·갱신</b><code>exp</code> 뒤에는 새 토큰 발급, 유효한 Refresh Token 활용 가능</span><i aria-hidden="true">→</i><span><b>로그아웃</b>클라이언트 토큰 삭제, 필요하면 서버에서 차단</span>
+      </div></div>
+      <p class="caption">세션은 <b>서버 설정에 따라 만료를 연장</b>할 수 있지만, JWT의 기존 <code>exp</code>를 늘리려면 <b>새 토큰을 발급</b>해야 합니다. 서버 차단 없이 탈취된 JWT가 남는 경우는 <a href="#token-theft">탈취·무효화 절</a>에서 이어집니다.</p>
+      <p class="source">일반 동작 설명 · TRACEBACK의 JWT 발급 기능을 뜻하지 않습니다. <a href="https://github.com/orange-taco/traceback/blob/2a8e0f1261a2c17fb72fadd786fbc3cb4d7d8a3a/config/settings/base.py#L126-L130">TRACEBACK 세션 인증 설정 · development 리비전</a> · <a href="https://docs.djangoproject.com/en/6.1/topics/http/sessions/">Django 세션·만료 문서</a> · <a href="https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.4">JWT <code>exp</code> 사양</a> · <a href="https://www.rfc-editor.org/rfc/rfc9700.html#section-4.14">Refresh Token 설명</a></p>
+    </details>
 
-    <section id="headless"><p class="eyebrow">DECISION 3 · allauth를 노출하는 방식</p><h2>allauth 화면 vs allauth Headless API</h2><div class="branch" role="img" aria-label="allauth를 선택한 다음 Django 템플릿 화면 또는 Headless API를 선택하고, TRACEBACK은 React Router 프런트에 Headless API를 연결합니다"><div class="card"><b>allauth 공통 기능</b><p>가입·확인·비밀번호·소셜 계정 규칙</p></div><div class="card"><b>화면 제공 방식 선택</b><p>Django 템플릿 화면 또는 Headless API</p></div><div class="card chosen"><b>TRACEBACK · Headless</b><p>React Router 화면이 <code>/_allauth/browser/v1/*</code> 호출</p></div></div><div class="grid extracted-inline-2"><article class="card"><h3>기본 템플릿 화면</h3><p>Django가 로그인·가입 HTML을 직접 렌더링합니다. 단일 Django 웹앱에는 단계가 적습니다. 별도 React 프런트의 UX를 유지하려면 화면과 이동 경로를 맞춰야 합니다.</p></article><article class="card chosen"><h3>Headless browser API · 현재 방식</h3><p>프런트가 화면을 맡고 allauth가 JSON 인증 흐름을 맡습니다. Kakao OAuth callback은 서버의 <code>allauth.urls</code>가 여전히 처리합니다. <code>HEADLESS_ONLY=True</code>는 기본 계정 화면을 숨기며 callback까지 없애는 설정은 아닙니다.</p></article></div><p class="caption"><b>독립된 두 축:</b> Headless를 써도 세션 쿠키를 쓸 수 있습니다. Headless가 JWT를 뜻하지 않습니다. <a href="https://docs.allauth.org/en/latest/headless/configuration.html">allauth Headless 설정 문서</a></p></section>
+    <div class="auth-risk" id="token-theft"><p class="eyebrow">보안 · 탈취와 무효화</p><h3>탈취된 인증 정보는 왜 통과하고, 어떻게 끊을까?</h3>
+      <div class="risk-group"><h4>1 · JWT와 세션 ID 탈취 원리</h4>
+        <p>서버는 제시된 인증 정보의 유효성을 확인합니다. 정상 JWT나 세션 ID를 탈취당하면 자격 증명 검사만으로는 원래 사용자와 탈취자를 구별할 수 없습니다.</p>
+        <div class="credential-flows" aria-label="JWT 서명 검증과 탈취된 인증 정보의 확인 과정">
+          <div class="credential-flow"><strong>JWT 서명 검증 <small>HS256 예시</small></strong><span>인코딩된 <code>Header.Payload</code>와 비밀키로 HMAC-SHA256 계산</span><b aria-hidden="true">→</b><span>JWT의 <code>Signature</code>와 비교</span><b aria-hidden="true">→</b><span>일치하면 <code>exp</code> 확인</span></div>
+          <div class="credential-flow"><strong>JWT 탈취</strong><span>정상 JWT 제시</span><b aria-hidden="true">→</b><span>서명·만료 유효</span><b aria-hidden="true">→</b><span>인증 통과</span></div>
+          <div class="credential-flow"><strong>세션 ID 탈취</strong><span>정상 세션 ID 제시</span><b aria-hidden="true">→</b><span>서버 저장소(DB·Redis 등)에 유효한 세션 존재</span><b aria-hidden="true">→</b><span>인증 통과</span></div>
+        </div>
+        <p class="risk-prevention"><b>탈취 전 예방.</b> 쿠키를 쓴다면 HttpOnly·Secure·SameSite로 저장을 보호합니다. HttpOnly는 JavaScript의 쿠키 직접 읽기를 막지만 XSS 전체를 막지는 못하며, 쿠키 인증에는 CSRF 방어도 필요합니다.</p>
+      </div>
+      <div class="risk-group"><h4>2 · JWT 탈취 이후 대응</h4>
+        <div class="remedy-grid jwt-remedies" aria-label="JWT 탈취 이후 세 가지 대응">
+          <div><strong>① 짧은 Access Token 만료</strong><span>만료 시간을 미리 짧게 정해 탈취된 토큰을 쓸 수 있는 시간을 줄입니다. 이미 탈취된 토큰을 즉시 끊지는 못합니다.</span></div>
+          <div><strong>② Refresh Token Rotation</strong><span>갱신할 때마다 새 Refresh Token을 발급하고 이전 것은 무효화합니다. 서버가 토큰 계열을 기록하고, 이전 토큰의 재사용을 감지하면 계열 전체를 폐기합니다.</span></div>
+          <div><strong>③ Redis 차단 목록 · 선택</strong><span>강제 로그아웃·탈취 의심 시 JWT의 <code>jti</code> 등을 등록합니다. 매 요청에서 서명·만료를 확인한 뒤 차단 여부를 조회하고, TTL은 남은 유효기간에 맞춥니다.</span></div>
+        </div>
+        <p class="risk-limit"><b>남는 한계.</b> Refresh Token 교체만으로 이미 발급된 Access Token은 막지 못합니다. 즉시 차단하려면 인증 요청마다 Redis를 조회해야 하므로 JWT의 무상태 처리 이점이 줄어듭니다.</p>
+      </div>
+      <div class="risk-group"><h4>3 · 세션 ID 탈취 이후 대응</h4>
+        <div class="remedy-grid" aria-label="세션 ID 탈취 이후 두 가지 대응">
+          <div><strong>① 서버 세션 무효화</strong><span>서버 저장소의 해당 세션을 삭제하거나 무효화합니다. 브라우저 쿠키만 지워서는 탈취된 복사본이 멈추지 않습니다.</span></div>
+          <div><strong>② 기존 ID 재사용 차단</strong><span>재로그인할 때 탈취된 ID를 이어 쓰지 않고 새 세션 ID를 발급합니다. 폐기된 ID는 더 이상 인증에 사용하지 않습니다.</span></div>
+        </div>
+      </div>
+      <p class="source">일반 설계 선택지 · TRACEBACK의 현재 JWT 구현 설명이 아닙니다. <a href="https://www.rfc-editor.org/rfc/rfc7518.html#section-3.2">HS256 서명 검증</a> · <a href="https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.4">JWT 만료 확인</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">OWASP 세션 탈취 안내</a> · <a href="https://www.rfc-editor.org/rfc/rfc9700.html#section-4.14.2">OAuth 2.0 보안 권고 · Refresh Token 교체</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_Cheat_Sheet.html">OWASP JWT 안내</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies">MDN 쿠키 보안 안내</a></p>
+    </div>
+
+    <div class="auth-risk" id="session-resources"><p class="eyebrow">운영 · 저장소와 조회 비용</p><h3>세션을 서버에서 관리하는 부담은 어떻게 줄일까?</h3>
+      <p><b>원인.</b> 세션 방식은 서버가 세션 ID에 연결된 인증 상태를 저장하고 요청 때 조회합니다. 서버가 여러 대라면 같은 세션 저장소를 볼 수 있어야 합니다.</p>
+      <div class="remedy-grid" aria-label="세션 저장과 조회 부담을 줄이는 네 가지 방법">
+        <div><strong>① Redis 세션 저장소</strong><span>DB 대신 Redis에서 세션을 조회하면 구성과 부하에 따라 조회 지연을 줄일 수 있습니다.</span></div>
+        <div><strong>② 서버 간 저장소 공유</strong><span>서버 A와 B가 같은 Redis를 사용하면 어느 서버가 요청을 받아도 같은 세션을 찾습니다.</span></div>
+        <div><strong>③ TTL로 자동 만료</strong><span>세션 유효기간과 Redis TTL을 맞춰 만료된 데이터를 자동 삭제합니다.</span></div>
+        <div><strong>④ 최소 정보만 저장</strong><span>세션에는 <code>user_id</code> 등 인증에 필요한 정보만 두고, 불필요한 프로필 데이터는 저장하지 않습니다.</span></div>
+      </div>
+      <p class="risk-limit"><b>남는 한계.</b> Redis도 메모리·네트워크·운영 비용이 듭니다. 세션 인증은 매 요청의 저장소 조회가 필요하므로 저장소의 가용성도 관리해야 합니다.</p>
+      <p class="source">일반 설계 선택지 · TRACEBACK의 세션 인증 설정은 <a href="https://github.com/orange-taco/traceback/blob/2a8e0f1261a2c17fb72fadd786fbc3cb4d7d8a3a/config/settings/base.py#L126-L130">development 브랜치의 확인한 리비전, base.py 126–130행</a>을 참고하세요. Redis 세션 저장소는 현재 구현 설명이 아닙니다. <a href="https://docs.djangoproject.com/en/6.1/topics/http/sessions/">Django 세션 문서</a> · <a href="https://redis.io/docs/latest/commands/expire/">Redis TTL 문서</a></p>
+    </div>
+
+    <div class="redis-compare"><h3>Redis를 쓰더라도 저장하는 대상이 다릅니다</h3>
+      <div class="redis-flow"><strong>JWT · 차단 목록</strong><span>JWT 서명·만료 확인</span><b aria-hidden="true">→</b><span>Redis에서 차단된 <code>jti</code> 확인</span><b aria-hidden="true">→</b><span>있으면 거부</span></div>
+      <div class="redis-flow"><strong>Session · 세션 저장소</strong><span>쿠키의 세션 ID 수신</span><b aria-hidden="true">→</b><span>Redis에서 인증 세션 조회</span><b aria-hidden="true">→</b><span>없으면 거부</span></div>
+    </div>
+    <div class="auth-summary"><h3>어떤 문제에 어떤 보완이 맞을까?</h3><div class="table-scroll"><table><thead><tr><th scope="col">방식</th><th scope="col">주요 문제</th><th scope="col">대표적인 보완</th></tr></thead><tbody><tr><th scope="row">JWT</th><td>탈취 후 즉시 무효화 어려움</td><td>짧은 만료 · Refresh Token 교체 · Redis 차단 목록</td></tr><tr><th scope="row">Session</th><td>서버 저장·조회 비용</td><td>Redis · TTL · 최소 정보 저장</td></tr><tr><th scope="row">Session</th><td>여러 서버 간 세션 공유</td><td>공용 Redis 세션 저장소</td></tr></tbody></table></div></div>
+    </section>
+
+    <section id="implementation"><p class="eyebrow">DECISION 2 · 계정 흐름 구현</p><h2>가입·이메일·소셜 인증은 누가 구현할까?</h2>
+      <p>이 선택은 세션과 JWT 중 무엇을 쓰느냐와 별개입니다. <b>Django 기본 auth는 사용자·비밀번호·세션의 토대</b>이고, 그 위에서 가입 확인과 소셜 연결 규칙을 누가 맡을지 정합니다.</p>
+      <div class="ownership-flow" role="group" aria-label="TRACEBACK이 함께 사용하는 계정 기능의 세 층"><div><strong>Django 기본 auth</strong><small>사용자·비밀번호·세션</small></div><b aria-hidden="true">+</b><div><strong>django-allauth</strong><small>가입·이메일 확인·소셜 흐름</small></div><b aria-hidden="true">+</b><div class="chosen"><strong>TRACEBACK 코드</strong><small>Kakao 연결 검증·탈퇴 정책</small></div></div>
+      <p class="caption">TRACEBACK은 이 세 층을 함께 씁니다. allauth를 고른 뒤에도 프로젝트 고유 정책은 앱 코드가 담당합니다. <a href="https://github.com/orange-taco/traceback/blob/2a8e0f1261a2c17fb72fadd786fbc3cb4d7d8a3a/config/settings/base.py#L20-L34">설치된 앱 · development 리비전</a> · <a href="https://github.com/orange-taco/traceback/blob/9c42266381356837f7840211cd788744dcf7950c/apps/accounts/adapters.py#L11-L29">Kakao 어댑터 · 확인 리비전</a></p>
+      <div class="grid decision-cards">
+        <article class="card"><h3>Django 기본 auth + 직접 API 작성</h3><p><b>맞는 경우:</b> 비밀번호 로그인부터 작은 범위로 시작할 때. 이메일 확인·재설정·소셜 연결과 오류 흐름은 직접 구현하고 유지해야 합니다.</p></article>
+        <article class="card chosen"><span class="badge chosen">TRACEBACK 선택</span><h3>django-allauth</h3><p><b>맞는 경우:</b> 이메일 확인과 Kakao 같은 소셜 계정 흐름이 함께 필요할 때. 기본 흐름을 맡기되, 프로젝트의 추가 검증·탈퇴 규칙은 직접 둡니다.</p></article>
+        <article class="card"><h3>외부 관리형 인증 · Cognito/Auth0 등</h3><p><b>맞는 경우:</b> 인증 운영을 외부 서비스에 맡길 때. 외부 사용자 저장소·비용·앱 사용자와의 연결 정책을 함께 설계해야 합니다.</p></article>
+        <article class="card"><h3>dj-rest-auth 같은 DRF API 패키지</h3><p><b>역할:</b> DRF용 인증 API를 제공하는 추가 층입니다. allauth와 함께 쓸 수도 있습니다. TRACEBACK은 allauth Headless API를 사용하므로 이 래퍼를 더하지 않았습니다. <a href="https://github.com/iMerica/dj-rest-auth">패키지 설명</a></p></article>
+      </div>
+    </section>
+
+    <section id="headless"><p class="eyebrow">DECISION 3 · allauth를 노출하는 방식</p><h2>allauth 화면 vs allauth Headless API</h2>
+      <p>Decision 2에서 <b>계정 규칙의 담당자</b>를 골랐다면, 여기서는 <b>로그인 화면의 담당자</b>를 고릅니다. 두 방식 모두 계정 검증은 allauth가 합니다.</p>
+      <div class="presentation-lanes" role="group" aria-label="allauth 화면 제공 방식 두 가지">
+        <div><strong>Django 템플릿 화면</strong><span>브라우저</span><b aria-hidden="true">→</b><span>Django가 로그인 HTML 제공</span><b aria-hidden="true">→</b><span>allauth가 제출 내용 처리</span></div>
+        <div class="chosen"><strong>TRACEBACK · Headless</strong><span>React Router가 로그인 화면 제공</span><b aria-hidden="true">→</b><span><code>POST /_allauth/browser/v1/auth/login</code></span><b aria-hidden="true">→</b><span>allauth가 JSON 응답·Django 세션 처리</span></div>
+      </div>
+      <div class="grid extracted-inline-2"><article class="card"><h3>기본 템플릿 화면</h3><p>한 Django 앱이 화면과 인증을 모두 제공할 때 간단합니다. React 화면을 따로 유지한다면 로그인 UI가 둘로 나뉠 수 있습니다.</p></article><article class="card chosen"><h3>Headless browser API · 현재 방식</h3><p>React가 화면과 이동을 맡고 Django가 인증 규칙을 맡습니다. 브라우저용 API는 여전히 <b>세션 쿠키와 CSRF</b>를 사용합니다. Kakao callback은 별도의 <code>allauth.urls</code> 경로가 처리합니다.</p></article></div>
+      <p class="caption"><b>Headless는 화면 제공 방식이지 JWT 선택이 아닙니다.</b> <code>HEADLESS_ONLY=True</code>는 기본 계정 화면을 숨겨도 OAuth callback을 없애지 않습니다. <a href="https://github.com/orange-taco/traceback/blob/2a8e0f1261a2c17fb72fadd786fbc3cb4d7d8a3a/config/urls.py#L7-L9">서버 URL 설정 · development 리비전</a> · <a href="https://github.com/orange-taco/traceback/blob/2a8e0f1261a2c17fb72fadd786fbc3cb4d7d8a3a/config/settings/base.py#L148-L149">Headless 설정</a> · <a href="https://github.com/orange-taco/traceback-client/blob/afd7664ce2e1b5d58f8f259b73b352878bdbf0e8/app/lib/auth-api.ts#L26-L32">클라이언트 요청</a> · <a href="https://docs.allauth.org/en/latest/headless/openapi-specification/">allauth browser API 문서</a></p>
+    </section>
 
     <section id="external-unlink"><p class="eyebrow">DECISION 4 · 외부 API와 DB 사이</p><h2>탈퇴 중 Kakao는 성공하고 DB가 실패하면?</h2><p class="lead">DB의 <code>atomic()</code>은 Kakao 서버까지 되돌리지 못합니다. 선택할 것은 “어느 쪽을 먼저 호출하나”만이 아니라, <b>중간 실패를 발견하고 끝까지 처리할 기록을 어디에 남기나</b>입니다. 현재 TRACEBACK 코드는 이 복구 기록이 없습니다.</p>
-      <p class="caption"><b>먼저 탈퇴 결과를 구분하세요.</b> TRACEBACK은 <code>User</code> 행을 남기고 비활성·익명화하는 <b>soft delete</b>를 합니다. <code>EmailAddress</code>와 <code>SocialAccount</code>는 실제 삭제합니다. 이메일 전용 계정은 Kakao 호출 없이 내부 트랜잭션으로 끝낼 수 있습니다. Kakao 전용과 이메일+Kakao 계정은 둘 다 원격 unlink가 필요합니다. <a href="traceback-system-guide.html#auth">세 계정 유형의 전체 탈퇴 그림</a></p>
+      <details><summary>어떤 계정에서 Kakao unlink가 필요한가요?</summary><p>TRACEBACK은 <code>User</code> 행을 남기고 비활성·익명화하는 <b>soft delete</b>를 합니다. <code>EmailAddress</code>와 <code>SocialAccount</code>는 실제 삭제합니다. 이메일 전용 계정은 Kakao 호출 없이 내부 트랜잭션으로 끝낼 수 있습니다. Kakao 전용과 이메일+Kakao 계정은 둘 다 원격 unlink가 필요합니다. <a href="traceback-system-guide.html#auth">세 계정 유형의 전체 탈퇴 그림</a></p></details>
+      <p class="eyebrow">개선안의 복구 경로 · 현재 미구현</p>
       <div class="external-window" aria-label="외부 API 성공과 DB 완료 기록 사이의 장애 구간"><div><strong>1 · DB 작업 기록 커밋</strong><small>탈퇴가 필요함을 잃지 않음</small></div><span class="arrow" aria-hidden="true">→</span><div class="risk"><strong>2 · Kakao unlink 성공</strong><small>외부 side effect 발생</small></div><span class="arrow" aria-hidden="true">→ 💥 →</span><div><strong>3 · DB 완료 기록</strong><small>그 전에 죽으면 성공 여부가 남지 않음</small></div></div>
+      <p class="caption"><b>핵심 선택:</b> 현재 코드는 Kakao 호출 뒤 DB를 변경합니다. 복구하려면 탈퇴 대기 기록을 먼저 커밋하고, Kakao 호출 뒤 완료를 기록해야 합니다. 외부 호출은 재시도될 수 있으므로 결과 확인도 필요합니다.</p>
+      <details class="deep-dive"><summary>현재 방식과 복구 선택지 보기</summary>
       <p class="caption"><b>작업 요청을 잃지 않는 것 ≠ Kakao를 정확히 한 번만 호출하는 것.</b> ②와 ③ 사이에서 죽으면 상태 머신이나 outbox가 있어도 재시도 때 unlink를 다시 호출할 수 있습니다. DB 트랜잭션을 Kakao 호출 동안 열어 두어도 외부 성공 뒤 로컬 롤백은 막지 못합니다. 재시도는 외부 API의 멱등한 동작 또는 목표 상태 확인과 함께 설계해야 합니다.</p>
       <div class="guarantee-grid" aria-label="서로 다른 세 가지 설계 축"><div><strong>① 상태 머신 + 재시도</strong><small>DELETE_PENDING을 커밋하고 실패·만료 작업을 다시 찾습니다. 원격 성공 뒤 DB 실패도 나중에 끝낼 수 있습니다.</small><em>목표: 최종 수렴</em></div><div><strong>② Transactional outbox / 작업 행</strong><small>계정 상태와 작업 요청을 같은 DB 커밋에 남깁니다. 큐 전달·worker 실행은 다시 일어날 수 있습니다.</small><em>목표: 작업 요청 유실 방지</em></div><div><strong>③ Kakao의 멱등성·상태 확인</strong><small>재호출 후 이미 연결 해제된 상태를 확인해 성공으로 수렴합니다. 외부 호출 횟수를 한 번으로 보장하지는 않습니다.</small><em>목표: 중복 호출의 결과 안전성</em></div></div>
       <p class="caption"><code>SELECT FOR UPDATE</code>, 조건부 <code>UPDATE</code>, <code>SKIP LOCKED</code>, <code>DELETING</code> 점유는 위 세 축과 별개의 원자성 해결책이 아닙니다. 여러 실행자가 <b>동시에</b> 같은 작업을 처리하지 않도록 하는 구현 도구입니다. 점유자가 외부 성공 뒤 DB 기록 전에 죽는 문제는 여전히 남습니다.</p>
       <div class="unlink-key" aria-label="서로 다른 세 가지 장치"><div><strong>① 커밋된 계정 상태</strong><small>DELETE_PENDING부터 완료까지 로그인·변경을 막는 논리적 잠금</small></div><div><strong>② 짧은 DB 행 락</strong><small>경쟁자가 작업을 가져가거나 완료 상태를 적을 때만 유지</small></div><div><strong>③ 점유 토큰·만료</strong><small>동시에 처리할 실행자를 하나로 조정하고 멈춘 작업을 인수</small></div></div>
       <p class="caption"><b>상태 전이 vs outbox는 양자택일이 아닙니다.</b> 상태는 계정·작업이 지금 무엇을 기다리는지 표현하고, outbox는 작업 요청을 DB에 내구성 있게 남겨 전달하는 패턴입니다. Celery는 실행기입니다. Outbox를 소비한 worker가 Kakao 성공 직후 죽으면 이벤트를 다시 소비하고 Kakao를 재호출할 수 있습니다. <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS transactional outbox 설명</a></p>
       <div class="unlink-options" aria-label="외부 API 연동의 세 가지 실무 선택"><article class="current"><span class="badge pending">TRACEBACK 현재 코드</span><h3>원격 호출 → 로컬 DB 변경</h3><p>코드가 적고 성공 경로는 즉시 끝납니다. Kakao 성공 뒤 DB 변경이 실패하면 원격 연결만 끊긴 채 복구 기록이 없습니다. <code>validate_disconnect()</code> 검증 단계에서도 외부 호출을 합니다.</p></article><article><span class="badge">대안 · 작은 규모</span><h3>상태 전이 + DB 재조회</h3><p>TX1에서 <code>DELETE_PENDING</code>을 커밋합니다. 요청과 주기적 실행자가 같은 claim 규칙으로 경쟁하고, 이긴 쪽만 Kakao를 호출합니다. 별도 메시지 브로커 없이 시작할 수 있지만 재조회 주기·점유 만료·오류 알림을 운영해야 합니다.</p></article><article class="proposed"><span class="badge chosen">검토 중인 개선안 · 미구현</span><h3>상태 + 내구성 있는 작업 기록 + Celery</h3><p>TX1에서 계정 상태와 작업 기록을 함께 커밋합니다. 그 뒤 요청과 Celery가 모두 작업을 볼 수 있고, 짧은 행 락으로 한 실행자만 claim합니다. 큐 알림이 유실돼도 DB 기록을 재조회합니다. 워커·브로커·감시 운영이 추가됩니다.</p></article></div>
+      </details>
+      <details class="deep-dive"><summary>Kakao 재시도와 응답 근거 보기</summary>
       <h3>Kakao Unlink에서 재시도를 안전하게 해석할 근거</h3><p>가장 편한 형태는 외부 API가 같은 요청을 반복해도 결과가 하나로 수렴하도록 멱등성을 제공하는 것입니다. 2026-10-04 기준 공식 <a href="https://developers.kakao.com/docs/en/kakaologin/rest-api#unlink">Unlink 요청 사양</a>과 <a href="https://developers.kakao.com/docs/en/rest-api/error-code">오류 코드</a>를 대조했습니다. 아래는 공식 문서에 명시된 범위와 TRACEBACK 코드의 현재 처리입니다.</p>
       <div class="guarantee-grid" aria-label="Kakao API의 멱등성 키, 연결 상태 조회, 이미 해제된 응답 지원"><div><strong>① Idempotency-Key</strong><small>공식 Unlink 요청의 헤더·파라미터에 요청별 멱등성 키가 문서화되어 있지 않습니다. 같은 키로 정확히 한 번만 처리된다고 가정할 수 없습니다.</small><em>문서상 지원 확인 안 됨</em></div><div><strong>② 연결 상태 확인</strong><small>Admin Key와 <code>target_id</code>로 <code>GET/POST /v2/user/me</code>를 호출하면 연결된 사용자의 정보를 조회할 수 있습니다. 전용 상태 조회 API는 아니며 오류 해석·권한 확인이 필요합니다.</small><em>간접 확인 경로 있음</em></div><div><strong>③ 이미 해제된 응답</strong><small>Kakao의 <code>-101</code>은 해당 앱에 연결되지 않은 사용자를 뜻합니다. 올바른 앱 키·대상 ID로 호출했다면 목표 상태인 “연결 없음”으로 해석할 수 있습니다.</small><em>현재 코드도 -101을 성공 처리</em></div></div>
       <p class="caption"><b>타임아웃이면 결과가 모호합니다.</b> 요청이 Kakao에 도착하지 않았을 수도, unlink는 성공했지만 응답만 사라졌을 수도 있습니다. 같은 앱의 Admin Key와 저장된 Kakao UID로 상태를 확인하거나 재호출해 <code>-101</code>을 목표 상태로 해석할 수 있습니다. 다만 이 과정은 <b>최종 상태를 맞추는 방법</b>이지, 외부 호출을 정확히 한 번만 보장하는 방법은 아닙니다. 현재 구현에는 타임아웃 뒤 상태 조회·작업 재시도 흐름이 없습니다. <a href="https://developers.kakao.com/docs/en/kakaologin/rest-api#retrieve-user-information">Kakao 사용자 정보 조회 사양</a></p>
@@ -52,6 +137,8 @@
    │         ... (45–50행 생략)
 51 │     if not isinstance(payload, dict) or str(payload.get("id")) != str(uid):
 52 │         raise KakaoUnlinkError("Kakao unlink response did not match the user.")</code></pre></div></div>
+      </details>
+      <details class="deep-dive"><summary>개선안 6단계 · 중간 실패와 재시도 보기</summary>
       <h3>TX1과 TX2 사이: 보이는 DELETE_PENDING을 누가 가져가나</h3><p>아래는 <b>개선안의 개념도</b>이며 현재 코드에 없는 계정 상태·작업 행입니다. TX1에서 계정 <code>DELETE_PENDING</code>과 작업 <code>READY</code>를 함께 커밋하므로 요청과 Celery가 둘 다 볼 수 있습니다. 성공은 ①→⑤, 중간 장애는 ④→⑥으로 이어집니다. 상태명은 설명용 예시이며 프로젝트에 아직 추가되지 않았습니다.</p>
       <div class="play-controls" role="group" aria-label="탈퇴 처리 단계 선택"><button type="button" data-unlink-stage="0" aria-pressed="true">① TX1</button><button type="button" data-unlink-stage="1" aria-pressed="false">② 커밋</button><button type="button" data-unlink-stage="2" aria-pressed="false">③ claim</button><button type="button" data-unlink-stage="3" aria-pressed="false">④ Kakao</button><button type="button" data-unlink-stage="4" aria-pressed="false">⑤ TX2</button><button type="button" data-unlink-stage="5" aria-pressed="false">⑥ 재시도</button><button type="button" id="play-unlink">▶ 성공 경로 재생</button></div>
       <p class="stage-message" id="unlink-stage-message" aria-live="polite">① TX1에서 계정 ACTIVE → DELETE_PENDING과 작업 READY를 저장합니다. 커밋 전에는 다른 실행자에게 보이지 않습니다.</p>
@@ -93,6 +180,7 @@
 27 │                 unlink_kakao_user(account.uid)
 28 │             except KakaoUnlinkError as exc:
 29 │                 raise ValidationError(str(exc), code="provider_unavailable") from exc</code></pre></div></div>
+      </details>
     </section>
 
     <section id="traceback"><p class="eyebrow">TRACEBACK · 실제 코드와 실행</p><h2>브라우저 요청 한 번을 따라가기</h2><div class="flow"><div class="step"><span class="num">1</span><div><strong>React Router가 같은 origin으로 요청</strong><small>가입은 <code>POST /_allauth/browser/v1/auth/signup</code>; 세션 조회는 <code>GET /_allauth/browser/v1/auth/session</code>.</small></div></div><div class="step"><span class="num">2</span><div><strong>Vercel rewrite → EC2 Nginx → Django</strong><small><code>DJANGO_ORIGIN</code>이 인증 경로를 API 서버로 전달합니다. 배포 HTTPS가 준비되어야 이 구간이 통과합니다.</small></div></div><div class="step"><span class="num">3</span><div><strong>allauth가 계정·확인 메일·소셜 흐름 처리</strong><small>이메일은 확인 전 로그인 불가. Kakao 새 연결에는 verified provider email이 필요합니다.</small></div></div><div class="step"><span class="num">4</span><div><strong>Django 세션과 CSRF로 다음 요청 검증</strong><small>브라우저는 <code>sessionid</code>를 보내고, 서버는 DB 세션을 확인합니다. 계정 삭제·Kakao 연결 해제는 추가 프로젝트 정책을 거칩니다.</small></div></div></div>

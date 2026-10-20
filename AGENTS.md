@@ -30,6 +30,11 @@ skill's Required artifact standard.
 
 Before merging any artifact PR:
 
+CodeRabbit auto-review is enabled in `.coderabbit.yaml` and runs on pushed PR
+commits. Never post `@coderabbitai review` or invoke a manual CodeRabbit review
+command. A rate-limited automatic review is a blocker, not a reason to request
+another review manually.
+
 1. Wait for the CodeRabbit review to finish. Inspect its review, comments, and
    status check; `PENDING`, a rate-limit message, or no submitted review is not
    a passing review. Address valid findings and wait for the follow-up review.
