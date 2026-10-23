@@ -75,6 +75,48 @@ future domains without reducing the explanation to a table or a prose-only page.
 - Keep detailed source paths in a compact reference area or accessible text, while
   keeping the diagram readable.
 
+## Database learning artifacts
+
+Apply these rules to database topics such as locking, MVCC, isolation levels,
+indexes, and transactions.
+
+### Separate common concepts from engine implementations
+
+- Classify each claim before drafting: is it a database-wide concept, or the
+  behavior and terminology of a particular engine? Do not mix both categories
+  in one unlabeled explanation.
+- Explain shared principles in an engine-neutral section. If an engine has an
+  important exception or implements the principle differently, label that
+  difference next to the common concept and expand it in the engine section.
+- Never generalize an engine-specific lock name, wait representation, index
+  behavior, or isolation rule into a universal database rule. Name the engine,
+  the locked target, and the relevant mode or condition.
+
+### Compare only on shared criteria
+
+- When a PostgreSQL and MySQL InnoDB comparison is useful, use the same axes for
+  both engines: purpose, target, mode or mechanism, conflict or wait condition,
+  release point, and variables such as isolation level, index, and predicate.
+- A common-concept overview followed by engine tabs is appropriate when readers
+  need to compare implementations of the same principle. Do not create tabs or
+  forced comparisons for unrelated topics merely to satisfy a template.
+- Keep the comparison symmetric enough that the same SQL or scenario can be
+  traced in each engine, while preserving differences that resist a one-to-one
+  mapping.
+
+### Teach from purpose to evidence
+
+- Explain in this order: what it is, why it is needed, how it works internally,
+  how engines differ, and a concrete example. Use a compact visual before dense
+  reference material.
+- For terms that beginners commonly confuse, state both the lock or operation's
+  target and its actual role. Similar names do not imply the same target,
+  compatibility, or implementation.
+- Do not simplify away technically meaningful differences. Verify engine claims
+  against the official documentation, state important conditions and limits,
+  and keep the detailed comparison available without overwhelming the primary
+  learning path.
+
 ## Required artifact standard
 
 Apply this standard whenever creating or updating an HTML artifact
