@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from hashlib import sha256
 from html import escape
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -12,6 +13,7 @@ from urllib.parse import urlsplit
 SITE = Path(__file__).resolve().parents[1] / "docs" / "artifact"
 CATALOG = SITE / "catalog.json"
 OUTPUT = SITE / "index.html"
+INDEX_STYLES = SITE / "styles" / "index.css"
 
 
 def load_catalog() -> dict:
@@ -69,6 +71,7 @@ def render(catalog: dict) -> str:
         for subject in subjects
         for topic in subject["topics"]
     )
+    style_version = sha256(INDEX_STYLES.read_bytes()).hexdigest()[:12]
     nav = "".join(
         f'<a href="#collection-{escape(collection["id"])}">{escape(collection["title"])}</a>'
         for collection in collections
@@ -150,7 +153,7 @@ def render(catalog: dict) -> str:
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="TRACEBACK 프로젝트 구현 문서와 독립적인 개념 학습 자료를 구분해 탐색하는 아티팩트 허브">
 <title>TRACEBACK 아티팩트 허브</title>
-<link rel="stylesheet" href="styles/index.css"></head><body><button class="pdf" type="button" onclick="window.print()">PDF로 저장</button><main>
+<link rel="stylesheet" href="styles/index.css?v={style_version}"></head><body><button class="pdf" type="button" onclick="window.print()">PDF로 저장</button><main>
 <nav class="top" aria-label="페이지 바로가기"><a class="brand" href="#top">TRACEBACK · ARTIFACTS</a><div>{nav}</div></nav>
 <header class="hero" id="top"><div><p class="eyebrow">KNOWLEDGE HUB</p><h1>프로젝트와 공부를<br>한눈에, 따로 읽기</h1><p>실제 TRACEBACK 구현 기록과 독립적인 개념 학습 자료를 분리했습니다. 목적에 맞는 입구를 고른 뒤, 분야별 읽기 순서를 따라가세요.</p></div><div class="hero-stats" aria-label="문서 현황"><span><strong>{len(subjects)}</strong>주제</span><span><strong>{total_topics}</strong>분야</span><span><strong>{total_artifacts}</strong>문서</span></div></header>
 <section class="routes" aria-labelledby="routes-heading"><div class="routes-head"><p class="eyebrow">CHOOSE A PATH</p><h2 id="routes-heading">무엇을 찾고 있나요?</h2><p>프로젝트의 현재 상태를 확인하는 문서와, 원리를 공부하는 문서를 섞지 않았습니다.</p></div><div class="route-grid">{"".join(routes)}</div></section>
