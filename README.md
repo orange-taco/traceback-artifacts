@@ -16,9 +16,10 @@ TRACEBACK의 학습용 시각 문서를 백엔드 코드와 독립적으로 관�
 소스 링크에 확인한 Git revision을 남깁니다. 이 저장소는 앱 코드를 복사해서
 보관하지 않습니다.
 
-목차는 `docs/artifact/catalog.json`에서 주제와 분야를 관리하고
+목차는 `docs/artifact/catalog.json`에서 컬렉션·주제·분야를 관리하고
 `python3 scripts/build_index.py`로 단일 진입점 `index.html`을 만듭니다.
-새 강의·프로젝트 자료도 catalog에 subject/topic을 추가할 수 있습니다.
+상위 컬렉션에서 **프로젝트 / 개념 학습**을 분리하므로,
+새 자료는 성격에 맞는 collection 아래 subject/topic으로 추가합니다.
 새 파일의 경로 규칙은 [`topics/README.md`](docs/artifact/topics/README.md)에
 있습니다. 새 아티팩트는 `topics/<주제>/<분야>/<문서>/index.html`에 두고,
 기존 공개 HTML·이미지는 URL을 유지합니다. DBMS 저장 구조는 먼저

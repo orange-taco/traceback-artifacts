@@ -14,15 +14,27 @@ CATALOG = SITE / "catalog.json"
 OUTPUT = SITE / "index.html"
 
 
-def load_catalog() -> list[dict]:
-    subjects = json.loads(CATALOG.read_text(encoding="utf-8"))["subjects"]
+def load_catalog() -> dict:
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    collections = catalog["collections"]
+    subjects = catalog["subjects"]
     seen_ids: set[str] = set()
     seen_paths: set[str] = set()
+    collection_ids: set[str] = set()
+    for collection in collections:
+        collection_id = collection["id"]
+        if collection_id in collection_ids:
+            raise ValueError(f"duplicate collection id: {collection_id}")
+        collection_ids.add(collection_id)
     for subject in subjects:
         subject_id = subject["id"]
         if subject_id in seen_ids:
             raise ValueError(f"duplicate subject id: {subject_id}")
         seen_ids.add(subject_id)
+        if subject["collection"] not in collection_ids:
+            raise ValueError(
+                f"unknown collection for subject {subject_id}: {subject['collection']}"
+            )
         for topic in subject["topics"]:
             topic_id = f"{subject_id}-{topic['id']}"
             if topic_id in seen_ids:
@@ -39,51 +51,116 @@ def load_catalog() -> list[dict]:
                 if href in seen_paths:
                     raise ValueError(f"duplicate catalog artifact: {href}")
                 seen_paths.add(href)
-    return subjects
+    return catalog
 
 
-def render(subjects: list[dict]) -> str:
-    nav = "".join(
-        f'<a href="#{escape(subject["id"])}">{escape(subject["title"])}</a>'
+def render(catalog: dict) -> str:
+    collections = catalog["collections"]
+    subjects = catalog["subjects"]
+    collection_subjects = {
+        collection["id"]: [
+            subject for subject in subjects if subject["collection"] == collection["id"]
+        ]
+        for collection in collections
+    }
+    total_topics = sum(len(subject["topics"]) for subject in subjects)
+    total_artifacts = sum(
+        len(topic["artifacts"])
         for subject in subjects
+        for topic in subject["topics"]
     )
+    nav = "".join(
+        f'<a href="#collection-{escape(collection["id"])}">{escape(collection["title"])}</a>'
+        for collection in collections
+    )
+    routes: list[str] = []
     sections: list[str] = []
-    for subject in subjects:
-        topics: list[str] = []
-        for topic in subject["topics"]:
-            reading_path = topic.get("layout") == "reading-path"
-            cards_class = "cards reading-path" if reading_path else "cards"
-            cards_attrs = ' role="group" aria-label="추천 읽기 순서"' if reading_path else ""
-            cards = "".join(
-                f'<a class="card" href="{escape(item["href"])}" '
-                f'data-search="{escape(" ".join([subject["title"], topic["title"], item["title"], item["description"]]))}">'
-                f'<strong>{escape(item["title"])}</strong><span>{escape(item["description"])}</span></a>'
-                for item in topic["artifacts"]
-            )
-            topics.append(
-                f'<div class="topic" id="{escape(subject["id"])}-{escape(topic["id"])}">'
-                f'<div class="topic-head"><h3>{escape(topic["title"])}</h3><p>{escape(topic["description"])}</p></div>'
-                f'<div class="{cards_class}"{cards_attrs}>'
-                f'{cards}</div></div>'
+    filters = ['<button type="button" data-collection-filter="all" aria-pressed="true">전체</button>']
+    for collection in collections:
+        grouped_subjects = collection_subjects[collection["id"]]
+        subject_count = len(grouped_subjects)
+        artifact_count = sum(
+            len(topic["artifacts"])
+            for subject in grouped_subjects
+            for topic in subject["topics"]
+        )
+        routes.append(
+            f'<a class="route-card route-{escape(collection["id"])}" '
+            f'href="#collection-{escape(collection["id"])}">'
+            f'<span class="route-label">{escape(collection["label"])}</span>'
+            f'<strong>{escape(collection["title"])}</strong>'
+            f'<p>{escape(collection["description"])}</p>'
+            f'<small>{subject_count}개 주제 · {artifact_count}개 문서</small></a>'
+        )
+        filters.append(
+            f'<button type="button" data-collection-filter="{escape(collection["id"])}" '
+            f'aria-pressed="false">{escape(collection["title"])}</button>'
+        )
+        rendered_subjects: list[str] = []
+        for subject in grouped_subjects:
+            topics: list[str] = []
+            subject_artifacts = sum(len(topic["artifacts"]) for topic in subject["topics"])
+            for topic in subject["topics"]:
+                reading_path = topic.get("layout") == "reading-path"
+                cards_class = "cards reading-path" if reading_path else "cards"
+                cards_attrs = ' role="group" aria-label="추천 읽기 순서"' if reading_path else ""
+                cards: list[str] = []
+                for index, item in enumerate(topic["artifacts"], start=1):
+                    card_label = f"STEP {index:02d}" if reading_path else "GUIDE"
+                    search_text = " ".join(
+                        [
+                            collection["title"],
+                            subject["title"],
+                            topic["title"],
+                            item["title"],
+                            item["description"],
+                        ]
+                    )
+                    cards.append(
+                        f'<a class="card" href="{escape(item["href"])}" '
+                        f'data-search="{escape(search_text)}">'
+                        f'<span class="card-label">{card_label}</span>'
+                        f'<strong>{escape(item["title"])}</strong>'
+                        f'<span class="card-description">{escape(item["description"])}</span>'
+                        f'<span class="card-open">열기 <b aria-hidden="true">→</b></span></a>'
+                    )
+                topics.append(
+                    f'<section class="topic" id="{escape(subject["id"])}-{escape(topic["id"])}">'
+                    f'<div class="topic-head"><div><span>TOPIC</span><h4>{escape(topic["title"])}</h4></div>'
+                    f'<p>{escape(topic["description"])}</p></div>'
+                    f'<div class="{cards_class}"{cards_attrs}>{"".join(cards)}</div></section>'
+                )
+            rendered_subjects.append(
+                f'<details class="subject" id="{escape(subject["id"])}" open>'
+                f'<summary><span><small>SUBJECT</small><strong>{escape(subject["title"])}</strong>'
+                f'<em>{escape(subject["description"])}</em></span>'
+                f'<b>{len(subject["topics"])}개 분야 · {subject_artifacts}개 문서</b></summary>'
+                f'<div class="subject-body">{"".join(topics)}</div></details>'
             )
         sections.append(
-            f'<section class="subject" id="{escape(subject["id"])}">'
-            f'<div class="subject-head"><p class="eyebrow">SUBJECT · {escape(subject["id"])}</p>'
-            f'<h2>{escape(subject["title"])}</h2><p>{escape(subject["description"])}</p></div>'
-            f'{"".join(topics)}</section>'
+            f'<section class="collection collection-{escape(collection["id"])}" '
+            f'id="collection-{escape(collection["id"])}" data-collection="{escape(collection["id"])}">'
+            f'<header class="collection-head"><div><p class="eyebrow">{escape(collection["label"])}</p>'
+            f'<h2>{escape(collection["title"])}</h2></div>'
+            f'<p>{escape(collection["description"])}</p>'
+            f'<span>{subject_count}개 주제 · {artifact_count}개 문서</span></header>'
+            f'{"".join(rendered_subjects)}</section>'
         )
     return f'''<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="TRACEBACK 인프라·계정과 데이터베이스 시스템의 저장·동시성, 아티팩트 운영을 학습하는 문서 목차">
-<title>학습 아티팩트 · TRACEBACK</title>
+<meta name="description" content="TRACEBACK 프로젝트 구현 문서와 독립적인 개념 학습 자료를 구분해 탐색하는 아티팩트 허브">
+<title>TRACEBACK 아티팩트 허브</title>
 <link rel="stylesheet" href="styles/index.css"></head><body><button class="pdf" type="button" onclick="window.print()">PDF로 저장</button><main>
-<header class="hero"><p class="eyebrow">LEARNING ARTIFACTS</p><h1>실제 구성을 따라 읽는 아티팩트</h1><p>TRACEBACK의 인프라와 계정 흐름, 데이터베이스의 저장 구조와 동시성, 이 문서 사이트의 운영 과정을 시각 자료로 살펴봅니다.</p></header>
-<nav class="jump" aria-label="주제 바로가기">{nav}</nav><label for="artifact-search">문서 찾기</label><input class="search" id="artifact-search" type="search" placeholder="주제, 설정, 용어 검색" autocomplete="off">
-<div id="catalog">{"".join(sections)}</div><p id="search-empty" hidden>일치하는 문서가 없습니다.</p>
+<nav class="top" aria-label="페이지 바로가기"><a class="brand" href="#top">TRACEBACK · ARTIFACTS</a><div>{nav}</div></nav>
+<header class="hero" id="top"><div><p class="eyebrow">KNOWLEDGE HUB</p><h1>프로젝트와 공부를<br>한눈에, 따로 읽기</h1><p>실제 TRACEBACK 구현 기록과 독립적인 개념 학습 자료를 분리했습니다. 목적에 맞는 입구를 고른 뒤, 분야별 읽기 순서를 따라가세요.</p></div><div class="hero-stats" aria-label="문서 현황"><span><strong>{len(subjects)}</strong>주제</span><span><strong>{total_topics}</strong>분야</span><span><strong>{total_artifacts}</strong>문서</span></div></header>
+<section class="routes" aria-labelledby="routes-heading"><div class="routes-head"><p class="eyebrow">CHOOSE A PATH</p><h2 id="routes-heading">무엇을 찾고 있나요?</h2><p>프로젝트의 현재 상태를 확인하는 문서와, 원리를 공부하는 문서를 섞지 않았습니다.</p></div><div class="route-grid">{"".join(routes)}</div></section>
+<section class="catalog-tools" aria-label="문서 필터와 검색"><div class="filters" role="group" aria-label="문서 유형 필터">{"".join(filters)}</div><div class="search-wrap"><label for="artifact-search">문서 찾기</label><input class="search" id="artifact-search" type="search" placeholder="예: 배포, 로그인, MVCC, 잠금" autocomplete="off"></div><p id="result-count" role="status" aria-live="polite">전체 {total_artifacts}개 문서</p></section>
+<div id="catalog">{"".join(sections)}</div><p id="search-empty" hidden>조건에 맞는 문서가 없습니다. 검색어 또는 분류 필터를 바꿔 보세요.</p>
 <footer class="foot">GitHub Pages의 공개 문서입니다. AWS·Vercel 상태는 각 문서의 확인 날짜를 기준으로 읽으세요.</footer>
 </main><script src="feedback.js" defer></script><script>
-const search=document.getElementById('artifact-search');const cards=[...document.querySelectorAll('.card')];
-search.addEventListener('input',()=>{{const q=search.value.trim().toLocaleLowerCase();document.body.classList.toggle('is-searching',!!q);for(const card of cards){{card.hidden=!!q&&!card.dataset.search.toLocaleLowerCase().includes(q)}}for(const topic of document.querySelectorAll('.topic')){{topic.hidden=![...topic.querySelectorAll('.card')].some(card=>!card.hidden)}}for(const subject of document.querySelectorAll('.subject')){{subject.hidden=![...subject.querySelectorAll('.topic')].some(topic=>!topic.hidden)}}document.getElementById('search-empty').hidden=cards.some(card=>!card.hidden)}});
+const search=document.getElementById('artifact-search');const cards=[...document.querySelectorAll('.card')];const filterButtons=[...document.querySelectorAll('[data-collection-filter]')];let activeCollection='all';
+function applyFilters(){{const q=search.value.trim().toLocaleLowerCase();let visibleCount=0;document.body.classList.toggle('is-searching',!!q);for(const collection of document.querySelectorAll('.collection')){{const collectionAllowed=activeCollection==='all'||collection.dataset.collection===activeCollection;for(const card of collection.querySelectorAll('.card')){{const matches=collectionAllowed&&(!q||card.dataset.search.toLocaleLowerCase().includes(q));card.hidden=!matches;if(matches)visibleCount++}}for(const topic of collection.querySelectorAll('.topic')){{topic.hidden=![...topic.querySelectorAll('.card')].some(card=>!card.hidden)}}for(const subject of collection.querySelectorAll('.subject')){{subject.hidden=![...subject.querySelectorAll('.topic')].some(topic=>!topic.hidden);if(q&&!subject.hidden)subject.open=true}}collection.hidden=!collectionAllowed||![...collection.querySelectorAll('.subject')].some(subject=>!subject.hidden)}}document.getElementById('search-empty').hidden=visibleCount>0;document.getElementById('result-count').textContent=`${{activeCollection==='all'?'전체':filterButtons.find(button=>button.dataset.collectionFilter===activeCollection).textContent}} · ${{visibleCount}}개 문서`}}
+search.addEventListener('input',applyFilters);for(const button of filterButtons){{button.addEventListener('click',()=>{{activeCollection=button.dataset.collectionFilter;for(const candidate of filterButtons)candidate.setAttribute('aria-pressed',String(candidate===button));applyFilters()}})}}
 </script></body></html>
 '''
 

@@ -1,7 +1,22 @@
 {
+  "collections": [
+    {
+      "id": "project",
+      "label": "PROJECT",
+      "title": "프로젝트",
+      "description": "TRACEBACK의 실제 코드·설정·배포 흐름과 이 학습 사이트의 운영 기록을 확인합니다."
+    },
+    {
+      "id": "study",
+      "label": "STUDY",
+      "title": "개념 학습",
+      "description": "특정 프로젝트와 분리해 컴퓨터 과학과 DBMS 원리를 공식 문서 기준으로 공부합니다."
+    }
+  ],
   "subjects": [
     {
       "id": "traceback",
+      "collection": "project",
       "title": "TRACEBACK",
       "description": "온라인 스토어의 화면·API·데이터와 그 인프라를 실제 설정 순서대로 읽습니다. 상품·주문 기능은 현재 개발 브랜치에서 와이어프레임과 인증 중심입니다.",
       "topics": [
@@ -30,6 +45,7 @@
     },
     {
       "id": "database-systems",
+      "collection": "study",
       "title": "데이터베이스 시스템",
       "description": "특정 프로젝트 설정과 분리해 DBMS의 저장 구조와 동시성·잠금 동작을 공식 문서 기준으로 탐색합니다.",
       "topics": [
@@ -56,7 +72,24 @@
       ]
     },
     {
+      "id": "algorithm-problem-solving",
+      "collection": "study",
+      "title": "알고리즘 문제 해결",
+      "description": "정답 코드를 외우기보다 작은 예시에서 출발해 관점을 전환하고, 규칙과 복잡도를 검증한 뒤 구현합니다.",
+      "topics": [
+        {
+          "id": "reasoning",
+          "title": "사고 과정",
+          "description": "막힌 풀이를 버리는 순간부터 수학적 규칙을 발견하고 코드로 옮기기까지의 생각을 단계별로 따라갑니다.",
+          "artifacts": [
+            {"title": "숫자 블록 · 덮어쓰기에서 약수로", "description": "정방향 시뮬레이션을 자리별 약수 탐색으로 바꾸는 8단계", "href": "topics/algorithm-problem-solving/reasoning/number-block/index.html"}
+          ]
+        }
+      ]
+    },
+    {
       "id": "artifact-operations",
+      "collection": "project",
       "title": "아티팩트 프로젝트 운영",
       "description": "이 공개 학습 사이트와 의견 저장, Codex Cloud 작업 연결의 설정 기록입니다.",
       "topics": [
