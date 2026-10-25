@@ -4,5 +4,25 @@ tone_instructions: >-
   코드 식별자와 공식 기술 용어는 원문을 유지하되 설명은 자연스러운 한국어로 쓴다.
 
 reviews:
+  path_filters:
+    - "docs/artifact/**/*.html"
+    - "README.md"
+    - ".codex/skills/**/*.md"
+  path_instructions:
+    - path: "docs/artifact/**/*.html"
+      instructions: |
+        보이는 학습 콘텐츠만 검토한다. 제목, 본문, 표·도식의 라벨, 코드 예제의 설명이
+        기술적으로 정확하고 서로 일관적인지 한국어로 확인한다.
+        HTML 구조, CSS, JavaScript 구현, 스타일, 성능, 리팩터링에는 리뷰 의견을 남기지 않는다.
+        단, 구현 때문에 학습 문구가 누락되거나 서로 모순되는 경우에만 콘텐츠 문제로 지적한다.
+    - path: "README.md"
+      instructions: |
+        문서 운영 절차와 링크의 정확성만 한국어로 검토한다.
+    - path: ".codex/skills/**/*.md"
+      instructions: |
+        학습 자료 작성 규칙의 정확성, 모순, 중복만 한국어로 검토한다.
+  tools:
+    htmlhint:
+      enabled: false
   auto_review:
     enabled: true
