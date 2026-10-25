@@ -82,7 +82,7 @@
           "title": "학습 커리큘럼",
           "description": "자료구조·알고리즘·공통 기초를 한 목록에서 구분하고, 상태와 완료 기준 및 연결 문제를 관리합니다.",
           "artifacts": [
-            {"title": "알고리즘 진도판", "description": "53개 주제의 학습 상태·완료 기준·문제 풀이 연결", "href": "topics/algorithm-problem-solving/curriculum/tracker/index.html"}
+            {"title": "알고리즘 진도판", "description": "56개 주제의 학습 상태·완료 기준·문제 풀이 연결", "href": "topics/algorithm-problem-solving/curriculum/tracker/index.html"}
           ]
         },
         {
