@@ -79,12 +79,10 @@
       "topics": [
         {
           "id": "learning",
-          "title": "학습과 문제 풀이",
-          "description": "자료구조·알고리즘 학습 진도와 코딩 테스트 문제의 사고 과정·풀이 기록을 한 흐름에서 관리합니다.",
-          "layout": "reading-path",
+          "title": "자료구조·알고리즘 정리판",
+          "description": "자료구조와 알고리즘을 공부하고, 각 개념에 해당하는 코딩 테스트 문제와 풀이 기록을 같은 항목에서 관리합니다.",
           "artifacts": [
-            {"title": "알고리즘 진도판", "description": "자료구조·알고리즘·공통 기초의 진도와 연결 문제 관리", "href": "topics/algorithm-problem-solving/curriculum/tracker/index.html"},
-            {"title": "숫자 블록 · 덮어쓰기에서 약수로", "description": "정방향 시뮬레이션을 자리별 약수 탐색으로 바꾸는 8단계", "href": "topics/algorithm-problem-solving/reasoning/number-block/index.html"}
+            {"title": "자료구조·알고리즘 정리판", "description": "56개 학습 항목과 항목별 이론·문제·풀이 기록", "href": "topics/algorithm-problem-solving/curriculum/tracker/index.html"}
           ]
         }
       ]
