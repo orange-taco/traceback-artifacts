@@ -60,59 +60,64 @@
           <div class="layer-stack">
             <div class="layer-map-title"><strong>개념적 위치 지도</strong><span>요청을 받는 계층과 실제 저장 자원을 한 장에 표시</span></div>
             <p class="map-scope-note"><b>MySQL·PostgreSQL 같은 디스크 기반 서버형 관계형 DBMS를 단순화한 그림입니다.</b> SQLite와 RocksDB를 이 시스템 안에 함께 넣은 구조가 아닙니다. SQLite는 애플리케이션에 내장된 전체 SQL DBMS이고, RocksDB는 SQL 처리 계층이 없는 Key–Value 라이브러리이므로 첫 번째 단계와 호출 주체가 다릅니다.</p>
-            <svg class="engine-stack-svg" viewBox="0 0 760 760" role="img" aria-labelledby="engine-map-title engine-map-desc">
+            <svg class="engine-stack-svg" viewBox="0 0 760 800" role="img" aria-labelledby="engine-map-title engine-map-desc">
               <title id="engine-map-title">애플리케이션 요청이 DBMS의 SQL 처리 계층, 저장 접근 인터페이스, 저장 계층을 거쳐 디스크에 접근하는 구조</title>
               <desc id="engine-map-desc">App Client의 SQL 요청이 서버형 관계형 Database System 내부의 SQL 처리 계층, 저장 접근 인터페이스, 저장 계층 순서로 전달됩니다. Buffer, WAL 또는 Redo, MVCC, Lock, Transaction은 이 계층들과 협력하는 DBMS 내부 기능이며, 일반적인 파일 입출력은 운영체제와 파일시스템을 거쳐 디스크로 전달됩니다.</desc>
               <defs>
-                <linearGradient id="dbmsBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12343f"/><stop offset="1" stop-color="#0a202a"/></linearGradient>
+                <linearGradient id="dbmsBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12343f"/><stop offset=".72" stop-color="#0b252f"/><stop offset="1" stop-color="#091c25"/></linearGradient>
                 <linearGradient id="engineBand" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#5f3d25"/><stop offset="1" stop-color="#3c2d22"/></linearGradient>
                 <linearGradient id="diskFill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c6a4eb"/><stop offset="1" stop-color="#58416f"/></linearGradient>
                 <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#000" flood-opacity=".35"/></filter>
                 <marker id="arrowEngine" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#8fc6ff"/></marker>
               </defs>
-              <text x="28" y="32" class="svg-kicker">SERVER RDBMS · CONCEPTUAL LAYERS</text>
+              <text x="380" y="32" text-anchor="middle" class="svg-kicker">SERVER RDBMS · CONCEPTUAL LAYERS</text>
               <g transform="translate(274 50)" filter="url(#softShadow)"><rect width="212" height="72" rx="14" fill="#15252c" stroke="#8c8350"/><rect x="22" y="18" width="42" height="28" rx="4" fill="#e8f0f1" stroke="#8c9aa0"/><path d="M16 54h54" stroke="#a9bdc6" stroke-width="3"/><text x="84" y="31" class="svg-label">App / SQL Client</text><text x="84" y="49" class="svg-small">SQL request</text></g>
-              <path d="M380 126V158" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)" class="flow-stroke"/><text x="395" y="147" class="svg-small">요청</text>
+              <path d="M380 126V153" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)" class="flow-stroke"/><text x="395" y="146" class="svg-small">요청</text>
+
               <g filter="url(#softShadow)">
-                <rect x="105" y="170" width="550" height="440" rx="24" fill="url(#dbmsBody)" stroke="#5fa99e" stroke-width="2"/>
-                <rect x="105" y="170" width="550" height="58" rx="24" fill="#174954"/>
-                <path d="M105 207h550" stroke="#5fa99e"/>
-                <text x="135" y="194" class="svg-kicker">DATABASE SYSTEM · PRODUCT BOUNDARY</text>
-                <text x="135" y="216" class="svg-small">제품별로 내부 책임의 위치와 범위는 달라질 수 있음</text>
+                <rect x="105" y="180" width="550" height="414" fill="url(#dbmsBody)"/>
+                <ellipse cx="380" cy="180" rx="275" ry="28" fill="#174954" stroke="#64b1a6" stroke-width="2"/>
+                <path d="M105 180v414M655 180v414" stroke="#64b1a6" stroke-width="2"/>
+                <ellipse cx="380" cy="594" rx="275" ry="28" fill="#091c25" stroke="#64b1a6" stroke-width="2"/>
+                <text x="380" y="177" text-anchor="middle" class="svg-kicker">DATABASE SYSTEM · PRODUCT BOUNDARY</text>
+                <text x="380" y="197" text-anchor="middle" class="svg-small">제품별로 내부 책임의 위치와 범위는 달라질 수 있음</text>
 
-                <rect x="145" y="250" width="470" height="76" rx="13" fill="#123944" stroke="#4c9e95"/>
-                <rect x="145" y="250" width="8" height="76" rx="4" fill="#79d8cb"/>
-                <text x="177" y="275" class="svg-kicker">01 · SQL PROCESSING LAYER</text>
-                <text x="177" y="299" class="svg-label">SQL 처리 계층</text>
-                <text x="354" y="299" class="svg-small">Parser · Optimizer · Executor가 해석·계획·지휘</text>
+                <rect x="145" y="224" width="470" height="72" rx="10" fill="#123944"/>
+                <rect x="145" y="224" width="7" height="72" rx="3.5" fill="#79d8cb"/>
+                <text x="176" y="249" class="svg-kicker">01 · SQL PROCESSING LAYER</text>
+                <text x="176" y="274" class="svg-label">SQL 처리 계층</text>
+                <text x="352" y="274" class="svg-small">Parser · Optimizer · Executor가 해석·계획·지휘</text>
 
-                <path d="M380 328v22" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)"/><text x="395" y="344" class="svg-small">저장 요청</text>
-                <rect x="175" y="354" width="410" height="62" rx="13" fill="#17324a" stroke="#8fc6ff"/>
-                <rect x="175" y="354" width="8" height="62" rx="4" fill="#8fc6ff"/>
-                <text x="207" y="379" class="svg-kicker">02 · STORAGE ACCESS INTERFACE</text>
-                <text x="207" y="401" class="svg-small">실행 계획의 읽기·쓰기 요청을 제품의 저장 API 호출로 연결</text>
+                <path d="M380 298v24" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)"/><text x="395" y="315" class="svg-small">저장 요청</text>
+                <rect x="175" y="326" width="410" height="58" rx="10" fill="#17324a"/>
+                <rect x="175" y="326" width="7" height="58" rx="3.5" fill="#8fc6ff"/>
+                <text x="206" y="350" class="svg-kicker">02 · STORAGE ACCESS INTERFACE</text>
+                <text x="206" y="371" class="svg-small">실행 계획의 읽기·쓰기 요청을 제품의 저장 API 호출로 연결</text>
 
-                <path d="M380 418v22" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)"/><text x="395" y="435" class="svg-small">저장 호출</text>
-                <rect x="145" y="444" width="470" height="76" rx="13" fill="url(#engineBand)" stroke="#ffbc72" stroke-width="2"/>
-                <rect x="145" y="444" width="8" height="76" rx="4" fill="#ffbc72"/>
-                <text x="177" y="469" class="svg-kicker">03 · STORAGE LAYER</text>
-                <text x="177" y="493" class="svg-label">저장 계층 (Storage Layer)</text>
-                <text x="177" y="511" class="svg-small">Record · Index · Page · File에서 실제 읽기·변경</text>
+                <path d="M380 386v24" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)"/><text x="395" y="403" class="svg-small">저장 호출</text>
+                <rect x="145" y="414" width="470" height="72" rx="10" fill="url(#engineBand)"/>
+                <rect x="145" y="414" width="7" height="72" rx="3.5" fill="#ffbc72"/>
+                <text x="176" y="439" class="svg-kicker">03 · STORAGE LAYER</text>
+                <text x="176" y="464" class="svg-label">저장 계층 (Storage Layer)</text>
+                <text x="176" y="480" class="svg-small">Record · Index · Page · File에서 실제 읽기·변경</text>
 
-                <path d="M161 542h438" stroke="#668091" stroke-dasharray="5 5"/>
-                <text x="380" y="558" text-anchor="middle" class="svg-kicker">COOPERATING FUNCTIONS · 순차 단계가 아니라 위 계층들과 협력</text>
-                <g transform="translate(145 568)">
-                  <rect width="82" height="34" rx="17" fill="#102632" stroke="#668091"/><text x="41" y="22" text-anchor="middle" class="svg-small">Buffer</text>
-                  <rect x="92" width="82" height="34" rx="17" fill="#102632" stroke="#668091"/><text x="133" y="22" text-anchor="middle" class="svg-small">WAL / Redo</text>
-                  <rect x="184" width="82" height="34" rx="17" fill="#102632" stroke="#668091"/><text x="225" y="22" text-anchor="middle" class="svg-small">MVCC</text>
-                  <rect x="276" width="82" height="34" rx="17" fill="#102632" stroke="#668091"/><text x="317" y="22" text-anchor="middle" class="svg-small">Lock</text>
-                  <rect x="368" width="102" height="34" rx="17" fill="#102632" stroke="#668091"/><text x="419" y="22" text-anchor="middle" class="svg-small">Transaction</text>
+                <path d="M130 254v284h22M630 254v284h-22" fill="none" stroke="#668091" stroke-width="1.5" stroke-dasharray="5 6"/>
+                <rect x="135" y="510" width="490" height="58" rx="12" fill="#102632"/>
+                <text x="380" y="531" text-anchor="middle" class="svg-kicker">COOPERATING FUNCTIONS · 위 계층들과 함께 동작</text>
+                <g class="svg-small" text-anchor="middle">
+                  <text x="198" y="553">Buffer</text><circle cx="250" cy="549" r="2" fill="#668091"/>
+                  <text x="305" y="553">WAL / Redo</text><circle cx="366" cy="549" r="2" fill="#668091"/>
+                  <text x="409" y="553">MVCC</text><circle cx="454" cy="549" r="2" fill="#668091"/>
+                  <text x="489" y="553">Lock</text><circle cx="526" cy="549" r="2" fill="#668091"/>
+                  <text x="570" y="553">Transaction</text>
                 </g>
+                <text x="380" y="582" text-anchor="middle" class="svg-small">순서대로 통과하는 독립 단계가 아님</text>
               </g>
-              <path class="flow-stroke" d="M380 612v27" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)"/><text x="395" y="630" class="svg-small">File / Block I/O</text>
-              <g transform="translate(235 644)"><rect width="290" height="52" rx="12" fill="#172334" stroke="#9d89b9"/><text x="145" y="22" text-anchor="middle" class="svg-kicker">OS / FILESYSTEM</text><text x="145" y="41" text-anchor="middle" class="svg-small">파일·블록 I/O를 저장 장치에 전달</text></g>
-              <path class="flow-stroke" d="M380 698v20" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)"/>
-              <g transform="translate(300 724)"><path d="M0 8c0-7 36-12 80-12s80 5 80 12v22c0 7-36 12-80 12S0 37 0 30Z" fill="url(#diskFill)" stroke="#c9a9f2"/><ellipse cx="80" cy="8" rx="80" ry="12" fill="#8c6cad" stroke="#e1cdf8"/><text x="80" y="28" text-anchor="middle" class="svg-label">Disk / SSD</text></g>
+
+              <path class="flow-stroke" d="M380 624v25" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)"/><text x="395" y="642" class="svg-small">File / Block I/O</text>
+              <g transform="translate(235 654)"><rect width="290" height="52" rx="12" fill="#172334" stroke="#9d89b9"/><text x="145" y="22" text-anchor="middle" class="svg-kicker">OS / FILESYSTEM</text><text x="145" y="41" text-anchor="middle" class="svg-small">파일·블록 I/O를 저장 장치에 전달</text></g>
+              <path class="flow-stroke" d="M380 708v24" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)"/>
+              <g transform="translate(300 744)"><path d="M0 8c0-7 36-12 80-12s80 5 80 12v22c0 7-36 12-80 12S0 37 0 30Z" fill="url(#diskFill)" stroke="#c9a9f2"/><ellipse cx="80" cy="8" rx="80" ry="12" fill="#8c6cad" stroke="#e1cdf8"/><text x="80" y="28" text-anchor="middle" class="svg-label">Disk / SSD</text></g>
             </svg>
           </div>
           <p class="layer-map-note"><b>중요:</b> 엔진이 물리 장치를 항상 직접 제어한다는 뜻은 아닙니다. 일반적으로 파일·블록 I/O는 운영체제와 파일시스템을 통하며, 지원 저장 매체와 원격 저장 방식은 제품·환경에 따라 달라집니다.</p>
