@@ -13,6 +13,8 @@
   };
   const currentPath = normalizePath(location.href);
   const isIndex = normalizePath(location.href) === normalizePath(new URL("index.html", root));
+  const resumeUrl = new URL("resume/index.html", root);
+  const isResume = currentPath === normalizePath(resumeUrl);
   const storage = {
     get(key) { try { return localStorage.getItem(key); } catch { return null; } },
     set(key, value) { try { localStorage.setItem(key, value); } catch {} },
@@ -54,7 +56,7 @@
 
     const header = document.createElement("header");
     header.className = "tb-global-header";
-    header.innerHTML = `<button class="tb-menu" type="button" aria-label="문서 탐색 열기" aria-expanded="false" aria-controls="tb-sidebar">☰</button><a class="tb-logo" href="${new URL("index.html", root).href}">TRACEBACK DOCS</a><nav class="tb-switch" aria-label="문서 영역 전환"></nav><div class="tb-context"><code>${current?.id || (isIndex ? "DOCS-HOME" : "REFERENCE")}</code><span>${current?.title || document.querySelector("h1")?.textContent?.trim() || document.title}</span></div><div class="tb-search-box"><input class="tb-search" type="search" aria-label="전체 문서 검색" placeholder="전체 문서 검색"><span class="tb-search-icon" aria-hidden="true">⌕</span></div><button class="tb-search-toggle" type="button" aria-label="전체 문서 검색 열기">⌕</button>`;
+    header.innerHTML = `<button class="tb-menu" type="button" aria-label="문서 탐색 열기" aria-expanded="false" aria-controls="tb-sidebar">☰</button><a class="tb-logo" href="${new URL("index.html", root).href}">TRACEBACK DOCS</a><nav class="tb-switch" aria-label="문서 영역 전환"></nav><a class="tb-resume-link" href="${resumeUrl.href}"${isResume ? ' aria-current="page"' : ""}>소개</a><div class="tb-context"><code>${current?.id || (isIndex ? "DOCS-HOME" : isResume ? "PROFILE-01" : "REFERENCE")}</code><span>${current?.title || document.querySelector("h1")?.textContent?.trim() || document.title}</span></div><div class="tb-search-box"><input class="tb-search" type="search" aria-label="전체 문서 검색" placeholder="전체 문서 검색"><span class="tb-search-icon" aria-hidden="true">⌕</span></div><button class="tb-search-toggle" type="button" aria-label="전체 문서 검색 열기">⌕</button>`;
     document.body.prepend(header);
 
     const sidebar = document.createElement("aside");
