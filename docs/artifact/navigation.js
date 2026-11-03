@@ -142,7 +142,6 @@
       menuButton.setAttribute("aria-expanded", String(open));
       menuButton.setAttribute("aria-label", open ? "문서 탐색 닫기" : "문서 탐색 열기");
       backdrop.hidden = !open || matchMedia("(min-width:1180px)").matches;
-      storage.set("traceback-sidebar-open", String(open));
     }
 
     function renderResults(query) {
@@ -155,8 +154,7 @@
 
     renderSwitcher();
     renderTree(false);
-    const saved = storage.get("traceback-sidebar-open");
-    setSidebar(saved === null ? matchMedia("(min-width:1180px)").matches : saved === "true");
+    setSidebar(false);
     void document.body.offsetWidth;
     document.body.classList.add("tb-nav-ready");
     menuButton.addEventListener("click", () => setSidebar(!document.body.classList.contains("tb-sidebar-open")));
