@@ -62,12 +62,12 @@
                 <div class="interface-bridge"><span>Handler API</span></div>
                 <div class="structure-group"><small>STORAGE ENGINE</small><div class="role-block storage-role"><b>InnoDB</b><span>Index · Page · MVCC · Redo</span></div></div>
               </div>
-              <p class="structure-summary"><b>두 구현 경계</b> · Server가 계획하고 InnoDB가 저장합니다.</p>
+              <p class="structure-summary">MySQL Server와 InnoDB는 <b>Handler API</b>를 경계로 역할을 나눕니다.</p>
             </article>
             <article class="form-card">
               <small>하나의 LIBRARY가 전체를 포함</small><strong>SQLite</strong>
               <div class="product-structure" aria-label="하나의 SQLite 라이브러리 경계 안에 SQL 처리와 저장 계층이 함께 있는 구조">
-                <div class="structure-group unified-group"><small>SQLITE LIBRARY · EMBEDDED DBMS</small><div class="role-block sql-role"><b>SQL 처리</b><span>Parser · Code Generator · VDBE</span></div><div class="interface-bridge"><span>내부 호출</span></div><div class="role-block storage-role"><b>저장 기능</b><span>B-tree · Pager · File</span></div></div>
+                <div class="structure-group unified-group"><small>SQLITE LIBRARY · EMBEDDED DBMS</small><div class="role-block sql-role"><b>SQL 처리</b><span>Parser · Code Generator · VDBE</span></div><div class="interface-bridge"><span>내부 실행 경로</span></div><div class="role-block storage-role"><b>저장 기능</b><span>B-tree · Pager · File</span></div></div>
               </div>
               <p class="structure-summary"><b>하나의 구현 경계</b> · 앱에 링크한 Library가 SQL부터 저장까지 맡습니다.</p>
             </article>
