@@ -7,10 +7,15 @@ This repository owns the TRACEBACK learning HTML, images, and the
 
 Before changing a guide:
 
-1. Read `README.md` and `.codex/skills/auth-flow-visualizer/SKILL.md`.
-2. Identify which statements describe general concepts and which describe
+1. Check the current Git branch and create or switch to a task-specific branch
+   before editing. Do not make artifact changes directly on `main` unless the
+   user explicitly requests it.
+2. Read `README.md` and `.codex/skills/auth-flow-visualizer/SKILL.md`. When
+   creating or restructuring a learning path, also read
+   `.codex/skills/question-led-learning/SKILL.md`.
+3. Identify which statements describe general concepts and which describe
    current TRACEBACK code or deployed state.
-3. For current-code claims, inspect `orange-taco/traceback` or
+4. For current-code claims, inspect `orange-taco/traceback` or
    `orange-taco/traceback-client` at an identifiable revision, as appropriate.
    Their default branches are `main`; use `development` or the named PR branch
    when documenting work that has not reached `main`.
@@ -18,10 +23,10 @@ Before changing a guide:
    to the same environment; do not assume the reader's iPad has a local checkout.
    If the relevant source is unavailable, say so and avoid asserting that code
    or infrastructure is current.
-4. Edit only this repository's guides and supporting assets. Link source
+5. Edit only this repository's guides and supporting assets. Link source
    excerpts to the relevant source repository and revision, with line numbers where
    the skill requires them.
-5. Run `python3 scripts/verify_site.py` and inspect the rendered page at a
+6. Run `python3 scripts/verify_site.py` and inspect the rendered page at a
    narrow and a desktop viewport when the visual layout changes.
 
 The index at `docs/artifact/index.html` is the single entry point. Keep the

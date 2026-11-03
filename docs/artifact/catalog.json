@@ -25,11 +25,11 @@
           "title": "인프라 구성",
           "description": "Client → Vercel과 Server → AWS. 접속, 배포, 주소, DNS의 실제 값과 확인 상태를 단계별로 봅니다.",
           "artifacts": [
-            {"title": "01 · 서비스 전체 구성", "description": "고객 요청과 두 배포 경로의 연결", "href": "flow-1-system.html"},
-            {"title": "02 · 개발 EC2 접속", "description": "접속 경로 선택·설정과 실제 SSM 접속", "href": "flow-2-access.html"},
-            {"title": "03 · Client와 Server 배포", "description": "Vercel·AWS CI/CD, 환경변수, dev/prod", "href": "flow-3-deploy.html"},
-            {"title": "04 · 개발 API 주소", "description": "Route 53 A 레코드·EIP·Vercel origin", "href": "flow-4-address.html"},
-            {"title": "05 · DNS 뒤의 HTTPS", "description": "주소 조회부터 EC2·Django·RDS까지", "href": "flow-5-dns.html"}
+            {"id": "TB-INFRA-01", "title": "서비스 전체 구성", "description": "고객 요청과 두 배포 경로의 연결", "href": "flow-1-system.html"},
+            {"id": "TB-INFRA-02", "title": "개발 EC2 접속", "description": "접속 경로 선택·설정과 실제 SSM 접속", "href": "flow-2-access.html"},
+            {"id": "TB-INFRA-03", "title": "Client와 Server 배포", "description": "Vercel·AWS CI/CD, 환경변수, dev/prod", "href": "flow-3-deploy.html"},
+            {"id": "TB-INFRA-04", "title": "개발 API 주소", "description": "Route 53 A 레코드·EIP·Vercel origin", "href": "flow-4-address.html"},
+            {"id": "TB-INFRA-05", "title": "DNS 뒤의 HTTPS", "description": "주소 조회부터 EC2·Django·RDS까지", "href": "flow-5-dns.html"}
           ]
         },
         {
@@ -37,8 +37,8 @@
           "title": "로그인·계정",
           "description": "인프라를 이해한 뒤 인증 흐름 자체를 공부할 때 엽니다.",
           "artifacts": [
-            {"title": "세션·allauth·계정 생명주기", "description": "로그인·가입·소셜 계정·탈퇴", "href": "auth-session-allauth-guide.html"},
-            {"title": "이메일 확인과 SES SMTP", "description": "확인 메일의 생성·전송·수신", "href": "email-smtp-ses-guide.html"}
+            {"id": "TB-AUTH-01", "title": "세션·allauth·계정 생명주기", "description": "로그인·가입·소셜 계정·탈퇴", "href": "auth-session-allauth-guide.html"},
+            {"id": "TB-AUTH-02", "title": "이메일 확인과 SES SMTP", "description": "확인 메일의 생성·전송·수신", "href": "email-smtp-ses-guide.html"}
           ]
         }
       ]
@@ -47,7 +47,7 @@
       "id": "database-systems",
       "collection": "study",
       "title": "데이터베이스 시스템",
-      "description": "특정 프로젝트 설정과 분리해 DBMS의 저장 구조와 동시성·잠금 동작을 공식 문서 기준으로 탐색합니다.",
+      "description": "특정 프로젝트 설정과 분리해 DBMS의 처리 계층, 저장 구조와 동시성·잠금 동작을 공식 문서 기준으로 탐색합니다.",
       "topics": [
         {
           "id": "storage",
@@ -55,8 +55,18 @@
           "description": "세 층의 정의를 먼저 익힌 뒤, PostgreSQL과 InnoDB에서 실제 Row까지 따라갑니다.",
           "layout": "reading-path",
           "artifacts": [
-            {"title": "00 · 저장 구조를 읽는 세 층", "description": "논리 객체·OS 파일·Page/자료구조의 정의와 연결", "href": "topics/database-systems/storage/foundations/index.html"},
-            {"title": "PostgreSQL · InnoDB 저장 구조", "description": "PGDATA·Relation·Page·Tuple과 .ibd·Clustered Index 비교", "href": "topics/database-systems/storage/postgresql-innodb/index.html"}
+            {"id": "DB-STORAGE-01", "title": "저장 구조를 읽는 세 층", "description": "논리 객체·OS 파일·Page/자료구조의 정의와 연결", "href": "topics/database-systems/storage/foundations/index.html"},
+            {"id": "DB-STORAGE-02", "title": "PostgreSQL · InnoDB 저장 구조", "description": "PGDATA·Relation·Page·Tuple과 .ibd·Clustered Index 비교", "href": "topics/database-systems/storage/postgresql-innodb/index.html"}
+          ]
+        },
+        {
+          "id": "storage-engine",
+          "title": "스토리지 엔진",
+          "description": "Database Engine의 뜻과 실제 결합 형태를 구분한 뒤, SQL 처리 계층과 저장 구현의 역할 및 대표 내부 구조를 학습합니다.",
+          "layout": "reading-path",
+          "artifacts": [
+            {"id": "DB-ENGINE-01", "title": "Database Engine과 SQL 처리", "description": "엔진의 뜻과 형태, 서버형 RDBMS의 SQL → 저장 접근 과정", "href": "topics/database-systems/storage-engine/overview/index.html"},
+            {"id": "DB-ENGINE-02", "title": "스토리지 엔진 종류와 내부 구조", "description": "8개 저장 기술의 분류와 InnoDB·SQLite·RocksDB 데이터 경로", "href": "topics/database-systems/storage-engine/types-and-internals/index.html"}
           ]
         },
         {
@@ -65,8 +75,8 @@
           "description": "좌석 예약으로 대기·데드락·중복 예약을 구분한 뒤, PostgreSQL의 INSERT 교착 상태를 더 자세히 따라갑니다.",
           "layout": "reading-path",
           "artifacts": [
-            {"title": "00 · 좌석 예약으로 읽는 동시성", "description": "예약 충돌별 처리 방법과 인덱스·파티셔닝·샤딩의 영향", "href": "topics/database-systems/concurrency/foundations/index.html"},
-            {"title": "PostgreSQL · INSERT 교착 상태", "description": "Transaction ID의 ShareLock/ExclusiveLock과 순환 대기", "href": "topics/database-systems/concurrency/postgresql-insert-deadlock/index.html"}
+            {"id": "DB-CONCURRENCY-01", "title": "좌석 예약으로 읽는 동시성", "description": "예약 충돌별 처리 방법과 인덱스·파티셔닝·샤딩의 영향", "href": "topics/database-systems/concurrency/foundations/index.html"},
+            {"id": "DB-CONCURRENCY-02", "title": "PostgreSQL · INSERT 교착 상태", "description": "Transaction ID의 ShareLock/ExclusiveLock과 순환 대기", "href": "topics/database-systems/concurrency/postgresql-insert-deadlock/index.html"}
           ]
         }
       ]
@@ -82,7 +92,7 @@
           "title": "자료구조·알고리즘 정리판",
           "description": "자료구조와 알고리즘을 공부하고, 각 개념에 해당하는 코딩 테스트 문제와 풀이 기록을 같은 항목에서 관리합니다.",
           "artifacts": [
-            {"title": "자료구조·알고리즘 정리판", "description": "56개 학습 항목과 항목별 이론·문제·풀이 기록", "href": "topics/algorithm-problem-solving/curriculum/tracker/index.html"}
+            {"id": "ALG-CURRICULUM-01", "title": "자료구조·알고리즘 정리판", "description": "56개 학습 항목과 항목별 이론·문제·풀이 기록", "href": "topics/algorithm-problem-solving/curriculum/tracker/index.html"}
           ]
         }
       ]
@@ -98,7 +108,7 @@
           "title": "게시·의견",
           "description": "GitHub Pages 공개 주소와 본인만 의견을 저장하는 경로를 설정한 순서입니다.",
           "artifacts": [
-            {"title": "Pages·의견·Codex Cloud 운영", "description": "설정 과정과 iPad 화면, 역할 분리", "href": "artifact-feedback-operations.html"}
+            {"id": "ART-OPS-01", "title": "Pages·의견·Codex Cloud 운영", "description": "설정 과정과 iPad 화면, 역할 분리", "href": "artifact-feedback-operations.html"}
           ]
         }
       ]

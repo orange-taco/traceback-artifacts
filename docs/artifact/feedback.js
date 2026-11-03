@@ -3,6 +3,11 @@
   const script = document.currentScript;
   if (!script) return;
 
+  const navigation = document.createElement("script");
+  navigation.src = new URL("navigation.js", script.src).href;
+  navigation.defer = true;
+  document.head.append(navigation);
+
   fetch(new URL("site-config.json", script.src), { cache: "no-store" })
     .then((response) => {
       if (!response.ok) throw new Error("Feedback is not configured");
