@@ -48,7 +48,7 @@
     <article class="scene" data-index="0" aria-labelledby="scene-0-title">
       <div class="scene-shell"><header class="scene-head"><div><small>Overview · definition &amp; architecture</small><h3 id="scene-0-title">Database Engine의 뜻부터 실제 형태까지</h3></div><span class="scope-badge common">개념 지도</span></header>
         <section class="engine-primer" aria-label="Database Engine의 정의와 세 가지 실제 형태">
-          <div class="engine-definition"><span>정의</span><p><b>Database Engine</b>은 지속 저장소에서 데이터를 만들고·읽고·바꾸고·지우는(CRUD) 소프트웨어 구성요소를 넓게 가리키는 말입니다. 단순 Key–Value 저장부터 트랜잭션과 ACID를 지원하는 복잡한 구현까지 범위가 넓고, 제품 문서마다 이 용어의 경계도 다릅니다.</p></div>
+          <div class="engine-definition"><span>정의</span><p><b>Database Engine</b>은 데이터 연산을 수행하는 핵심 소프트웨어를 넓게 부르는 말로, 업계 전체에서 경계가 하나로 고정된 정식 계층 이름은 아닙니다. 이 페이지에서는 그중 <b>데이터를 배치하고 찾고 변경하며 필요하면 영속화하는 책임</b>을 정확히 가리킬 때 <b>Storage Engine 또는 저장 계층</b>이라고 부릅니다. 구현은 메모리 전용 저장부터 Persistent Key–Value, 트랜잭션·ACID를 지원하는 관계형 저장까지 다양합니다.</p></div>
           <div class="form-grid">
             <div class="form-card"><small>DBMS 내부 교체형 구성요소</small><b>MySQL Storage Engine</b><p>MySQL Server가 Handler API로 InnoDB 같은 저장 엔진을 호출합니다.</p></div>
             <div class="form-card"><small>애플리케이션에 내장되는 전체 DBMS</small><b>SQLite</b><p>SQL 계층과 저장 계층을 함께 가진 Embedded SQL DBMS이며, 별도 교체형 엔진 이름이 아닙니다.</p></div>
@@ -59,10 +59,10 @@
         <section class="engine-layer-map" aria-label="애플리케이션, DBMS의 저장 계층, 운영체제와 물리 저장소의 개념적 레이어">
           <div class="layer-stack">
             <div class="layer-map-title"><strong>개념적 위치 지도</strong><span>요청을 받는 계층과 실제 저장 자원을 한 장에 표시</span></div>
-            <p class="map-scope-note"><b>하나의 제품을 그대로 복사한 그림이 아닙니다.</b> MySQL·SQLite·RocksDB를 한 시스템 안에 넣은 구조가 아니라, “SQL 처리 계층 → 저장 접근 인터페이스 → 저장 계층 → OS / Filesystem → Disk”라는 공통 역할의 위치를 표시한 개념 지도입니다.</p>
+            <p class="map-scope-note"><b>MySQL·PostgreSQL 같은 디스크 기반 서버형 관계형 DBMS를 단순화한 그림입니다.</b> SQLite와 RocksDB를 이 시스템 안에 함께 넣은 구조가 아닙니다. SQLite는 애플리케이션에 내장된 전체 SQL DBMS이고, RocksDB는 SQL 처리 계층이 없는 Key–Value 라이브러리이므로 첫 번째 단계와 호출 주체가 다릅니다.</p>
             <svg class="engine-stack-svg" viewBox="0 0 760 760" role="img" aria-labelledby="engine-map-title engine-map-desc">
               <title id="engine-map-title">애플리케이션 요청이 DBMS의 SQL 처리 계층, 저장 접근 인터페이스, 저장 계층을 거쳐 디스크에 접근하는 구조</title>
-              <desc id="engine-map-desc">App Client의 SQL 또는 API 요청이 Database System 내부의 SQL 처리 계층, 저장 접근 인터페이스, 저장 계층 순서로 전달됩니다. Buffer, WAL, MVCC, Lock, Transaction은 이 계층들과 협력하는 DBMS 내부 기능이며, 실제 파일 입출력은 운영체제와 파일시스템을 거쳐 디스크로 전달됩니다.</desc>
+              <desc id="engine-map-desc">App Client의 SQL 요청이 서버형 관계형 Database System 내부의 SQL 처리 계층, 저장 접근 인터페이스, 저장 계층 순서로 전달됩니다. Buffer, WAL 또는 Redo, MVCC, Lock, Transaction은 이 계층들과 협력하는 DBMS 내부 기능이며, 일반적인 파일 입출력은 운영체제와 파일시스템을 거쳐 디스크로 전달됩니다.</desc>
               <defs>
                 <linearGradient id="dbmsBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12343f"/><stop offset="1" stop-color="#0a202a"/></linearGradient>
                 <linearGradient id="engineBand" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#5f3d25"/><stop offset="1" stop-color="#3c2d22"/></linearGradient>
@@ -70,8 +70,8 @@
                 <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#000" flood-opacity=".35"/></filter>
                 <marker id="arrowEngine" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#8fc6ff"/></marker>
               </defs>
-              <text x="28" y="32" class="svg-kicker">DATABASE ENGINE · CONCEPTUAL LAYERS</text>
-              <g transform="translate(274 50)" filter="url(#softShadow)"><rect width="212" height="72" rx="14" fill="#15252c" stroke="#8c8350"/><rect x="22" y="18" width="42" height="28" rx="4" fill="#e8f0f1" stroke="#8c9aa0"/><path d="M16 54h54" stroke="#a9bdc6" stroke-width="3"/><text x="84" y="31" class="svg-label">App / Client</text><text x="84" y="49" class="svg-small">SQL · Key–Value API</text></g>
+              <text x="28" y="32" class="svg-kicker">SERVER RDBMS · CONCEPTUAL LAYERS</text>
+              <g transform="translate(274 50)" filter="url(#softShadow)"><rect width="212" height="72" rx="14" fill="#15252c" stroke="#8c8350"/><rect x="22" y="18" width="42" height="28" rx="4" fill="#e8f0f1" stroke="#8c9aa0"/><path d="M16 54h54" stroke="#a9bdc6" stroke-width="3"/><text x="84" y="31" class="svg-label">App / SQL Client</text><text x="84" y="49" class="svg-small">SQL request</text></g>
               <path d="M380 126V158" stroke="#8fc6ff" stroke-width="3" marker-end="url(#arrowEngine)" class="flow-stroke"/><text x="395" y="147" class="svg-small">요청</text>
               <g filter="url(#softShadow)">
                 <rect x="105" y="170" width="550" height="440" rx="24" fill="url(#dbmsBody)" stroke="#5fa99e" stroke-width="2"/>
@@ -131,10 +131,10 @@
           <div class="arch-arrow" aria-hidden="true">→</div>
           <div class="actor disk"><span class="owner os">물리 저장 장치</span><b>Disk / SSD</b><p>Data File과 Log File의 바이트를 지속적으로 저장하고 읽습니다.</p></div>
         </div>
-        <div class="journey-result"><span><b>처리 결과</b> · id=7 기록의 balance가 바뀌고 성공·대기·오류가 사용자 앱으로 돌아갑니다.</span><span aria-hidden="true">← 응답</span></div>
+        <div class="journey-result"><span><b>처리 결과</b> · 충돌하는 잠금이 있으면 실행 도중 기다릴 수 있고, 대기가 풀린 뒤에는 완료 정보나 오류가 사용자 앱으로 돌아갑니다.</span><span aria-hidden="true">← 응답</span></div>
         <div class="takeaway"><strong>공통 그림에서는 “저장 계층”이라고 부릅니다.</strong> · MySQL Server는 <b>Handler interface → InnoDB Storage Engine</b> 경계를 사용하고, PostgreSQL은 하나의 엔진이 전부 맡기보다 <b>Core → Table/Index Access Method</b>와 공용 저장 기능이 책임을 나눕니다. 세부 자료구조는 <a href="../types-and-internals/index.html">스토리지 엔진 종류와 내부 구조</a>에서 이어집니다.</div>
         <div class="write-separation"><strong>논리적 UPDATE와 데이터 파일 기록은 같은 순간일 필요가 없습니다</strong><div class="write-timeline"><div class="write-step"><small>① 논리적 변경</small><b>메모리의 Buffer/Page</b><p>트랜잭션 규칙에 따라 새 값이나 새 버전이 준비됩니다.</p></div><div class="write-arrow" aria-hidden="true">⇢</div><div class="write-step"><small>② 복구 가능성 확보</small><b>WAL·Redo 같은 Log</b><p>커밋·내구성 설정에 맞춰 복구 로그가 기록됩니다.</p></div><div class="write-arrow" aria-hidden="true">⇢</div><div class="write-step"><small>③ 물리 데이터 반영</small><b>Data File Page</b><p>변경된 데이터 페이지는 백그라운드 처리나 체크포인트에서 나중에 기록될 수 있습니다.</p></div></div><p class="write-caveat">따라서 “UPDATE가 논리적으로 처리됨”, “트랜잭션이 커밋됨”, “데이터 파일 페이지가 디스크에 기록됨”은 구분해야 합니다. 정확한 순서와 완료 조건은 DBMS와 내구성 설정에 따라 달라집니다.</p></div>
-        <details class="concept-details"><summary>처음 나온 용어 자세히 보기</summary><div><ul><li><b>Record/Row:</b> 테이블의 한 기록. 여기서는 id=7 계좌입니다.</li><li><b>Index:</b> 모든 기록을 읽지 않고 대상을 빨리 찾는 탐색 구조입니다.</li><li><b>Page:</b> DBMS가 메모리와 파일 사이에서 데이터를 다루는 일정 크기의 블록입니다.</li><li><b>Buffer:</b> 파일에서 읽은 Page를 잠시 보관하고 재사용하는 메모리 영역입니다.</li><li><b>Interface:</b> 두 내부 구성요소가 서로 호출하는 약속입니다.</li><li><b>Library와 Engine:</b> 라이브러리는 재사용 코드라는 일반 용어이고, 스토리지 엔진은 DBMS 안에서 저장 책임을 맡는 아키텍처 구성요소입니다.</li></ul></div></details>
+        <details class="concept-details"><summary>처음 나온 용어 자세히 보기</summary><div><ul><li><b>Record/Row:</b> 테이블의 한 기록. 여기서는 id=7 계좌입니다.</li><li><b>Index:</b> 모든 기록을 읽지 않고 대상을 빨리 찾는 탐색 구조입니다.</li><li><b>Page:</b> DBMS가 메모리와 파일 사이에서 데이터를 다루는 일정 크기의 블록입니다.</li><li><b>Buffer:</b> Page를 메모리에 보관해 읽기와 변경에 사용하는 영역입니다.</li><li><b>Interface:</b> 두 내부 구성요소가 서로 호출하는 약속입니다.</li><li><b>Library와 Engine:</b> Engine은 저장을 맡는 <em>역할</em>, Library는 호출 가능한 코드라는 <em>배포·결합 형태</em>입니다. RocksDB처럼 라이브러리 형태의 저장 엔진도 있고, MySQL Storage Engine처럼 DBMS 내부 인터페이스에 결합되는 구현도 있으므로 두 단어는 동의어가 아닙니다.</li></ul></div></details>
       </div>
     </article>
 
