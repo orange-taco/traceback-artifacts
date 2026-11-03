@@ -1,0 +1,4 @@
+interface:
+  display_name: "Question-led Learning"
+  short_description: "작은 질문부터 학습 아티팩트 구조를 설계·점검합니다"
+  default_prompt: "정의부터 실무 분류까지 질문 순서로 학습 자료를 구성하거나 점검해 주세요."
