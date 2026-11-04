@@ -150,8 +150,8 @@
                 </g>
 
                 <path class="flow-stroke" d="M520 584V618" fill="none" stroke="#79d8cb" stroke-width="4" marker-end="url(#lsmArrow)"/>
-                <text x="30" y="640" class="v-kicker">LARGER CAPACITY</text><text x="30" y="663" class="v-kicker">OLDER DATA</text><text x="30" y="690" class="v-label">Level 2…Ln</text>
-                <g transform="translate(210 626)"><rect width="680" height="58" rx="14" fill="#151e2d" stroke="#705f91"/><path d="M136 0v58m136-58v58m136-58v58m136-58v58" stroke="#705f91"/><text x="340" y="35" text-anchor="middle" class="v-small">더 큰 목표 용량 · 안전해진 오래된 값과 삭제 표식 정리</text></g>
+                <text x="30" y="640" class="v-kicker">LARGER CAPACITY</text><text x="30" y="663" class="v-kicker">AGE ≠ LEVEL</text><text x="30" y="690" class="v-label">Level 2…Ln</text>
+                <g transform="translate(210 626)"><rect width="680" height="58" rx="14" fill="#151e2d" stroke="#705f91"/><path d="M136 0v58m136-58v58m136-58v58m136-58v58" stroke="#705f91"/><text x="340" y="35" text-anchor="middle" class="v-small">최신성은 Sequence로 판단 · 안전해진 오래된 값과 삭제 표식 정리</text></g>
               </svg>
             </div>
             <aside class="lsm-order"><small>같은 Key가 여러 곳에 있으면?</small><h4>Sequence가 최신 값을 결정</h4><div class="version-list"><div class="version new"><code>seq 104 · Memtable</code><b>account:7 → 5300</b><span>현재 snapshot에서 보이는 가장 최신 entry</span></div><div class="version-arrow">↓ 이전 값은 즉시 제자리 덮어쓰지 않음</div><div class="version"><code>seq 98 · SST</code><b>account:7 → 5400</b><span>Compaction이 안전하게 제거할 때까지 남을 수 있음</span></div></div><p class="visible-version"><b>READ:</b> Memtable과 후보 SST를 확인해 snapshot에서 보이는 가장 큰 sequence의 값을 선택합니다. Bloom Filter와 Index가 불필요한 SST·Block 확인을 줄입니다.</p></aside>
