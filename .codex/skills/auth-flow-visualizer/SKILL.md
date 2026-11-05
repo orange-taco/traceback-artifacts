@@ -11,9 +11,9 @@ future domains without reducing the explanation to a table or a prose-only page.
 
 ## Workflow
 
-- The canonical guides and this skill live in `orange-taco/traceback-artifacts`,
+- The canonical guides and this skill live in `traceback-team/traceback-artifacts`,
   separate from the TRACEBACK backend and frontend. Inspect
-  `orange-taco/traceback` or `orange-taco/traceback-client`, as appropriate,
+  `traceback-team/traceback` or `traceback-team/traceback-client`, as appropriate,
   at a known revision before asserting current implementation or deployment state.
   In Codex Cloud, attach all three repositories to the same environment. The
   iPad itself does not need to clone them. If a relevant source repository is
